@@ -1,0 +1,9 @@
+*.gem
+.bundle
+pkg/*
+.DS_STORE
+.project
+bundle
+.rvmrc
+spec/tmp
+coverage
