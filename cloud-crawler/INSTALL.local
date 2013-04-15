@@ -1,0 +1,55 @@
+To install on a local machine 
+(i.e Mac or Linux, Ruby does not play well with Windows)
+
+I. Dependencies
+
+Ruby 1.9.3 with Bundler   http://gembundler.com/
+Redis 2.6.x  (stable)     http://redis.io/download
+
+it is suggested to use RVM to install ruby
+https://rvm.io/
+
+and to use git to obtain the source
+http://git-scm.com/
+
+
+II.  Installation Steps
+
+II.0  install ruby 1.9.3, and redis 2.6.x
+
+II.1  install bundler
+  gem install bundler
+
+
+II.2 clone the git source
+git clone git://github.com/CalculatedContent/cloud-crawler.git
+
+II.3  install the required gems and sources
+change directories to where the Gemfile.lock file is located
+
+  cd cloud_crawler/cloud-crawler
+
+install the gems and required source and build the gem
+
+  bundle install --path vendor/bundle
+  
+this will install the cloud_crawler in a local bundle gem repository
+we use bundler locally because we also use this on amazon aws / ec2 machines
+
+
+III. Testing the Install
+
+III.1  start the redis server
+
+  redis-server &
+  
+III.2  run rake 
+
+  XX not sure yet how to do with with bundler XX
+ 
+
+III.3  run a test crawl
+
+  bundle exec ./test/test_crawl.rb
+  
+

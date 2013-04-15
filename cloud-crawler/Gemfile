@@ -1,0 +1,5 @@
+source :rubygems
+
+gem 'sourcify', :git=>"git://github.com/CalculatedContent/sourcify.git" 
+gem 'qless', :git=>"git://github.com/CalculatedContent/qless.git"
+gemspec

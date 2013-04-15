@@ -1,0 +1,13 @@
+require 'rubygems'
+require 'bundler/setup'
+require 'cloud_crawler'
+require 'cloud_crawler/cookie_store'
+require 'cloud_crawler/http'
+require 'cloud_crawler/page'
+require 'cloud_crawler/redis_page_store'
+require 'cloud_crawler/driver'
+require 'cloud_crawler/dsl_core'
+require 'cloud_crawler/dsl_front_end'
+require 'cloud_crawler/crawl_job'
+require 'cloud_crawler/worker'
+
