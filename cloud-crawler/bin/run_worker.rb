@@ -4,8 +4,8 @@ require 'bundler/setup'
 require 'trollop'
 
 require 'socket'
-require 'cloud_crawler'
-require 'cloud_crawler/worker'
+require 'cloud-crawler'
+require 'cloud-crawler/worker'
 
 
 opts = Trollop::options do

@@ -1,9 +1,9 @@
 spec = Gem::Specification.new do |s|
-  s.name = "cloud_crawler"
+  s.name = "cloud-crawler"
   s.version = "0.1"
   s.author = "Charles H. Martin, PhD"
   s.homepage = "http://calculatedcontent.com"
-  s.rubyforge_project = "cloud_crawler"
+  s.rubyforge_project = "cloud-crawler"
   s.platform = Gem::Platform::RUBY
   s.summary = "Cloud Crawler distributed web-spider framework"
   s.executables = %w[start_batch_crawl.rb run_worker.rb] 
