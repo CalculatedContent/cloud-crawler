@@ -54,11 +54,19 @@ module CloudCrawler
       # and the block given to focus_crawl()
       #
       def links_to_follow(page)
+        @page = page
         links = @focus_crawl_block ? instance_eval(@focus_crawl_block).call(page) : page.links
         links.select { |link| visit_link?(link, page) }.map { |link| link.dup }
       end
       
-      #TODO:  how do we get links from the focus crawl block if we have doms
+      #TODO:  marshall methods to page
+      def text_for(link)
+        @page.text_for(link)
+      end
+      
+      def dom_for(link)
+        @page.dom_for(link)
+      end
       
 
       #

@@ -1,6 +1,7 @@
 require 'nokogiri'
 require 'ostruct'
 require 'json'
+require 'iconv'
 require 'webrick/cookie'
 
 module CloudCrawler
@@ -31,6 +32,10 @@ module CloudCrawler
     # Response time of the request for this page in milliseconds
     attr_accessor :response_time
 
+
+    IC = Iconv.new('UTF-8//IGNORE', 'UTF-8')
+
+
     #
     # Create a new page
     #
@@ -49,52 +54,64 @@ module CloudCrawler
       @body = params[:body]
       @error = params[:error]
 
-      @fetched = !params[:code].nil?      
+      @fetched = !params[:code].nil?   
     end
 
     #
     # Array of distinct A tag HREFs from the page
     #
-    # def links
-      # return @links unless @links.nil?
-      # @links = []
-      # return @links if !doc
-# 
-      # doc.search("//a[@href]").each do |a|
-        # u = a['href']
-        # next if u.nil? or u.empty?
-        # abs = to_absolute(u) rescue next
-        # @links << abs if in_domain?(abs)
-      # end
-      # @links.uniq!
-      # @links
-    # end
-    
-    
-   # links are now full fledged dom objects
-   
-   def link_elems
-     return @links unless @links.nil?
-     @links = []
-     return @links if !doc
+    def links     
+      return @links unless @links.nil?
+      @links = []
+      return @links if !doc
 
-     doc.search("//a[@href]").each do |a|
+      @doms_for_link = {}
+      doc.search("//a[@href]").each do |a|
         u = a['href']
         next if u.nil? or u.empty?
         abs = to_absolute(u) rescue next
-        next unless in_domain?(abs) 
-        @links << a
+        @links << abs if in_domain?(abs)
+        @doms_for_link[abs] = a
       end
+      @links.uniq!
       @links
-   end
-   
-   
-   def links
-      link_elems.map{ |a| to_absolute(a['href']) } 
-   end
-   
-   
-   
+    end
+    
+    def dom_for(link)
+       @doms_for_link[link]
+    end
+    
+    def text_for(link)
+      untrusted_string = dom_for(link).text
+       text = IC.iconv(untrusted_string + ' ')[0..-2]
+       text.strip
+    end
+    
+    
+   # links are now full fledged dom objects
+#    
+   # def link_elems
+     # return @links unless @links.nil?
+     # @links = []
+     # return @links if !doc
+# 
+     # doc.search("//a[@href]").each do |a|
+        # u = a['href']
+        # next if u.nil? or u.empty?
+        # abs = to_absolute(u) rescue next
+        # next unless in_domain?(abs) 
+        # @links << a
+      # end
+      # @links
+   # end
+#    
+#    
+   # def links
+      # link_elems.map{ |a| to_absolute(a['href']) } 
+   # end
+#    
+#    
+#    
    
 
     #TODO:  allow acces to dom documents and to filter in DSL
