@@ -83,14 +83,14 @@ module CloudCrawler
         next if u.nil? or u.empty?
         abs = to_absolute(u) rescue next
         next unless in_domain?(abs) 
-        @links << u
+        @links << a
       end
       @links
    end
    
    
    def links
-      link_elems.map{ |u| to_absolute(u) } 
+      link_elems.map{ |a| to_absolute(a['href']) } 
    end
    
    
