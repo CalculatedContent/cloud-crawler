@@ -52,4 +52,21 @@ III.3  run a test crawl
 
   bundle exec ./test/test_crawl.rb
   
+IV  try a real crawl using the DSL
+
+flush the redis database 
+
+  redis-cli flushdb
+
+load the first job into redis
+
+  bundle exec ./examples/crossfit_crawl.rb
+  
+run the worker job
+  
+  bundle exec ./bin/run_worker.rb
+  
+  
+  
+
 
