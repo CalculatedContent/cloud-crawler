@@ -56,6 +56,17 @@ module CloudCrawler
 
       @fetched = !params[:code].nil?   
     end
+    
+    
+    #
+    # Returns +true+ if *uri* is in the same domain as the page, returns
+    # +false+ otherwise
+    #
+    def in_domain?(uri)
+      uri.host == @url.host
+    end
+    
+    
 
     #
     # Array of distinct A tag HREFs from the page
@@ -70,8 +81,8 @@ module CloudCrawler
         u = a['href']
         next if u.nil? or u.empty?
         abs = to_absolute(u) rescue next
-        @links << abs if in_domain?(abs)
         @doms_for_link[abs] = a
+        @links << abs  #  now part of DSL only  if in_domain?(abs) 
       end
       @links.uniq!
       @links
@@ -81,42 +92,14 @@ module CloudCrawler
        @doms_for_link[link]
     end
     
+    #  ruby does not always parse html correctly
     def text_for(link)
       untrusted_string = dom_for(link).text
        text = IC.iconv(untrusted_string + ' ')[0..-2]
        text.strip
     end
     
-    
-   # links are now full fledged dom objects
-#    
-   # def link_elems
-     # return @links unless @links.nil?
-     # @links = []
-     # return @links if !doc
-# 
-     # doc.search("//a[@href]").each do |a|
-        # u = a['href']
-        # next if u.nil? or u.empty?
-        # abs = to_absolute(u) rescue next
-        # next unless in_domain?(abs) 
-        # @links << a
-      # end
-      # @links
-   # end
-#    
-#    
-   # def links
-      # link_elems.map{ |a| to_absolute(a['href']) } 
-   # end
-#    
-#    
-#    
-   
 
-    #TODO:  allow acces to dom documents and to filter in DSL
-    #  add method to sync the two
-    
     
     #
     # Nokogiri document for the HTML body
@@ -213,13 +196,6 @@ module CloudCrawler
       return absolute
     end
 
-    #
-    # Returns +true+ if *uri* is in the same domain as the page, returns
-    # +false+ otherwise
-    #
-    def in_domain?(uri)
-      uri.host == @url.host
-    end
 
     # def marshal_dump
       # [@url, @headers, @data, @body, @links, @code, @visited, @depth, @referer, @redirect_to, @response_time, @fetched]

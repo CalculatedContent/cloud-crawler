@@ -9,8 +9,8 @@ module CloudCrawler
   DEFAULT_OPTS = {
     # disable verbose output
     :verbose => false,
-    # don't throw away the page response body after scanning it for links
-    :discard_page_bodies => true,
+    #  throw away the page response body after scanning it for links
+    :discard_page_bodies => false,
     # identify self as CloudCrawler/VERSION
     :user_agent => "CloudCrawler",
     # no delay between requests
@@ -32,7 +32,13 @@ module CloudCrawler
     # proxy server port number
     :proxy_port => false,
     # HTTP read timeout in seconds
-    :read_timeout => nil
+    :read_timeout => nil,
+    
+    # allow links outside of the root domain
+     :outside_domain => false,
+    # allow links inside of the root domain
+     :inside_domain => true
+  
   }
 
   # does DSL can use instance methods or class instance methods ?

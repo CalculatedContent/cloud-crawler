@@ -13,6 +13,7 @@ module CloudCrawler
       @redis = Redis.new
       @redis.flushdb
       @opts = CloudCrawler::Driver::DRIVER_OPTS
+      @opts.reverse_merge! CloudCrawler::DEFAULT_OPTS
      
       @namespace = @opts[:name]
       @lcache = Redis::Namespace.new("#{@namespace}:lcache", :redis => @redis)
@@ -137,6 +138,7 @@ module CloudCrawler
       @page_store.keys.should_not  include(pages[2].url.to_s)
     end
 
+   
     it "should not discard page bodies by default" do
       crawl_link(FakePage.new('0').url).should == 1
       @page_store.values.first.doc.should_not be_nil
@@ -146,6 +148,12 @@ module CloudCrawler
       @opts[:discard_page_bodies] = true
       crawl_link(FakePage.new('0').url)
       @page_store.values.first.doc.should be_nil
+    end
+    
+     it "should optionally discard page bodies to conserve memory" do
+      @opts[:discard_page_bodies] = false
+      crawl_link(FakePage.new('0').url)
+      @page_store.values.first.doc.should_not be_nil
     end
 
     it "should be able to call a block on every page, with access to a shared cache" do

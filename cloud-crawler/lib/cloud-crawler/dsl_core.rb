@@ -54,7 +54,7 @@ module CloudCrawler
       # and the block given to focus_crawl()
       #
       def links_to_follow(page)
-        @page = page
+        @page = page  # need below, sorry
         links = @focus_crawl_block ? instance_eval(@focus_crawl_block).call(page) : page.links
         links.select { |link| visit_link?(link, page) }.map { |link| link.dup }
       end
@@ -81,6 +81,7 @@ module CloudCrawler
         !skip_link?(link) &&
         !skip_query_string?(link) &&
         allowed(link) &&
+        in_domain?(link, from_page) &&
         !too_deep?(from_page)
       end
 
@@ -96,6 +97,16 @@ module CloudCrawler
         end
 
       #
+      # optionally allows outside_domain links
+      #
+      def in_domain?(link, from_page)
+        if from_page.in_domain? link then
+          @opts[:inside_domain]
+        else
+          @opts[:outside_domain]
+        end
+      end
+      #
       # Returns +true+ if we are over the page depth limit.
       # This only works when coming from a page and with the +depth_limit+ option set.
       # When neither is the case, will always return +false+.
@@ -103,7 +114,7 @@ module CloudCrawler
         if from_page && @opts[:depth_limit]
           from_page.depth >= @opts[:depth_limit]
         else
-        false
+          false
         end
       end
 

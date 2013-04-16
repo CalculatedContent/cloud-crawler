@@ -38,10 +38,12 @@ opts = Trollop::options do
   opt :proxy_host, "proxy server hostname", :type => :string, :default => nil
   opt :proxy_port, " proxy server port number",  :type => :int, :default => nil
   
+  opt :outside_domain, "allow links outside of the root domain", :short => "-U", :default => false
+  opt :inside_domain, "allow links inside of the root domain", :short => "-T", :default => true
+
   opt :qless_db, "", :short => "-B", :default => 0   # not used yet
-
-
 end
+
 Trollop::die :urls, "can not be empty" if opts[:url].empty?
 Trollop::die :name, "crawl name necessary" if opts[:name].empty?
 
