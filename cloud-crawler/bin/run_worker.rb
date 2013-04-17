@@ -18,7 +18,7 @@ opts = Trollop::options do
   
   #opt :qless_queue, "", :short => "-q", :default => "crawl"   # :multi => true 
 
-  opt :interval, "", :short => "-i", :default => 0
+  opt :interval, "", :short => "-i", :default => 1
   opt :job_reserver, "", :short => "-r", :default => 'Ordered'
   opt :verbose, "", :short => "-v", :default => true
   opt :single_process, "run as single process", :short => "-s", :default => false  
