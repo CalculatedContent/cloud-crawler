@@ -98,7 +98,7 @@ module CloudCrawler
       @page_store.keys.should_not include('http://www.other.com/')
     end
 
-
+    # not sure why this fails
     it "should not follow redirects that leave the original domain" do
       pages = []
       pages << FakePage.new('0', :links => ['1'], :redirect => 'http://www.other.com/')

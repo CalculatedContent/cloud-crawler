@@ -40,18 +40,20 @@ module CloudCrawler
          next if @bloomfilter.visited_url?(url)
 
          do_page_blocks(page)
-         page.discard_doc! if @opts[:discard_page_bodies]
-         @page_store[url] = page
-         @bloomfilter.visit_url(url)
-
-         links = links_to_follow(page)
+         
+         links = links_to_follow(page)       
          links.each do |lnk|
+            # next if lnk.to_s==url  # avoid loop
             next if @bloomfilter.visited_url?(lnk)  
             data[:link], data[:referer], data[:depth] =  lnk.to_s,  page.referer.to_s,  page.depth + 1 
             next if @depth_limit and data[:depth] > @depth_limit 
             @queue.put(CrawlJob, data)
          end
-        
+         
+         page.discard_doc! if @opts[:discard_page_bodies]
+         @page_store[url] = page   
+         @bloomfilter.visit_url(url)
+
      end  
     end
    

@@ -21,8 +21,7 @@ module CloudCrawler
       @data[:skip_link_patterns] =  [].to_json  
       @data[:on_pages_like_blocks] = Hash.new { |hash,key| hash[key] = [] }.to_json
       @data.merge! blocks 
-      
-   
+         
       @data[:urls] = [links].flatten.map { |lnk|  { :link =>  lnk } }.to_json
     end
 

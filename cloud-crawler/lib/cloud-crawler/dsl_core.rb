@@ -59,7 +59,6 @@ module CloudCrawler
         links.select { |link| visit_link?(link, page) }.map { |link| link.dup }
       end
       
-      #TODO:  marshall methods to page
       def text_for(link)
         @page.text_for(link)
       end

@@ -68,22 +68,23 @@ module CloudCrawler
       outbound_urls = []
       pages.each do |page|
         do_page_blocks(page)
-        page.discard_doc! if @opts[:discard_page_bodies]
 
         # cache page locally, we assume
         #  or @page_store << page
         url = page.url.to_s
-        @page_store[url] = page
-
-
         links = links_to_follow(page)
         links.reject! { |lnk| @bloomfilter.visited_url?(lnk) }
         links.each do |lnk|
+         # next if lnk.to_s==url  # avoid loop
           next if @depth_limit and page.depth + 1 > @depth_limit 
           outbound_urls <<{ :link => lnk.to_s, :referer => page.referer.to_s, :depth => page.depth + 1}
         end
+        
+        page.discard_doc! if @opts[:discard_page_bodies]
+        @page_store[url] = page  # will stil store links, for depth analysis later .. not critical to store 
       end
-            
+           
+
       # must optionally turn off caching for testing
 
       # hard, synchronous flush  to s3 (or disk) here

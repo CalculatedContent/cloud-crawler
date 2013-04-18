@@ -110,12 +110,12 @@ module CloudCrawler
     # @redis.save
     # end
 
-    # simple implementation for testing locally
-    def old_flush!
-      keys, filename = save_keys
-      push_to_s3!(filename) if @save_to_s3
-      delete!(keys)
-    end
+    # # simple implementation for testing locally
+    # def old_flush!
+      # keys, filename = save_keys
+      # push_to_s3!(filename) if @save_to_s3
+      # delete!(keys)
+    # end
 
     def flush
       keys = []

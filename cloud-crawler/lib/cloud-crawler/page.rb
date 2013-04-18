@@ -53,7 +53,7 @@ module CloudCrawler
       @response_time = params[:response_time]
       @body = params[:body]
       @error = params[:error]
-
+      
       @fetched = !params[:code].nil?   
     end
     
@@ -70,21 +70,12 @@ module CloudCrawler
 
     #
     # Array of distinct A tag HREFs from the page
+    #  returns existing links, or all links if not called yet
     #
     def links     
-      return @links unless @links.nil?
-      @links = []
-      return @links if !doc
-
-      @doms_for_link = {}
-      doc.search("//a[@href]").each do |a|
-        u = a['href']
-        next if u.nil? or u.empty?
-        abs = to_absolute(u) rescue next
-        @doms_for_link[abs] = a
-        @links << abs  #  now part of DSL only  if in_domain?(abs) 
-      end
-      @links.uniq!
+      return @links unless @links.nil? or @links.empty?
+      return [] if !doc
+      @links ||= all_links
       @links
     end
     
@@ -95,9 +86,31 @@ module CloudCrawler
     #  ruby does not always parse html correctly
     def text_for(link)
       untrusted_string = dom_for(link).text
-       text = IC.iconv(untrusted_string + ' ')[0..-2]
-       text.strip
+      text = IC.iconv(untrusted_string + ' ')[0..-2]
+      text.strip
     end
+    
+    def all_links
+      select_links_by("//a[@href]")
+    end
+    alias_method :select_all_links, :all_links
+    
+    
+    # xpath or css 
+    def select_links_by(expr)
+      @links ||= []
+      
+      @doms_for_link = {}
+      doc.search(expr).each do |a|
+        u = a['href']
+        next if u.nil? or u.empty?
+        abs = to_absolute(u) rescue next
+        @doms_for_link[abs] = a
+        @links << abs  #  now part of DSL only  if in_domain?(abs) 
+      end
+      @links.uniq!
+      @links
+    end    
     
 
     
@@ -106,14 +119,16 @@ module CloudCrawler
     #
     def doc
       return @doc if @doc
-      @doc = Nokogiri::HTML(@body) if @body && html? rescue nil
+      return nil unless @body
+      @doc ||= Nokogiri::HTML(@body) if html?  rescue nil  
+      @doc ||= Nokogiri::XML(@body) if  xml? rescue nil
+      @doc
     end
 
     #
     # Delete the Nokogiri document and response body to conserve memory
     #
     def discard_doc!
-      links # force parsing of page links before we trash the document
       @doc = @body = nil
     end
 
@@ -145,6 +160,14 @@ module CloudCrawler
     #
     def html?
       !!(content_type =~ %r{^(text/html|application/xhtml+xml)\b})
+    end
+    
+     #
+    # Returns +true+ if the page is a HTML document, returns +false+
+    # otherwise.
+    #
+    def xml?
+      !!(content_type =~ %r{^(text/xml|application/xml)\b})
     end
 
     #
