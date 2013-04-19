@@ -16,7 +16,7 @@ module CloudCrawler
       @opts.reverse_merge! CloudCrawler::DEFAULT_OPTS
      
       @namespace = @opts[:name]
-      @lcache = Redis::Namespace.new("#{@namespace}:lcache", :redis => @redis)
+      @w_cache = Redis::Namespace.new("#{@namespace}:w_cache", :redis => @redis)
 
       @page_store = RedisPageStore.new(@redis, @opts)
       @bloomfilter = RedisUrlBloomfilter.new(@redis)
@@ -164,9 +164,9 @@ module CloudCrawler
 
       # problem:  how to get the state back -- it is not persisted in the run
       # need to persist to redis or page-store
-      b = {:on_every_page_blocks => [Proc.new { lcache.incr "count" }.to_source].to_json }
+      b = {:on_every_page_blocks => [Proc.new { w_cache.incr "count" }.to_source].to_json }
       crawl_link(pages[0].url,blocks=b)
-      @lcache.get("count").should == "3"
+      @w_cache.get("count").should == "3"
     end
 
     it "should provide a focus_crawl method to select the links on each page to follow" do

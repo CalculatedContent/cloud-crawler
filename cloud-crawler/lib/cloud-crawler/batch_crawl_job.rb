@@ -9,18 +9,19 @@ module CloudCrawler
 
   class BatchCrawlJob
     include DslCore
-
+    
+    
     MAX_SLICE_DEFAULT = 1000
 
     def self.init(job)
       @namespace = @opts[:name]
       @queue_name = @opts[:name]
-      @mcache = Redis::Namespace.new("#{@namespace}:mcache", :redis =>  job.client.redis)
+      @m_cache = Redis::Namespace.new("#{@namespace}:m_cache", :redis =>  job.client.redis)
       
       local_redis = Redis.new(:host=>'localhost')
-      @lcache = Redis::Namespace.new("#{@namespace}:lcache", :redis =>  local_redis)
+      @lcache = Redis::Namespace.new("#{@namespace}:w_cache", :redis =>  local_redis)
       @page_store = RedisPageStore.new(local_redis,@opts)  
-      
+            
       @bloomfilter = RedisUrlBloomfilter.new(job.client.redis,@opts)
       @queue = job.client.queues[@queue_name]
       @max_slice = @opts[:max_slice] || MAX_SLICE_DEFAULT
@@ -28,12 +29,12 @@ module CloudCrawler
       @depth_limit = @opts[:depth_limit]
     end
 
-    def self.mcache
-      @mcache
+    def self.m_cache
+      @m_cache
     end
     
-    def self.lcache
-      @lcache
+    def self.w_cache
+      @w_cache
     end
     
   

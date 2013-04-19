@@ -25,9 +25,7 @@ end
 CloudCrawler::crawl(opts[:urls], opts)  do |cc|
   
   cc.focus_crawl do |page|
-    page.select_links_by("//h4/a[@href]").each do |lnk|
-      puts "lnk -->  #{lnk}"
-    end
+    lcache.incr 'count'
   end
   
 end

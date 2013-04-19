@@ -96,6 +96,7 @@ module CloudCrawler
     alias_method :select_all_links, :all_links
     
     
+    
     # xpath or css 
     def select_links_by(expr)
       @links ||= []
