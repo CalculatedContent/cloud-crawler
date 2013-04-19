@@ -30,7 +30,9 @@ change directories to where the Gemfile.lock file is located
   cd cloud_crawler/cloud-crawler
 
 install the gems and required source and build the gem
+   bundle install 
 
+to create a complete, sandbox, you can say
   bundle install --path vendor/bundle
   
 this will install the cloud_crawler in a local bundle gem repository
@@ -45,7 +47,7 @@ III.1  start the redis server
   
 III.2  run rake 
 
-  XX not sure yet how to do with with bundler XX
+  bundle exec rake
  
 
 III.3  run a test crawl
@@ -66,7 +68,16 @@ run the worker job
   
   bundle exec ./bin/run_worker.rb
   
+V.  To view the queue monitor in a browser
   
+   bunlde exec qless-web
+   
+this should launch a tab in the web browser
+if this fails, the monitor may still work , and 
+may be visible in your browser at
+
+   localhost:5678
+
   
 
 

@@ -12,11 +12,10 @@ opts = Trollop::options do
 
   opt :flush,  "flush pages out of local redis cache after every batch crawl", :short => "-x", :default => true
   opt :max_slice, "maximum slice for batch job", :short => "-m", :default => 1000
+  
   opt :save_to_s3, "save intermediate results to s3 bucket",  :short => "-s", :default => "crawls"
-  opt :save_to_dir, "save intermediate files to local dir", :short => "-", :type => :string, :default => nil
-  opt :dont_save_to_s3, "dont save intermediate results to s3 bucket",  :short => "-S", :default => false
-  opt :dont_save_to_dir, "dont save intermediate files to in directory",  :short => "-F", :default => false
-
+  opt :save_to_dir, "save intermediate files to local dir", :short => "-t", :type => :string, :default => nil
+ 
   opt :delay, "delay between requests (not used yet, see worker interval)",  :short => "-d", :default => 0  # not used yet
   opt :depth_limit, "limit the depth of the crawl", :short => "-l", :type => :int, :default => nil
   opt :obey_robots_txt, "obey the robots exclusion protocol", :short => "-o", :default => true
@@ -31,8 +30,8 @@ opts = Trollop::options do
   opt :proxy_host, "proxy server hostname", :type => :string, :default => nil
   opt :proxy_port, " proxy server port number",  :type => :int, :default => nil
   
-  opt :outside_domain, "allow links outside of the root domain", :short => "-U", :default => false
-  opt :inside_domain, "allow links inside of the root domain", :short => "-T", :default => true
+  opt :outside_domain, "allow links outside of the root domain", :short => "-X", :default => false
+  opt :inside_domain, "allow links inside of the root domain", :short => "-Y", :default => true
 
   opt :qless_db, "", :short => "-B", :default => 0   # not used yet
 end
@@ -40,11 +39,8 @@ end
 Trollop::die :urls, "can not be empty" if opts[:url].empty?
 Trollop::die :name, "crawl name necessary" if opts[:name].empty?
 
-Troolop::die :max_slice, "can not be <= 0" if opts[:max_slice] <= 0
-Troolop::die :save_to_s3, "s3 bucket not found, please make first" if `s3cmd ls | grep "#{opts[:save_to_s3]}"`.empty?
-Troolop::die :save_to_file, "directory not found" unless Dir.exists?(opts[:save_to_file])  if opts[:save_to_file]
-Troolop::die :dont_save_to_s3, "can not specify save and dont save to s3" if opts[:dont_save_to_s3] and opts[:save_to_s3] 
-Troolop::die :dont_save_to_dir, "can not specify save and dont save to dir" if opts[:dont_save_to_dir] and opts[:save_to_dir] 
+Trollop::die :max_slice, "can not be <= 0" if opts[:max_slice] <= 0
+Trollop::die :save_to_s3, "s3 bucket #{opts[:save_to_s3]} not found, please make first" if `s3cmd ls | grep "#{opts[:save_to_s3]}"`.empty?
 
 urls = opts[:urls].map { |u| URI::encode(u)  }
 CloudCrawler::batch_crawl(urls, opts)

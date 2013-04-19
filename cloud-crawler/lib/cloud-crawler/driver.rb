@@ -42,6 +42,16 @@ module CloudCrawler
   end
   
   
+  
+  # Convenience method to start a crawl in stand alone mode
+  #
+  def CloudCrawler.standalone_batch_crawl(urls, opts = {}, &block)
+    opts.reverse_merge! CloudCrawler::Driver::DRIVER_OPTS
+    Driver.batch_crawl(urls, opts, &block)
+    Worker.run(opts)
+  end
+  
+  
 
    # do I need to make a class ?
    class Driver

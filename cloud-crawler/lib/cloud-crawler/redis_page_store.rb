@@ -21,13 +21,13 @@ module CloudCrawler
       @namespace = "#{opts[:name]}:pages"
       
       @pages = Redis::Namespace.new(@namespace, :redis => redis)
-      @save_to_s3 = if opts[:dont_save_to_s3]  then nil else opts[:save_to_s3]  end
-      @save_to_dir = if opts[:dont_files_to_dir]  then nil else opts[:save_to_dir]  end
+      @save_to_s3 =  opts[:save_to_s3]  
+      @save_to_dir =  opts[:save_to_dir]  
 
       @worker_id = opts[:worker_id] || Socket.gethostname
       @s3bucket = @save_to_s3
       @s3folder = opts[:name]
-      @s3name = @namespace.gsub(/:/,"-")
+      @s3name = @namespace.gsub(/:/,"-")      
     end
 
     def close
@@ -122,8 +122,9 @@ module CloudCrawler
       FileUtils.mkdir_p @save_to_dir if  @save_to_dir
       Dir.mktmpdir do |dir|
         keys, tmpfile = save_pages_to(dir)
-        system "s3cmd put #{dir}/#{tmpfile} s3://#{s3bucket}/#{s3folder}/#{tmpfile}" if @save_to_s3
-        FileUtils.mv tmpfile @save_to_dir if @save_to_dir
+        cmd = "s3cmd put #{dir}/#{tmpfile} s3://#{s3bucket}/#{s3folder}/#{tmpfile}"
+        system cmd if @save_to_s3
+        FileUtils.mv(File.join(dir,tmpfile), @save_to_dir) if @save_to_dir
       end
       return keys
     end
