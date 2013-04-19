@@ -3,12 +3,12 @@ require 'rubygems'
 require 'bundler/setup'
 require 'cloud-crawler'
 require 'trollop'
-
+require 'open-uri'
 
 
 opts = Trollop::options do
   opt :urls, "urls to crawl", :short => "-u", :multi => true,  :default => "http://www.livestrong.com"
-  opt :name, "name of crawl", :short => "-n",  :default => "LS"
+  opt :name, "name of crawl", :short => "-n",  :default => "crawl"
 
   opt :delay, "delay between requests (not used yet, see worker interval)",  :short => "-d", :default => 0  # not used yet
   opt :depth_limit, "limit the depth of the crawl", :short => "-l", :type => :int, :default => nil
@@ -35,10 +35,9 @@ Trollop::die :urls, "can not be empty" if opts[:url].empty?
 Trollop::die :name, "crawl name necessary" if opts[:name].empty?
 
 
-urls = opts[:urls].map{ |u| URI::encode(u)  }
-CloudCrawler::crawl(urls, opts) do |crawl|
+urls = opts[:urls].map { |u| URI::encode(u)  }
+CloudCrawler::standalone_crawl(urls,opts) do |crawl|
   crawl.on_every_page do |p|
-    cache.incr "count"
-    puts p.to_json
+     puts p.url.to_s
   end
 end
