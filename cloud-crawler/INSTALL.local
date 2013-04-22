@@ -70,7 +70,7 @@ run the worker job
   
 V.  To view the queue monitor in a browser
   
-   bunlde exec qless-web
+   bundle exec qless-web
    
 this should launch a tab in the web browser
 if this fails, the monitor may still work , and 
