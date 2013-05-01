@@ -62,11 +62,11 @@ flush the redis database
 
 load the first job into redis
 
-  bundle exec ./examples/crossfit_crawl.rb
+  bundle exec ./examples/crossfit_crawl.rb 
   
 run the worker job
   
-  bundle exec ./bin/run_worker.rb
+  bundle exec ./bin/run_worker.rb -n crossfit-crawl
   
 V.  To view the queue monitor in a browser
   
