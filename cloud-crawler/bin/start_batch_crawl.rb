@@ -13,8 +13,9 @@ opts = Trollop::options do
   opt :flush,  "flush pages out of local redis cache after every batch crawl", :short => "-x", :default => true
   opt :max_slice, "maximum slice for batch job", :short => "-m", :default => 1000
   
-  opt :save_to_s3, "save intermediate results to s3 bucket",  :short => "-s", :default => "crawls"
-  opt :save_to_dir, "save intermediate files to local dir", :short => "-t", :type => :string, :default => nil
+  opt :s3_bucket, "save intermediate results to s3 bucket",  :short => "-s", :default => "crawls"
+  opt :keep_tmp_files, "save intermediate files to local dir", :short => "-t",  :type => :string, :default => false
+
  
   opt :delay, "delay between requests (not used yet, see worker interval)",  :short => "-d", :default => 0  # not used yet
   opt :depth_limit, "limit the depth of the crawl", :short => "-l", :type => :int, :default => nil
@@ -40,7 +41,7 @@ Trollop::die :urls, "can not be empty" if opts[:url].empty?
 Trollop::die :name, "crawl name necessary" if opts[:name].empty?
 
 Trollop::die :max_slice, "can not be <= 0" if opts[:max_slice] <= 0
-Trollop::die :save_to_s3, "s3 bucket #{opts[:save_to_s3]} not found, please make first" if `s3cmd ls | grep "#{opts[:save_to_s3]}"`.empty?
+Trollop::die :s3_bucket, "s3 bucket #{opts[:s3_bucket]} not found, please make first" if `s3cmd ls | grep "#{opts[:s3_bucket]}"`.empty?
 
 urls = opts[:urls].map { |u| URI::encode(u)  }
 CloudCrawler::batch_crawl(urls, opts)

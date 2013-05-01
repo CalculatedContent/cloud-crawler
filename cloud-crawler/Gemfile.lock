@@ -8,6 +8,15 @@ GIT
       vegas (>= 0.1.11)
 
 GIT
+  remote: git://github.com/CalculatedContent/redis-caches.git
+  revision: 47d8600bc51a5dfcf9a9b65ecdd05abc50ce93dc
+  specs:
+    redis-caches (0.1)
+      hiredis (~> 0.4.5)
+      redis (>= 3.0.3)
+      redis-namespace (>= 1.2.1)
+
+GIT
   remote: git://github.com/CalculatedContent/sourcify.git
   revision: cdef8e0b3b7017312407000985a279d6627c77e5
   specs:
@@ -101,5 +110,6 @@ DEPENDENCIES
   fakeweb (>= 1.3.0)
   qless!
   rake (>= 10.0.0)
+  redis-caches!
   rspec (>= 2.12.0)
   sourcify!

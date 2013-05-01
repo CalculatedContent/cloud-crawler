@@ -5,6 +5,9 @@ require 'cloud-crawler/dsl_core'
 require 'active_support/inflector'
 require 'active_support/core_ext'
 
+require 'redis-caches/s3_cache'
+
+
 module CloudCrawler
 
   class BatchCrawlJob
@@ -17,9 +20,13 @@ module CloudCrawler
       @namespace = @opts[:name]
       @queue_name = @opts[:name]
       @m_cache = Redis::Namespace.new("#{@namespace}:m_cache", :redis =>  job.client.redis)
+      @m_cache.s3_init(@opts)
       
       local_redis = Redis.new(:host=>'localhost')
-      @lcache = Redis::Namespace.new("#{@namespace}:w_cache", :redis =>  local_redis)
+      @w_cache = Redis::Namespace.new("#{@namespace}:w_cache", :redis =>  local_redis)
+      @s3_cache = Redis::Namespace.new("#{@namespace}:s3_cache", :redis =>  local_redis)
+      @s3_cache.s3_init(@opts)
+
       @page_store = RedisPageStore.new(local_redis,@opts)  
             
       @bloomfilter = RedisUrlBloomfilter.new(job.client.redis,@opts)
@@ -31,10 +38,14 @@ module CloudCrawler
 
     def self.m_cache
       @m_cache
-    end
+    end   
     
     def self.w_cache
       @w_cache
+    end
+    
+    def self.s3_cache
+      @s3_cache
     end
     
   
@@ -88,7 +99,7 @@ module CloudCrawler
       # must optionally turn off caching for testing
 
       # hard, synchronous flush  to s3 (or disk) here
-      saved_urls = if @flush then  @page_store.flush! else @page_store.keys end
+      saved_urls = if @flush then  @page_store.save! else @page_store.keys end
               
       # add pages to bloomfilter only if store to s3 succeeds
       saved_urls.each { |url|  @bloomfilter.visit_url(url) }
@@ -97,7 +108,9 @@ module CloudCrawler
         data[:urls] = urls.to_json
         @queue.put(BatchCrawlJob, data)
       end
-
+      
+      @s3_cache.save!
+      
     end
   end
 

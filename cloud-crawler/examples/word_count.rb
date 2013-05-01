@@ -11,8 +11,8 @@ opts = Trollop::options do
   opt :urls, "urls to crawl", :short => "-u", :multi => true,  :default => qurl
   opt :name, "name of crawl", :short => "-n", :default => "crawl"  # does not work yet
   opt :flush,  "", :short => "-f", :default => true
-  opt :max_slice, "", :short => "-m", :default => 10
-  
+  opt :max_slice, "", :short => "-m", :default => 1000
+
   opt :s3_bucket, "save intermediate results to s3 bucket",  :short => "-s", :type => :string, :default => false
   opt :keep_tmp_files, "save intermediate files to local dir", :short => "-t",  :type => :string, :default => false
 
@@ -22,14 +22,20 @@ opts = Trollop::options do
 end
 
 
-# Crawl digital camera listings on the first page of eBay
-#  select links by  xpath
-#  
-CloudCrawler::crawl(opts[:urls], opts)  do |cc|
+# Count all words in the titles of the pages
+#  sync the local data to redis master when done
+
+#  ideally, a counter
+CloudCrawler::batch_crawl(opts[:urls], opts)  do |cc|
   
-  cc.focus_crawl do |page|
-    lcache.incr 'count'
+  
+  cc.on_every_page do |page|  
+    page.document.title.downcase.split(/\s/).each do |tok|
+       synced_cache.incr(tok)
+    end
+    
   end
+
   
 end
 

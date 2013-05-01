@@ -1,5 +1,7 @@
 require 'redis'
 require 'redis-namespace'
+require 'redis-caches/s3_cache'
+
 require 'bloomfilter-rb'
 require 'json'
 require 'zlib'
@@ -12,22 +14,16 @@ module CloudCrawler
     include Enumerable
 
 
-    attr_reader :namespace, :save_to_s3, :save_to_dir, :worker_id, :s3bucket, :s3folder
+    attr_reader :namespace
 
     MARSHAL_FIELDS = %w(links visited fetched)
     def initialize(redis, opts = {})
       @redis = redis
       @opts = opts
       @namespace = "#{opts[:name]}:pages"
-      
+            
       @pages = Redis::Namespace.new(@namespace, :redis => redis)
-      @save_to_s3 =  opts[:save_to_s3]  
-      @save_to_dir =  opts[:save_to_dir]  
-
-      @worker_id = opts[:worker_id] || Socket.gethostname
-      @s3bucket = @save_to_s3
-      @s3folder = opts[:name]
-      @s3name = @namespace.gsub(/:/,"-")      
+      @pages.s3_init(opts)   
     end
 
     def close
@@ -97,60 +93,15 @@ module CloudCrawler
       result
     end
 
-    # # very dangerous if all redis are saved
-    # # at least can we place in a seperate db?
-    #  wait for this
 
-    # def flush!
-    # @redis.save
-    # @redis.flushdb
-    # end
-    #
-    # def save
-    # @redis.save
-    # end
-
-    # # simple implementation for testing locally
-    # def old_flush!
-      # keys, filename = save_keys
-      # push_to_s3!(filename) if @save_to_s3
-      # delete!(keys)
-    # end
-
-    def flush
-      keys = []
-      FileUtils.mkdir_p @save_to_dir if  @save_to_dir
-      Dir.mktmpdir do |dir|
-        keys, tmpfile = save_pages_to(dir)
-        cmd = "s3cmd put #{dir}/#{tmpfile} s3://#{s3bucket}/#{s3folder}/#{tmpfile}"
-        system cmd if @save_to_s3
-        FileUtils.mv(File.join(dir,tmpfile), @save_to_dir) if @save_to_dir
-      end
-      return keys
+    def save_to_s3!
+      @pages.s3.save!
     end
-
-    def flush!
-      keys = flush
-      delete!(keys)
+    
+    def save_to_s3
+        @pages.s3.save
     end
-
-    def timestamp
-      Time.now.getutc.to_s.gsub(/\s/,'').gsub(/:/,"-")
-    end
-
-    def save_pages_to(dir=".")
-      tmpfile = "#{@s3name}.#{@worker_id}.#{timestamp}.jsons.gz".gsub(/:/,"-")
-      filename = File.join(dir,tmpfile)
-      Zlib::GzipWriter.open(filename) do |gz|
-        keys.each do |k|
-          gz.write @pages[k]
-          gz.write "\n"
-        end
-      end
-      return keys, tmpfile
-    end
-
-    # this is so dumb...can't ruby redis cli take a giant list of keys?
+    
     def delete!(keys)
       @pages.pipelined do
         keys.each { |k| @pages.del k }
