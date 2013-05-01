@@ -11,7 +11,7 @@ opts = Trollop::options do
   opt :urls, "urls to crawl", :short => "-u", :multi => true,  :default => qurl
   opt :name, "name of crawl", :short => "-n", :default => "crossfit-crawl"  # does not work yet
   opt :flush,  "", :short => "-f", :default => true
-  opt :max_slice, "", :short => "-m", :default => 100
+  opt :max_slice, "", :short => "-m", :default => 10
   
   opt :s3_bucket, "save intermediate results to s3 bucket",  :short => "-s", :default => "cc-examples"
   opt :keep_tmp_files, "save intermediate files to local dir", :short => "-t", :type => :string, :default => nil
