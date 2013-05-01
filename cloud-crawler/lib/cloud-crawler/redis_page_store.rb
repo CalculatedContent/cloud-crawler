@@ -99,7 +99,7 @@ module CloudCrawler
     end
     
     def save
-        @pages.s3.save
+       @pages.s3.save
     end
     
     def delete!(keys)

@@ -13,7 +13,7 @@ opts = Trollop::options do
   opt :flush,  "", :short => "-f", :default => true
   opt :max_slice, "", :short => "-m", :default => 100
   
-  opt :s3_bucket, "save intermediate results to s3 bucket",  :short => "-s", :type => :string, :default => false
+  opt :s3_bucket, "save intermediate results to s3 bucket",  :short => "-s", :default => "cc-examples"
   opt :keep_tmp_files, "save intermediate files to local dir", :short => "-t", :type => :string, :default => false
 
   opt :depth_limit, "limit the depth of the crawl", :short => "-l", :type => :int, :default => 2

@@ -109,7 +109,7 @@ module CloudCrawler
         @queue.put(BatchCrawlJob, data)
       end
       
-      @s3_cache.save!
+      @s3_cache.s3.save!
       
     end
   end
