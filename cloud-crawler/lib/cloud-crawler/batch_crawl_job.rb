@@ -107,7 +107,6 @@ module CloudCrawler
       
       outbound_urls.flatten.compact.each_slice(@max_slice) do |urls|
         data[:urls] = urls.to_json
-        $stderr << data << "\n"
         @queue.put(BatchCrawlJob, data)
       end
       
