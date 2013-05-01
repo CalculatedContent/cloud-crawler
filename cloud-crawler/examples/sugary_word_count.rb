@@ -9,7 +9,7 @@ qurl = URI::encode("http://www.ebay.com/sch/&_nkw=digital+camera")
 
 opts = Trollop::options do
   opt :urls, "urls to crawl", :short => "-u", :multi => true,  :default => qurl
-  opt :name, "name of crawl", :short => "-n", :default => "crawl"  # does not work yet
+  opt :name, "name of crawl", :short => "-n", :default => "not-ready"  # does not work yet
   opt :flush,  "", :short => "-f", :default => true
   opt :max_slice, "", :short => "-m", :default => 1000
   

@@ -18,7 +18,6 @@ module CloudCrawler
 
     def self.init(job)
       @namespace = @opts[:name]
-      @queue_name = @opts[:name]
       @m_cache = Redis::Namespace.new("#{@namespace}:m_cache", :redis =>  job.client.redis)
       @m_cache.s3_init(@opts)
       

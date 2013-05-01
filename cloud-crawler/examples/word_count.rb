@@ -9,7 +9,7 @@ qurl = URI::encode("http://www.ebay.com/sch/&_nkw=digital+camera")
 
 opts = Trollop::options do
   opt :urls, "urls to crawl", :short => "-u", :multi => true,  :default => qurl
-  opt :name, "name of crawl", :short => "-n", :default => "crawl"  # does not work yet
+  opt :name, "name of crawl", :short => "-n", :default => "word-count"  # does not work yet
   opt :flush,  "", :short => "-f", :default => true
   opt :max_slice, "", :short => "-m", :default => 1000
 
@@ -31,7 +31,7 @@ CloudCrawler::batch_crawl(opts[:urls], opts)  do |cc|
   
   cc.on_every_page do |page|  
     page.document.title.downcase.split(/\s/).each do |tok|
-       synced_cache.incr(tok)
+       m_cache.incr(tok)
     end
     
   end
