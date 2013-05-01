@@ -18,6 +18,8 @@ module CloudCrawler
 
     def self.init(job)
       @namespace = @opts[:name]
+      @queue_name = @opts[:name] 
+
       @m_cache = Redis::Namespace.new("#{@namespace}:m_cache", :redis =>  job.client.redis)
       @m_cache.s3_init(@opts)
       
@@ -102,9 +104,10 @@ module CloudCrawler
               
       # add pages to bloomfilter only if store to s3 succeeds
       saved_urls.each { |url|  @bloomfilter.visit_url(url) }
-
+      
       outbound_urls.flatten.compact.each_slice(@max_slice) do |urls|
         data[:urls] = urls.to_json
+        $stderr << data << "\n"
         @queue.put(BatchCrawlJob, data)
       end
       

@@ -125,6 +125,7 @@ module CloudCrawler
       @doc ||= Nokogiri::XML(@body) if  xml? rescue nil
       @doc
     end
+    alias_method :document, :doc
 
     #
     # Delete the Nokogiri document and response body to conserve memory

@@ -12,7 +12,7 @@ module CloudCrawler
   
     def self.init(job)
       @namespace = @opts[:name] || 'cc'
-      @queue_name = @opts[:name] || @opts[:qless_queue]
+      @queue_name = @opts[:name] 
       @cache = Redis::Namespace.new("#{@namespace}:cache", :redis => job.client.redis)
       @page_store = RedisPageStore.new(job.client.redis,@opts)
       @bloomfilter = RedisUrlBloomfilter.new(job.client.redis,@opts)
