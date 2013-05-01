@@ -94,11 +94,11 @@ module CloudCrawler
     end
 
 
-    def save_to_s3!
+    def save!
       @pages.s3.save!
     end
     
-    def save_to_s3
+    def save
         @pages.s3.save
     end
     
