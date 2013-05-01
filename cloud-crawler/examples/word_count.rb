@@ -22,18 +22,12 @@ opts = Trollop::options do
 end
 
 
-# Count all words in the titles of the pages
-#  sync the local data to redis master when done
-
-#  ideally, a counter
 CloudCrawler::batch_crawl(opts[:urls], opts)  do |cc|
-  
-  
+    
   cc.on_every_page do |page|  
     page.document.title.downcase.split(/\s/).each do |tok|
        m_cache.incr(tok)
-    end
-    
+    end    
   end
 
   
