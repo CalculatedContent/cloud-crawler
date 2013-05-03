@@ -28,7 +28,7 @@ end
 CloudCrawler::crawl(opts[:urls], opts)  do |cc|
   
   cc.focus_crawl do |page|
-    lcache.incr 'count'
+    w_cache.incr 'count'
   end
   
 end

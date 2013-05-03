@@ -10,7 +10,7 @@ GIT
 
 GIT
   remote: git://github.com/CalculatedContent/redis-caches.git
-  revision: dc3ba6efa7d6c6d8af0d759e0d2350e64392f634
+  revision: f150ca5dc5fc562ec8e7b0fd9d6cda574f950e00
   specs:
     redis-caches (0.1)
       hiredis (~> 0.4.5)

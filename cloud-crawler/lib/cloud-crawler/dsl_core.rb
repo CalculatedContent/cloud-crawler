@@ -28,6 +28,11 @@ module CloudCrawler
       #  @after_crawl_blocks = JSON.parse(data[:after_crawl_blocks])
       end
 
+ 
+     def opts
+       @opts
+     end
+    
       #
       # TODO: implement locally
       #
