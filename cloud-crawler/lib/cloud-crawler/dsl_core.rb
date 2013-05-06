@@ -16,7 +16,7 @@ module CloudCrawler
     module ClassMethods
       # Qless hook
       def perform(job)
-        data = job.data.symbolize_keys
+        @data = job.data.symbolize_keys
         @opts = JSON.parse(data[:opts]).symbolize_keys
         @robots = Robotex.new(@opts[:user_agent]) if @opts[:obey_robots_txt]
 
@@ -28,6 +28,10 @@ module CloudCrawler
       #  @after_crawl_blocks = JSON.parse(data[:after_crawl_blocks])
       end
 
+     def data
+       @data
+     end
+    
  
      def opts
        @opts
