@@ -58,8 +58,8 @@ module CloudCrawler
         link, referer, depth = url_data[:link], url_data[:referer], url_data[:depth]
         next if link.nil? or link.empty? or link == :END
         next if @bloomfilter.visited_url?(link.to_s)
-
-        sleep(rand(delay)) if delay 
+  
+        sleep(delay) if delay 
         http = CloudCrawler::HTTP.new(@opts)
         next if http.nil?
         http.fetch_pages(link, referer, depth)
