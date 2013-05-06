@@ -59,6 +59,7 @@ module CloudCrawler
         next if link.nil? or link.empty? or link == :END
         next if @bloomfilter.visited_url?(link.to_s)
 
+        sleep(delay) if delay 
         http = CloudCrawler::HTTP.new(@opts)
         next if http.nil?
         http.fetch_pages(link, referer, depth)

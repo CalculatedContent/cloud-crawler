@@ -36,6 +36,10 @@ module CloudCrawler
      def opts
        @opts
      end
+     
+     def delay
+       @opts[:delay]
+     end
     
       #
       # TODO: implement locally
