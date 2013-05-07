@@ -52,14 +52,26 @@ module CloudCrawler
 
       data = job.data.symbolize_keys
       urls = JSON.parse(data[:urls])
+      
+      $stderr << "crawling #{urls.size} urls \n"
 
+      # TODO:  support conintuous crawl
+      #  while urls.not_empty?
+      #  instead of urls.map, we urls.slice and map each slice
+      
       pages = urls.map do |url_data|
         url_data.symbolize_keys!
         link, referer, depth = url_data[:link], url_data[:referer], url_data[:depth]
         next if link.nil? or link.empty? or link == :END
         next if @bloomfilter.visited_url?(link.to_s)
   
-        sleep(delay) if delay 
+        $stderr << "crawling #{link.to_s}  \n"
+         
+        if delay then
+          $stderr << "sleeping for #{delay} secs \n"
+          sleep(delay)      
+        end
+        
         http = CloudCrawler::HTTP.new(@opts)
         next if http.nil?
         http.fetch_pages(link, referer, depth)
@@ -81,7 +93,7 @@ module CloudCrawler
       
       #  s3_cache.pipelined do
       
-       
+      
         pages.each do |page|
           do_page_blocks(page)
 
@@ -115,15 +127,21 @@ module CloudCrawler
       # add pages to bloomfilter only if store to s3 succeeds
       saved_urls.each { |url|  @bloomfilter.visit_url(url) }
 
+      #TODO:  change to allow submit
       outbound_urls.flatten.compact.each_slice(@max_slice) do |urls|
         data[:urls] = urls.to_json
         @queue.put(BatchCrawlJob, data)
       end
 
       @s3_cache.s3.save!
+      
+      #  urls <<  outbound_urls.flatten.compact
+      # end while not urls.empty?
 
     end
   end
 
 end
+
+
 
