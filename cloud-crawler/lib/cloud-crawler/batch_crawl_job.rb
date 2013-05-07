@@ -74,7 +74,10 @@ module CloudCrawler
         
         http = CloudCrawler::HTTP.new(@opts)
         next if http.nil?
-        http.fetch_pages(link, referer, depth)
+        page = http.fetch_pages(link, referer, depth)
+        
+        do_page_blocks(page)
+        page
       end
 
       return if pages.nil? or pages.empty?
@@ -95,7 +98,7 @@ module CloudCrawler
       
       
         pages.each do |page|
-          do_page_blocks(page)
+         
 
           # cache page locally, we assume
           #  or @page_store << page
