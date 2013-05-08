@@ -74,17 +74,24 @@ module CloudCrawler
         
         http = CloudCrawler::HTTP.new(@opts)
         next if http.nil?
-        page = http.fetch_pages(link, referer, depth)
+        fetched_pages = http.fetch_pages(link, referer, depth)
         
-        do_page_blocks(page)
-        page
+        fetched_pages.flatten!
+        fetched_pages.compact!
+        fetched_pages.reject! { |page|  @bloomfilter.visited_url?(page.url.to_s) }
+      
+        fetched_pages.each do |page|
+           next if page.nil?
+           do_page_blocks(page) 
+        end
+        
+        fetched_pages
       end
 
       return if pages.nil? or pages.empty?
 
       pages.flatten!
       pages.compact!
-      pages.reject! { |page|  @bloomfilter.visited_url?(page.url.to_s) }
       return if pages.empty?
 
       outbound_urls = []
