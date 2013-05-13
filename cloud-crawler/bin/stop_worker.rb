@@ -1,4 +1,3 @@
-
 #!/usr/bin/env ruby
 
 # Copyright (c) 2013, Calculated Content (TM)
@@ -15,7 +14,6 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-require 'rubygems'
 require 'fog'
 require 'socket'
 require 'logger'

@@ -40,6 +40,10 @@ module CloudCrawler
      def delay
        @opts[:delay]
      end
+     
+     def worker_id
+       @opts[:worker_id]
+     end
     
       #
       # TODO: implement locally
