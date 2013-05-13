@@ -1,0 +1,9 @@
+bin_dir = "/home/ubuntu/apps/cloud-crawler/cloud-crawler/bin"
+log_dir = "/home/ubuntu/apps/cloud-crawler/cloud-crawler/logs"
+
+master_ip = <%= master_ip =>
+
+every :reboot do
+   command "sudo -E bundle exec  #{bin_dir}/run_worker.rb -h #{master_ip}", :output => "#{log_dir}/worker.log"
+end
+

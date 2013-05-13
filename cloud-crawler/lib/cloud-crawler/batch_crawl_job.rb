@@ -31,6 +31,17 @@ module CloudCrawler
       @flush =  @opts[:flush]
       @depth_limit = @opts[:depth_limit]
     end
+    
+  
+    def user_agent
+      @opts[:user_agent]
+    end
+    
+    def user_agent=(a)
+      @opts[:user_agent]=a
+    end
+    
+    
 
     def self.m_cache
       @m_cache

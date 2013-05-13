@@ -3,4 +3,6 @@ source 'http://rubygems.org'
 gem 'redis-caches', :git=>"git://github.com/CalculatedContent/redis-caches.git"
 gem 'sourcify', :git=>"git://github.com/CalculatedContent/sourcify.git" 
 gem 'qless', :git=>"git://github.com/CalculatedContent/qless.git"
+
+gem 'whenever'
 gemspec
