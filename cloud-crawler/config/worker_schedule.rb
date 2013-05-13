@@ -1,4 +1,4 @@
-cc_dir = "/home/ubuntu/apps/cloud-crawler/cloud-crawler"
+cc_dir = "/home/ubuntu/apps/cloud-crawler"
 bin_dir = "#{cc_dir}/bin"
 log_dir = "#{cc_dir}/logs"
 
