@@ -19,14 +19,16 @@ require 'fog'
 require 'socket'
 require 'logger'
 
-cc_dir = "/home/ubuntu/apps/cloud-crawler/cloud-crawler"
+cc_dir = "/home/ubuntu/apps/cloud-crawler"
 log_dir = "#{cc_dir}/logs"
 
 log = Logger.new("#{log_dir}/master.log")
 
-aws_access_key_id = ENV['AWS_ACCESS_KEY_ID']
-aws_secret_access_key = ENV['AWS_SECRET_ACCESS_KEY']
-aws_region = ENV['EC2_REGION']
+#TODO:  read from .s3cfg, hard code region
+
+aws_access_key_id = `grep access_key /home/ubuntu/.s3cfg | awk '{print $3}'` # #ENV['AWS_ACCESS_KEY_ID']
+aws_secret_access_key = `grep secret_key /home/ubuntu/.s3cfg | awk '{print $3}'` # ENV['AWS_SECRET_ACCESS_KEY']
+aws_region = 'us-west-1' #ENV['EC2_REGION']
 
 c = Fog::Compute.new(
 :provider => 'AWS',
