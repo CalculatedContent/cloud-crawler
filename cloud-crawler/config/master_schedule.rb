@@ -3,7 +3,7 @@ bin_dir = "#{cc_dir}/bin"
 log_dir = "#{cc_dir}/logs"
 
 
-every :hour do
+every 10.minutes do
    command "cd #{cc_dir}; sudo -E bundle exec  #{bin_dir}/restart_workers.rb ", :output => "#{log_dir}/master.log"
 end
 
