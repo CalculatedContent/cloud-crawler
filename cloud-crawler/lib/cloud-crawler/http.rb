@@ -6,7 +6,6 @@ require 'cloud-crawler/cookie_store'
 module CloudCrawler
   class HTTP
     
-    @log = Logger.new(STDERR)    #TODO where does app log go?  how do we set?
     
     # Maximum number of redirects to follow on each get_response
     REDIRECT_LIMIT = 5
@@ -18,6 +17,7 @@ module CloudCrawler
       @connections = {}
       @opts = opts
       @cookie_store = CookieStore.new(@opts[:cookies])
+      @log = Logger.new(STDERR)    #TODO where does app log go?  how do we set?
     end
     
    
@@ -53,7 +53,7 @@ module CloudCrawler
         return pages
       rescue Exception => e
         if verbose?
-          @log.info e.inspect[]
+          @log.info e.inspect
           @log.info e.backtrace
         end
         return [Page.new(url, :error => e)]
@@ -141,6 +141,7 @@ module CloudCrawler
       opts['Referer'] = referer.to_s if referer
       opts['Cookie'] = @cookie_store.to_s unless @cookie_store.empty? || (!accept_cookies? && @opts[:cookies].nil?)
 
+      @log.info "get_response #{opts['User-Agent']}  #{opts['Referer']}"
       retries = 0
       begin
         start = Time.now()
