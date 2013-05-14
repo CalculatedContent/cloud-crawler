@@ -13,7 +13,7 @@ module CloudCrawler
 
     # CookieStore for this HTTP client
     attr_reader :cookie_store
-
+    
     def initialize(opts = {})
       @connections = {}
       @opts = opts
@@ -21,7 +21,6 @@ module CloudCrawler
     end
     
    
-
     def size
       @connections.size
     end
@@ -73,7 +72,11 @@ module CloudCrawler
     # or nil if no such option is set
     #
     def user_agent
-      @opts[:user_agent]
+      @user_agent ||= @opts[:user_agent]
+    end
+    
+    def user_agent=(ua)
+      @user_agent = ua
     end
 
     #

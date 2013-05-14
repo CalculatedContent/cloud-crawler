@@ -41,8 +41,12 @@ module CloudCrawler
        @opts[:delay]
      end
      
-     def worker_id
-       @opts[:worker_id]
+     def user_agent
+       @opts[:user_agent]
+     end
+     
+     def user_agent=(ua)
+       @opts[:user_agent]=ua
      end
     
       #
