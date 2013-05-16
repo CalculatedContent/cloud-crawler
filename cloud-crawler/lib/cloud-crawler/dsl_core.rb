@@ -7,6 +7,9 @@ require 'active_support/core_ext'
 
 module CloudCrawler
 
+#TODO
+  #@log = Logge.rnew(STDERR)
+  
   module DslCore
     def self.included(base)
       base.send :extend, ClassMethods

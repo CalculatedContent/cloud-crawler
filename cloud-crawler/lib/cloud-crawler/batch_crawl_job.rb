@@ -54,8 +54,6 @@ module CloudCrawler
       data = job.data.symbolize_keys
       urls = JSON.parse(data[:urls])
       
-      $stderr << "crawling #{urls.size} urls \n"
-
       # TODO:  support conintuous crawl
       #  while urls.not_empty?
       #  instead of urls.map, we urls.slice and map each slice
@@ -66,10 +64,10 @@ module CloudCrawler
         next if link.nil? or link.empty? or link == :END
         next if @bloomfilter.visited_url?(link.to_s)
   
-        $stderr << "crawling #{link.to_s}  \n"
+    #    $stderr << "crawling #{link.to_s}  \n"
          
         if delay then
-          $stderr << "sleeping for #{delay} secs \n"
+        #  $stderr << "sleeping for #{delay} secs \n"
           sleep(delay)      
         end
         
