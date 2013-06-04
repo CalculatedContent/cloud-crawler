@@ -11,7 +11,7 @@ module CloudCrawler
      WORKER_OPTS = {     
       :qless_host => 'localhost',
       :qless_port => 6379,
-      :qless_queue => "crawl",
+      :qless_queue => "crawls",
       :interval => 10
      }
     

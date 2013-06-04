@@ -8,6 +8,8 @@ require 'cloud-crawler/redis_page_store'
 #  crawl with blocks
 #  crawl options
 
+#TODO:  why is this totally broken?
+#  
 module CloudCrawler
   describe Driver do
 
@@ -17,9 +19,9 @@ module CloudCrawler
       @redis.flushdb
       @opts = CloudCrawler::Driver::DRIVER_OPTS
       @page_store = RedisPageStore.new(@redis, @opts)
-      @cache =  Redis::Namespace.new("#{@opts[:name]}:cache", :redis => @redis)
+      @cache =  Redis::Namespace.new("#{@opts[:job_name]}:cache", :redis => @redis)
       @client = Qless::Client.new
-      @queue = @client.queues[@opts[:name]]
+      @queue = @client.queues[@opts[:queue_name]]
     end
 
     after(:each) do
@@ -40,7 +42,12 @@ module CloudCrawler
       pages << FakePage.new('2')
       pages << FakePage.new('3')
 
-      Driver.crawl(pages[0].url)
+      Driver.crawl(pages[0].url) do |a|
+        a.focus_crawl do |p|
+          p.all_links
+        end
+      end
+      
       run_jobs
       @page_store.size.should == 4
     end
@@ -53,7 +60,9 @@ module CloudCrawler
 
       count = 0
       Driver.crawl(pages[0].url) do |a|
-        a.on_every_page { cache.incr "count" }
+        a.on_every_page do 
+          cache.incr "count" 
+        end
       end
 
       run_jobs

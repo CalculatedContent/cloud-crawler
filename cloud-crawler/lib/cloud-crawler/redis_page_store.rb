@@ -20,7 +20,7 @@ module CloudCrawler
     def initialize(redis, opts = {})
       @redis = redis
       @opts = opts
-      @namespace = "#{opts[:name]}:pages"
+      @namespace = "#{opts[:job_name]}:pages"
             
       @pages = Redis::Namespace.new(@namespace, :redis => redis)
       @pages.s3_init(opts)   

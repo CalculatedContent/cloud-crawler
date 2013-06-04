@@ -58,7 +58,8 @@ module CloudCrawler
      include DslFrontEnd
      
      DRIVER_OPTS = {   
-      :name => "cc",        
+      :job_name => "cc",       
+      :queue_name => "crawls",         
       :qless_host => 'localhost',
       :qless_port => 6379,
       :qless_db => 0,  # not used yet..not sure how
@@ -74,7 +75,8 @@ module CloudCrawler
       opts.reverse_merge! DRIVER_OPTS
       init(opts)
       @client = Qless::Client.new( :host => opts[:qless_host], :port => opts[:qless_port] )
-      @queue = @client.queues[opts[:name]]
+      @queue = @client.queues[opts[:queue_name]]
+      
       yield self if block_given?
     end
 

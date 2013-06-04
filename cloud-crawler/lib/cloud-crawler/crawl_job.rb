@@ -11,8 +11,8 @@ module CloudCrawler
     include DslCore
   
     def self.init(job)
-      @namespace = @opts[:name] || 'cc'
-      @queue_name = @opts[:name] 
+      @namespace = @opts[:job_name] || 'cc'
+      @queue_name = @opts[:queue_name] 
       @cache = Redis::Namespace.new("#{@namespace}:cache", :redis => job.client.redis)
       @page_store = RedisPageStore.new(job.client.redis,@opts)
       @bloomfilter = RedisUrlBloomfilter.new(job.client.redis,@opts)
@@ -28,10 +28,11 @@ module CloudCrawler
       super(job)
       init(job)
              
+      
       data = job.data.symbolize_keys
       link, referer, depth = data[:link], data[:referer], data[:depth]     
       return if link == :END     
-      
+            
 
       http = CloudCrawler::HTTP.new(@opts)
       pages = http.fetch_pages(link, referer, depth)

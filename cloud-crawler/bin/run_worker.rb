@@ -9,7 +9,7 @@ require 'cloud-crawler/worker'
 
 
 opts = Trollop::options do
-  opt :name, "name of crawl", :short => "-n",  :default => "crawl"  # must be same as start
+  opt :queue_name, "name of crawl", :short => "-q",  :default => "crawls"  # must be same as start
   opt :worker_id, "id for this worker", :short => "-w", :default => Socket.gethostname
   
   opt :qless_host, "qless host", :short => "-h", :default => 'localhost'

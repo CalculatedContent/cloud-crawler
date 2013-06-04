@@ -11,11 +11,11 @@ module CloudCrawler
   class RedisUrlBloomfilter
     include Enumerable
     
-    attr_reader :key_prefix
+    attr_reader :namespace
     
     def initialize(redis, opts = {})
       @redis = redis
-      @key_prefix = opts[:key_prefix] || 'cc'
+      @namespace = opts[:job_name] || 'cc'
  
       items, bits = 100_000, 5
       opts[:size] ||= items*bits
@@ -30,7 +30,7 @@ module CloudCrawler
 
     # really a bloom filter for anything with sugar
     def name
-      "#{@key_prefix}:bf"
+      "#{@namespace}:bf"
     end
 
     # same as page store

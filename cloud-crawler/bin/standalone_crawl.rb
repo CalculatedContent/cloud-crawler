@@ -8,7 +8,7 @@ require 'open-uri'
 
 opts = Trollop::options do
   opt :urls, "urls to crawl", :short => "-u", :multi => true,  :default => "http://www.livestrong.com"
-  opt :name, "name of crawl", :short => "-n",  :default => "crawl"
+  opt :job_name, "name of crawl", :short => "-n",  :default => "crawl"
 
   opt :delay, "delay between requests (not used yet, see worker interval)",  :short => "-d", :default => 0  # not used yet
   opt :depth_limit, "limit the depth of the crawl", :short => "-l", :type => :int, :default => nil

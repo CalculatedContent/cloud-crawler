@@ -12,8 +12,8 @@ module CloudCrawler
 
     MAX_SLICE_DEFAULT = 1000
     def self.init(job)
-      @namespace = @opts[:name]
-      @queue_name = @opts[:name]
+      @namespace = @opts[:job_name]
+      @queue_name = @opts[:queue_name]
 
       @m_cache = Redis::Namespace.new("#{@namespace}:m_cache", :redis =>  job.client.redis)
       @m_cache.s3_init(@opts)

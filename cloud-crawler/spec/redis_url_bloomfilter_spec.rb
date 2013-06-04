@@ -25,6 +25,10 @@ module CloudCrawler
       end
 
       
+      it "should have a namespace" do
+        @bloomfilter.should respond_to(:namespace)
+      end
+        
       it "should store urls in bloomfilter" do
         @bloomfilter.should respond_to(:touch_url)
         @bloomfilter.should respond_to(:touched_url?)

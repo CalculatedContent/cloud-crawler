@@ -15,7 +15,7 @@ module CloudCrawler
       @opts = CloudCrawler::Driver::DRIVER_OPTS
       @opts.reverse_merge! CloudCrawler::DEFAULT_OPTS
      
-      @namespace = @opts[:name]
+      @namespace = @opts[:job_name]
       @w_cache = Redis::Namespace.new("#{@namespace}:w_cache", :redis => @redis)
 
       @page_store = RedisPageStore.new(@redis, @opts)

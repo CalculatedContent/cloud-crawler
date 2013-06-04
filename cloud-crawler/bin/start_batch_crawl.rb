@@ -8,7 +8,7 @@ require 'trollop'
 
 opts = Trollop::options do
   opt :urls, "urls to crawl", :short => "-u", :multi => true,  :default => "http://www.livestrong.com"
-  opt :name, "name of crawl", :short => "-n",  :default => "LS"
+  opt :job_name, "name of crawl", :short => "-n",  :default => "LS"
 
   opt :flush,  "flush pages out of local redis cache after every batch crawl", :short => "-x", :default => true
   opt :max_slice, "maximum slice for batch job", :short => "-m", :default => 1000
