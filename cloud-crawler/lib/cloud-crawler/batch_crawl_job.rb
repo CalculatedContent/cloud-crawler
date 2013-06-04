@@ -1,3 +1,4 @@
+require 'cloud-crawler/logger'
 require 'cloud-crawler/http'
 require 'cloud-crawler/redis_page_store'
 require 'cloud-crawler/redis_url_bloomfilter'
@@ -5,6 +6,10 @@ require 'cloud-crawler/dsl_core'
 require 'active_support/inflector'
 require 'active_support/core_ext'
 require 'redis-caches/s3_cache'
+
+
+
+
 
 module CloudCrawler
   class BatchCrawlJob

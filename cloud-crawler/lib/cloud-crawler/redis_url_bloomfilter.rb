@@ -3,7 +3,7 @@ require 'redis-namespace'
 require 'bloomfilter-rb'
 require 'json'
 require 'zlib'
-require 'logger'
+require 'cloud-crawler/logger'
 
     
 module CloudCrawler

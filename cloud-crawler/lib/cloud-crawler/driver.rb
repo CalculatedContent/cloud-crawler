@@ -89,9 +89,20 @@ module CloudCrawler
           core.load_urls(urls)
         end
       end
+      
+    #
+    # Convenience method to start a new crawl
+    #
+   def self.crawl(urls, opts = {}, &block)
+        self.new(opts) do |core|
+          yield core if block_given?
+          core.load_urls(urls)
+        end
+      end
 
       
    def load_urls(urls)
+      
       urls = [urls].flatten.map{ |url| url.is_a?(URI) ? url : URI(url) }
       urls.each{ |url| url.path = '/' if url.path.empty? }
       data = block_sources

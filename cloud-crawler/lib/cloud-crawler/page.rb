@@ -3,6 +3,8 @@ require 'ostruct'
 require 'json'
 require 'iconv'
 require 'webrick/cookie'
+require 'cloud-crawler/logger'
+
 
 module CloudCrawler
   class Page

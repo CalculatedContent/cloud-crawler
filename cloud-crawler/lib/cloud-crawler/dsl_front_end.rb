@@ -3,6 +3,7 @@ require 'sourcify'
 require 'json'
 require 'active_support/inflector'
 require 'active_support/core_ext'
+require 'cloud-crawler/logger'
 
 module CloudCrawler
 

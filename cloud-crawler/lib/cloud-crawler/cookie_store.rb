@@ -1,5 +1,6 @@
 require 'delegate'
 require 'webrick/cookie'
+require 'cloud-crawler/logger'
 
 class WEBrick::Cookie
   def expired?

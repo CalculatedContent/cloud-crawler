@@ -7,6 +7,9 @@ require 'json'
 require 'zlib'
 require 'socket'
 
+require 'cloud-crawler/logger'
+
+
 #TODO  move S3 serialization to a seperate module
 #  so it can be tested, re-used, and optmized everywhere we use redis
 module CloudCrawler

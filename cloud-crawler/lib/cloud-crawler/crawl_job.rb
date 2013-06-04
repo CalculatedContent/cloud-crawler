@@ -1,3 +1,4 @@
+require 'cloud-crawler/logger'
 require 'cloud-crawler/http'
 require 'cloud-crawler/redis_page_store'
 require 'cloud-crawler/redis_url_bloomfilter'
