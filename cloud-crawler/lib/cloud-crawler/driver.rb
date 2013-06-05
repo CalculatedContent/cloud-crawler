@@ -70,7 +70,7 @@ module CloudCrawler
     
      def create_job_data(hsh)
       url = hsh[:url]
-      url= URI(url) unless url.is_a? URI
+      url= URI::encode("#{surl}=#{line}") unless url.is_a? URI
       url.path = '/' if url.path.empty?
 
       data = block_sources
