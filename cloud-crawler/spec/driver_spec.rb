@@ -52,6 +52,27 @@ module CloudCrawler
       @page_store.size.should == 4
     end
 
+
+    it "should crawl all the html pages loaded as hashes" do
+      pages = []
+      pages << FakePage.new('0', :links => ['1', '2'])
+      pages << FakePage.new('1', :links => ['3'])
+      pages << FakePage.new('2')
+      pages << FakePage.new('3')
+
+      Driver.crawl( {:url => pages[0].url} ) do |a|
+        a.focus_crawl do |p|
+          p.all_links
+        end
+      end
+      
+      run_jobs
+      @page_store.size.should == 4
+    end
+
+
+
+
     it "should be able to call a block on every page" do
       pages = []
       pages << FakePage.new('0', :links => ['1', '2'])
@@ -88,6 +109,9 @@ module CloudCrawler
       @page_store.keys.should include(pages[0].url.to_s)
       @page_store.keys.should_not include(pages[1].url.to_s)
     end
+    
+    
+    
 
     describe "options" do
       it "should accept options for the crawl" do
