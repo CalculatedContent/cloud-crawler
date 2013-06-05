@@ -14,6 +14,7 @@ require 'qless'
 module CloudCrawler
   VERSION = '0.1';
   
+  
   #
   # Convenience methods to start a crawl
   #
@@ -70,7 +71,7 @@ module CloudCrawler
     
      def create_job_data(hsh)
       url = hsh[:url]
-      url= URI::encode("#{surl}=#{line}") unless url.is_a? URI
+      url = URI(url) unless url.instance_of? URI
       url.path = '/' if url.path.empty?
 
       data = block_sources
@@ -79,6 +80,7 @@ module CloudCrawler
       data.reverse_merge!(hsh)
       return data
     end
+
 
     def load_crawl_job(hsh) 
        @queue.put( CrawlJob, create_job_data(hsh) )
@@ -93,7 +95,7 @@ module CloudCrawler
     # Convenience method to start a new crawl
     #
     def self.crawl(urls, opts = {}, &block)
-      logger.info "no urls to crawl" if urls.nil? or urls.empty?
+     # logger.info "no urls to crawl" if urls.nil? or urls.empty?
       self.new(opts) do |core|
         yield core if block_given?
 
@@ -107,7 +109,7 @@ module CloudCrawler
     end
 
     def self.batch_crawl(urls, opts = {}, &block)
-      logger.info "no urls to batch crawl" if urls.nil? or urls.empty?
+      #logger.info "no urls to batch crawl" if urls.nil? or urls.empty?
       self.new(opts) do |core|
         yield core if block_given?
 
