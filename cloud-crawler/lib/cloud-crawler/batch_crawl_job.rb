@@ -62,6 +62,7 @@ module CloudCrawler
       init(job)
 
       data = job.data.symbolize_keys
+      p data.keys
       jobs = JSON.parse(data[:jobs])
       # TODO:  support conintuous crawl
       #  while urls.not_empty?
