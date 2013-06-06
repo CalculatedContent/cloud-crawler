@@ -62,7 +62,6 @@ module CloudCrawler
       init(job)
 
       data = job.data.symbolize_keys
-      $stderr << "data keys " << data.keys << "\n"
       jobs = JSON.parse(data[:jobs])
       # TODO:  support conintuous crawl
       #  while urls.not_empty?
@@ -75,8 +74,7 @@ module CloudCrawler
       # for_every_job ...
       #   
       pages = jobs.map do |jxb|
-        @job=jxb
-        job.symbolize_keys!
+        @job=jxb.symbolize_keys
         link, referer, depth = job[:link], job[:referer], job[:depth]
         next if link.nil? or link.empty? or link == :END
         next if @bloomfilter.visited_url?(link.to_s)
