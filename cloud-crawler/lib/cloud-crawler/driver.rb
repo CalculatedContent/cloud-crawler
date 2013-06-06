@@ -96,7 +96,7 @@ module CloudCrawler
          hsh[:link] = normalize_link( hsh[:url] )
        end
       
-      data[:jobs] = jobs
+      data[:jobs] = jobs.to_json
        @queue.put( BatchCrawlJob, data )
     end
      
