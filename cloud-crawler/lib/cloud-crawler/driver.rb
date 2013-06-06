@@ -69,25 +69,34 @@ module CloudCrawler
       yield self if block_given?
     end
     
-     def create_job_data(hsh)
-      url = hsh[:url]
+    def normalize_link(url)
       url = URI(url) unless url.instance_of? URI
       url.path = '/' if url.path.empty?
-
-      data = block_sources
-      data[:opts] = @opts.to_json
-      data[:link] = url.to_s
-      data.reverse_merge!(hsh)
-      return data
-    end
-
-
-    def load_crawl_job(hsh) 
-       @queue.put( CrawlJob, create_job_data(hsh) )
+      return url.to_s
     end
     
-    def load_batch_crawl_job(hsh) 
-       @queue.put( BatchCrawlJob, create_job_data(hsh) )
+   # TODO;  eventually consolidate these apis
+
+    def load_crawl_job(hsh) 
+      data = block_sources
+      data[:opts] = @opts.to_json
+      
+      data[:link] = normalize_link( hsh[:url])
+      data.reverse_merge!(hsh)
+      
+      @queue.put( CrawlJob, data )
+    end
+    
+    def load_batch_crawl(jobs) 
+       data = block_sources
+       data[:opts] = @opts.to_json
+       data[:jobs] = jobs
+
+       data[:jobs].each do |hsh| 
+         hsh[:link] = normalize_link( hsh[:url] )
+       end
+      
+       @queue.put( BatchCrawlJob, data )
     end
      
       
@@ -115,9 +124,7 @@ module CloudCrawler
 
         jobs = [urls].flatten
         jobs.map!{ |url| { :url => url } }  unless jobs.first.is_a? Hash
-        jobs.each do |hsh|
-           core.load_batch_crawl_job(hsh)
-        end
+        core.load_batch_crawl(jobs)
       end
     end
 

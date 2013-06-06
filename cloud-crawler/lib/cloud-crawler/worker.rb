@@ -8,7 +8,7 @@ module CloudCrawler
         
       
       ENV['REDIS_URL']= "redis://#{opts[:qless_host]}:#{opts[:qless_port]}/#{opts[:qless_db]}"
-      ENV['QUEUES'] = opts[:name]
+      ENV['QUEUES'] = opts[:queue_name]
       
       ENV['JOB_RESERVER'] = opts[:job_reserver]
       ENV['INTERVAL'] = opts[:interval].to_s

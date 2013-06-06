@@ -35,6 +35,11 @@ module CloudCrawler
       @max_slice = @opts[:max_slice] || MAX_SLICE_DEFAULT
       @flush =  @opts[:flush]
       @depth_limit = @opts[:depth_limit]
+      @job = {}
+    end
+    
+    def job
+      @job
     end
     
   
@@ -57,15 +62,21 @@ module CloudCrawler
       init(job)
 
       data = job.data.symbolize_keys
-      urls = JSON.parse(data[:urls])
-      
+      jobs = JSON.parse(data[:jobs])
       # TODO:  support conintuous crawl
       #  while urls.not_empty?
       #  instead of urls.map, we urls.slice and map each slice
       
-      pages = urls.map do |url_data|
-        url_data.symbolize_keys!
-        link, referer, depth = url_data[:link], url_data[:referer], url_data[:depth]
+      # do job blocks?
+      # yes...this would be, generally, better 
+      #  a better api for general purpose batch jobs
+      
+      # for_every_job ...
+      #   
+      pages = jobs.map do |jxb|
+        @job=jxb
+        job.symbolize_keys!
+        link, referer, depth = job[:link], job[:referer], job[:depth]
         next if link.nil? or link.empty? or link == :END
         next if @bloomfilter.visited_url?(link.to_s)
   
@@ -110,7 +121,6 @@ module CloudCrawler
       
         pages.each do |page|
          
-
           # cache page locally, we assume
           #  or @page_store << page
           url = page.url.to_s
