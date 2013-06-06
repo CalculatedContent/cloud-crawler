@@ -62,7 +62,6 @@ module CloudCrawler
       init(qjob)
 
       data = qjob.data.symbolize_keys
-      $stderr << "data keys " << data.keys << "\n"
       jobs = JSON.parse(data[:jobs])
       # TODO:  support conintuous crawl
       #  while urls.not_empty?
@@ -76,18 +75,11 @@ module CloudCrawler
       #   
       pages = jobs.map do |jxb|
         @job=jxb.symbolize_keys
-        $stderr << "job keys " << job.keys << "\n"
         link, referer, depth = job[:link], job[:referer], job[:depth]
-        $stderr << "link: #{link} \n"
         next if link.nil? or link.empty? or link == :END
         next if @bloomfilter.visited_url?(link.to_s)
-  
-    #    $stderr << "crawling #{link.to_s}  \n"
-         
-        if delay then
-          $stderr << "sleeping for #{delay} secs \n"
-          sleep(delay)      
-        end
+           
+        sleep(delay) if delay 
         
         http = CloudCrawler::HTTP.new(@opts)
         next if http.nil?
