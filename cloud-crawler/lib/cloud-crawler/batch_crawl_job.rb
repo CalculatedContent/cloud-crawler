@@ -16,11 +16,11 @@ module CloudCrawler
     include DslCore
 
     MAX_SLICE_DEFAULT = 1000
-    def self.init(job)
+    def self.init(qjob)
       @namespace = @opts[:job_name]
       @queue_name = @opts[:queue_name]
 
-      @m_cache = Redis::Namespace.new("#{@namespace}:m_cache", :redis =>  job.client.redis)
+      @m_cache = Redis::Namespace.new("#{@namespace}:m_cache", :redis =>  qjob.client.redis)
       @m_cache.s3_init(@opts)
 
       local_redis = Redis.new(:host=>'localhost')
@@ -30,15 +30,15 @@ module CloudCrawler
 
       @page_store = RedisPageStore.new(local_redis,@opts)
 
-      @bloomfilter = RedisUrlBloomfilter.new(job.client.redis,@opts)
-      @queue = job.client.queues[@queue_name]
+      @bloomfilter = RedisUrlBloomfilter.new(qjob.client.redis,@opts)
+      @queue = qjob.client.queues[@queue_name]
       @max_slice = @opts[:max_slice] || MAX_SLICE_DEFAULT
       @flush =  @opts[:flush]
       @depth_limit = @opts[:depth_limit]
       @job = {}
     end
     
-    def job
+    def self.job
       @job
     end
     
@@ -57,11 +57,12 @@ module CloudCrawler
     end
    
 
-    def self.perform(job)
-      super(job)
-      init(job)
+    def self.perform(qjob)
+      super(qjob)
+      init(qjob)
 
-      data = job.data.symbolize_keys
+      data = qjob.data.symbolize_keys
+      $stderr << "data keys " << data.keys << "\n"
       jobs = JSON.parse(data[:jobs])
       # TODO:  support conintuous crawl
       #  while urls.not_empty?
@@ -75,14 +76,16 @@ module CloudCrawler
       #   
       pages = jobs.map do |jxb|
         @job=jxb.symbolize_keys
+        $stderr << "job keys " << job.keys << "\n"
         link, referer, depth = job[:link], job[:referer], job[:depth]
+        $stderr << "link: #{link} \n"
         next if link.nil? or link.empty? or link == :END
         next if @bloomfilter.visited_url?(link.to_s)
   
     #    $stderr << "crawling #{link.to_s}  \n"
          
         if delay then
-        #  $stderr << "sleeping for #{delay} secs \n"
+          $stderr << "sleeping for #{delay} secs \n"
           sleep(delay)      
         end
         

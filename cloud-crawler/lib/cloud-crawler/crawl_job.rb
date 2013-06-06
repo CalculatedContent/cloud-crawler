@@ -11,13 +11,13 @@ module CloudCrawler
   class CrawlJob
     include DslCore
   
-    def self.init(job)
+    def self.init(qjob)
       @namespace = @opts[:job_name] || 'cc'
       @queue_name = @opts[:queue_name] 
-      @cache = Redis::Namespace.new("#{@namespace}:cache", :redis => job.client.redis)
-      @page_store = RedisPageStore.new(job.client.redis,@opts)
-      @bloomfilter = RedisUrlBloomfilter.new(job.client.redis,@opts)
-      @queue = job.client.queues[@queue_name]   
+      @cache = Redis::Namespace.new("#{@namespace}:cache", :redis => qjob.client.redis)
+      @page_store = RedisPageStore.new(qjob.client.redis,@opts)
+      @bloomfilter = RedisUrlBloomfilter.new(qjob.client.redis,@opts)
+      @queue = qjob.client.queues[@queue_name]   
       @depth_limit = @opts[:depth_limit]
     end
   
@@ -25,12 +25,11 @@ module CloudCrawler
       @cache
     end
   
-    def self.perform(job)
-      super(job)
-      init(job)
+    def self.perform(qjob)
+      super(qjob)
+      init(qjob)
              
-      
-      data = job.data.symbolize_keys
+      data = qjob.data.symbolize_keys
       link, referer, depth = data[:link], data[:referer], data[:depth]     
       return if link == :END     
             
