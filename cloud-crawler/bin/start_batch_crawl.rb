@@ -11,7 +11,7 @@ opts = Trollop::options do
   opt :job_name, "name of crawl", :short => "-n",  :default => "LS"
 
   opt :flush,  "flush pages out of local redis cache after every batch crawl", :short => "-x", :default => true
-  opt :max_slice, "maximum slice for batch job", :short => "-m", :default => 1000
+  opt :batch_size, "maximum slice for batch job", :short => "-b", :default => 1000
   
   opt :s3_bucket, "save intermediate results to s3 bucket",  :short => "-s", :default => "crawls"
   opt :keep_tmp_files, "save intermediate files to local dir", :short => "-t",  :type => :string, :default => false
