@@ -87,17 +87,16 @@ module CloudCrawler
       @queue.put( CrawlJob, data )
     end
     
-    def load_batch_crawl(jobs) 
-       data = block_sources
-       data[:opts] = @opts.to_json
+    def load_batch_crawl(batch) 
+      data = block_sources
+      data[:opts] = @opts.to_json
        
-
-      jobs.each do |hsh| 
+      batch.each do |hsh| 
          hsh[:link] = normalize_link( hsh[:url] )
        end
       
-      data[:jobs] = jobs.to_json
-       @queue.put( BatchCrawlJob, data )
+      data[:batch] = batch.to_json
+      @queue.put( BatchCrawlJob, data )
     end
      
       
