@@ -11,6 +11,8 @@ module CloudCrawler
     def self.process_batch_with_counter(jobs_batch)
     #  puts "processing batch #{jobs_batch.size}"
       m_cache.incr "num_batches"
+      w_cache.incr "num_batches"
+         
       process_batch_without_counter(jobs_batch)
     end
 
@@ -27,6 +29,8 @@ module CloudCrawler
       m_cache.incr "num_jobs"
       
       m_cache["simple_job:#{hsh[:iid]}"]=hsh.to_json
+      s3_cache["simple_job:#{hsh[:iid]}"]=hsh.to_json
+      
       self.make_children(hsh)
     end
 

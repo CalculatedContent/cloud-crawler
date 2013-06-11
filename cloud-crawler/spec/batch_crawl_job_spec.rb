@@ -6,6 +6,16 @@ require 'test_batch_crawl_job'
 require 'sourcify'
 
 module CloudCrawler
+  
+   
+    # TODO:  add test for just perform-job, outside of the batch job framework
+    # 
+    #  make it run from a stand alone script
+    #
+    #  test serps...do i need cookie ?  will g allow? we know ip address will eventualy eb shut down?
+    # 
+   
+  
   describe BatchCrawlJob do
 
     before(:each) do
@@ -14,6 +24,7 @@ module CloudCrawler
       @redis.flushdb
       @opts = CloudCrawler::Driver::DRIVER_OPTS
       @opts.reverse_merge! CloudCrawler::DEFAULT_OPTS
+      @opts[:save_batch]= false
      
       @namespace = @opts[:job_name]
       @w_cache = Redis::Namespace.new("#{@namespace}:w_cache", :redis => @redis)
@@ -23,9 +34,48 @@ module CloudCrawler
       
     end
     
+   
     after(:each) do
        @redis.flushdb
     end
+    
+    # TODO:  implement this test
+    it "should create a list of next jobs based on the input batch" do
+      
+    end
+    
+     # TODO:  implement this test
+    it "should not recrawl a url if it is in the bloomfilter" do
+      
+    end
+    
+    # TODO:  implement this test
+    it "should save the results in the page store" do
+      
+    end
+    
+    # TODO:  implement this test
+    it "should save the results in the page store" do
+      
+    end
+    
+     # TODO:  implement this test
+    it "retain data, like user_agent, in the next_jobs from the parent job" do
+      
+    end
+    
+     # TODO:  implement this test
+    it "optionally drop a cookie and re-use it in the next job" do
+      
+    end
+    
+    # TODO:   implement this test
+    it 'should normalize the url, or use some other key, for the pagestore' do
+      
+    end
+    
+    
+    
     
 
     def crawl_link(urls, blocks={})
@@ -37,8 +87,7 @@ module CloudCrawler
       return @page_store.size
     end
     
-    # TODO:  add test for just perform-job, outside of the batch job framework
-    # 
+  
 
     it "should crawl all the html pages in a domain by following <a> href's , and populate the bloom filter" do
       pages = []

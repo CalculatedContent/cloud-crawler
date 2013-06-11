@@ -22,7 +22,8 @@ module CloudCrawler
     
       @opts[:queue_name] = 'test_batch_job_spec'
       @opts[:depth_limit] = 2 # => gives 60 jobs
-
+      @opts[:save_batch] = false   # deal with permissions later
+      
       @client = Qless::Client.new()
       
       @queue = @client.queues[@opts[:queue_name]]
@@ -133,24 +134,33 @@ module CloudCrawler
       
     end
   
-  
-    # easy check...but needs to be here
+      
     
-    #
-  # it "should have access to the master cache" do
-  # @opts[:flush] = false
-  # run_batch(batch)
-  # end
-  #
-  # it "should have access to the local cache" do
-  # @opts[:flush] = false
-  # run_batch(batch)
-  # end
-  #
-
-   # TODO: painful  ..need to optionally turn on and off cache
+  it "should have access to the master cache" do
+      puts "....\n\n"
+      run_batch(make_batch)
+      
+      keys = @m_cache.keys("*")
+      keys.should_not be_empty
+  end
   
-
+  it "should have access to the worker cache" do
+      puts "....\n\n"
+      run_batch(make_batch)
+      
+      keys = @w_cache.keys("*")
+      keys.should_not be_empty
+  end
+  
+  it "should have access to the s3cache cache" do
+      puts "....\n\n"
+      run_batch(make_batch)
+      
+      keys = @s3_cache.keys("*")
+      keys.should_not be_empty
+  end
+  
+  
   #
   # it "should flush the s3 cache, optionally" do
   # @opts[:flush] = true
@@ -161,7 +171,20 @@ module CloudCrawler
   # @opts[:flush] = false
   # run_batch(batch)
   # end
-
+  
+  it 'should optionally turn off the s3 cache save' do
+    
+  end
+  
+  
+  it 'should include montioring for batch processing in the local and master queues' do
+  end
+  
+  it 'should support some sane logging' do
+    
+  end
+  
+  
 
 
   end

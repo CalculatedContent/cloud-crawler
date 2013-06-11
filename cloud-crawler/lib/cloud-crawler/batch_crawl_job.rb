@@ -42,14 +42,14 @@ module CloudCrawler
 
       fetched_pages.each do |page|
         next if page.nil?
-        do_page_blocks(page)
+        do_page_blocks(page)  #DSL
       end
 
       fetched_pages.each do |page|
         # TODO:  normalize the url to avoid parameter shuffling
         url = page.url.to_s
 
-        links = links_to_follow(page)
+        links = links_to_follow(page)  #DSL
         links.reject! { |lnk| @bloomfilter.visited_url?(lnk) }
         links.each do |lnk|
           # next if lnk.to_s==url  # avoid loop

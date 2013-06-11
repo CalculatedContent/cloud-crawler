@@ -47,7 +47,11 @@ module CloudCrawler
     end
 
     def self.init_job
-
+     
+    end
+    
+    def self.save_batch?
+       @opts[:save_batch]
     end
 
     def self.queue_up?
@@ -126,7 +130,7 @@ module CloudCrawler
           jobs.flatten!.compact!
         end
 
-        @s3_cache.s3.save!
+        @s3_cache.s3.save! if save_batch? # for debugging
 
       end #  while jobs.not_empty?
 

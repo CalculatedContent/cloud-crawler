@@ -36,9 +36,12 @@ module CloudCrawler
     :read_timeout => nil,
     
     # allow links outside of the root domain
-     :outside_domain => false,
+    :outside_domain => false,
     # allow links inside of the root domain
-     :inside_domain => true
+    :inside_domain => true,
+    
+    # save batch jobs in s3
+    :save_batch => true
   
   }
 
