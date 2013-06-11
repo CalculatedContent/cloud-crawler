@@ -161,19 +161,8 @@ module CloudCrawler
   end
   
   
-  #
-  # it "should flush the s3 cache, optionally" do
-  # @opts[:flush] = true
-  # run_batch(batch)
-  # end
-  #
-  # it "not should flush the s3 cache, optionally" do
-  # @opts[:flush] = false
-  # run_batch(batch)
-  # end
-  
   it 'should optionally turn off the s3 cache save' do
-    
+    # not tested here...until s3 is mocked up
   end
   
   
