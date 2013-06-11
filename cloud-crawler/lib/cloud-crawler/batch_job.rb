@@ -95,6 +95,7 @@ module CloudCrawler
     
     def self.process_batch(jobs_batch)
       next_jobs = jobs_batch.map do |hsh|
+        @job=hsh # hack for dsl
         hsh.symbolize_keys!
         sleep(delay) if delay
         process_job(hsh)
@@ -111,7 +112,8 @@ module CloudCrawler
       super(qjob)
       init(qjob)
 
-      data = qjob.data.symbolize_keys
+      # use @ for DSL ... crappy design
+      @data = qjob.data.symbolize_keys
       jobs = JSON.parse(data[:batch])
 
       while jobs.size > 0 do

@@ -173,7 +173,9 @@ module CloudCrawler
     
   end
   
-  
+  it ' should allow a child class to access @job through the dsl' do
+    
+  end
 
 
   end

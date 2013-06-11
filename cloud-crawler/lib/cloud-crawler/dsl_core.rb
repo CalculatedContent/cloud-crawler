@@ -31,10 +31,15 @@ module CloudCrawler
       #  @after_crawl_blocks = JSON.parse(data[:after_crawl_blocks])
       end
 
+     # accessors for DSL, but not thread safe?
      def data
        @data
      end
     
+     def job
+        @job
+      end
+      
  
      def opts
        @opts
@@ -92,6 +97,7 @@ module CloudCrawler
       end
       
 
+     
       #
       # Returns +true+ if *link* has not been visited already,
       # and is not excluded by a skip_link pattern...

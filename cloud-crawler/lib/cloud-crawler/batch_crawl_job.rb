@@ -23,10 +23,10 @@ module CloudCrawler
     
     
 
-    def self.process_job(job_hsh)
+    def self.process_job(job)
       next_jobs = []
 
-      link, referer, depth = job_hsh[:link], job_hsh[:referer], job_hsh[:depth]
+      link, referer, depth = job[:link], job[:referer], job[:depth]
       
       return next_jobs if link.nil? or link.empty? or link == :END
       return next_jobs if @bloomfilter.visited_url?(link.to_s)
@@ -55,7 +55,7 @@ module CloudCrawler
           # next if lnk.to_s==url  # avoid loop
           next if depth_limit and (page.depth + 1 > depth_limit)
           next_job = { :link => lnk.to_s, :referer => page.referer.to_s, :depth => page.depth + 1}
-          next_job.reverse_merge!(job_hsh)
+          next_job.reverse_merge!(job)
           next_jobs << next_job
         end
 
