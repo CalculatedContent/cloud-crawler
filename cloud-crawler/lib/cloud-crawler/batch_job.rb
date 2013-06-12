@@ -43,6 +43,7 @@ module CloudCrawler
       @queue = qjob.client.queues[@queue_name]
       @batch_size = @opts[:batch_size] || MAX_BATCH_SIZE
       @depth_limit = @opts[:depth_limit]
+
     end
 
     def self.init_job
