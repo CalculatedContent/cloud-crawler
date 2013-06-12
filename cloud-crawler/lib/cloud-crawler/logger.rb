@@ -5,10 +5,15 @@ require 'logger'
 # does not seem to load
 
 module CloudCrawler
-  @logger = Logger.new(STDERR)
+  
+  LOGGER = Logger.new($stdout)
   
   def logger
-    @logger
+    LOGGER
+  end 
+  
+   def self.logger
+    LOGGER
   end  
   
 end
