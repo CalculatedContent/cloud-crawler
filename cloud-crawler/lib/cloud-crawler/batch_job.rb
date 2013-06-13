@@ -116,18 +116,22 @@ module CloudCrawler
       # use @ for DSL ... crappy design
       @data = qjob.data.symbolize_keys
       jobs = JSON.parse(data[:batch])
+      LOGGER.info 'performing #{jobs.size} bacthed jobs '
 
       while jobs.size > 0 do
         
         jobs_batch = jobs.slice!(0,batch_size)
         next_jobs = process_batch(jobs_batch)
+        LOGGER.info "next jobs like #{next_jobs.first}"
 
         if queue_up? then
+          LOGGER.info "queing up next jobs #{next_jobs.size}"
           next_jobs.each_slice(batch_size) do |batch|
             data[:batch] = batch.to_json
             @queue.put(self, data)
           end
         else #long_run
+          LOGGER.info "running next jobs #{next_jobs.size} on same wormer"
           jobs << next_jobs
           jobs.flatten!.compact!
         end

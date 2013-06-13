@@ -7,6 +7,8 @@ require 'cloud-crawler/logger'
 
 module CloudCrawler
 
+ #TODO:  these are never actually input
+ #  need to reconcile with unit tests and trollop
   DEFAULT_OPTS = {
     # disable verbose output
     :verbose => false,
