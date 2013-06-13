@@ -103,7 +103,7 @@ module CloudCrawler
       end
       next_jobs.flatten!.compact!
 
-      next_jobs.reject! { |j| j[:depth].to_i >= depth_limit } if depth_limit
+      next_jobs.reject! { |j| j[:depth].to_i > depth_limit } if depth_limit
       return next_jobs
     end
     
