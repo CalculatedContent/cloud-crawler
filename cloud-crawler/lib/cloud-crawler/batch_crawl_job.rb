@@ -14,18 +14,18 @@ module CloudCrawler
     def self.init_with_pagestore(qjob)   
       @page_store = RedisPageStore.new(@local_redis,@opts)
       @bloomfilter = RedisUrlBloomfilter.new(@redis)
+      @http_cache={}
+      @http=nil
       init_without_pagestore(qjob)
     end
     
-    def self.process_batch_with_http(jobs_batch)
-       @http = CloudCrawler::HTTP.new(@opts)
-       process_batch_without_http(jobs_batch)
+   
+    def self.http
+       @http
     end
-    
     
     class << self
       alias_method_chain :init, :pagestore
-      alias_method_chain :process_batch, :http
     end
     
     
@@ -39,7 +39,10 @@ module CloudCrawler
       return next_jobs if link.nil? or link.empty? or link == :END
       return next_jobs if @bloomfilter.visited_url?(link.to_s)
 
-      @http.job_id = job[:qid]  # hack for cookies
+      # hack for cookies 
+      @http_cache[job[:qid] ] ||=  CloudCrawler::HTTP.new(@opts)
+      @http=@http_cache[job_id]
+      
       return next_jobs if http.nil?
       
       fetched_pages = http.fetch_pages(link, referer, depth) # hack for testing

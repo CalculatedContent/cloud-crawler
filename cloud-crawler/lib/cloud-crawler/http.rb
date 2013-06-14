@@ -13,13 +13,11 @@ module CloudCrawler
 
     # CookieStore for this HTTP client
     attr_reader :cookie_store
-    attr_accessor :job_id
     
     def initialize(opts = {})
       @connections = {}
       @opts = opts
-      @cookie_store =  {} #CookieStore.new(@opts[:cookies])
-      @job_id
+      @cookie_store =  CookieStore.new(@opts[:cookies])
     end
     
     
@@ -143,10 +141,9 @@ module CloudCrawler
       opts = {}
       opts['User-Agent'] = user_agent if user_agent
       opts['Referer'] = referer.to_s if referer
-    #  opts['Cookie'] =  @cookie_store.to_s unless @cookie_store.empty? || (!accept_cookies? && @opts[:cookies].nil?)
-      opts['Cookie'] =  @cookie_store[job_id] # unless @cookie_store.empty? || !accept_cookies? 
-
-      LOGGER.info "getting cookie for #{job_id} as  #{@cookie_store[job_id]} " 
+      opts['Cookie'] =  @cookie_store.to_s unless @cookie_store.empty? || (!accept_cookies? && @opts[:cookies].nil?)
+      
+      LOGGER.info "getting cookie  as  #{@cookie_store.to_s} " 
 
 
      # logger.info "get_response #{opts['User-Agent']}  #{opts['Referer']}"
@@ -161,9 +158,8 @@ module CloudCrawler
         finish = Time.now()
         response_time = ((finish - start) * 1000).round
        
-       # @cookie_store.merge!(response['Set-Cookie']) if accept_cookies?
-        @cookie_store[job_id] = response['Set-Cookie'] if accept_cookies?
-        LOGGER.info "setting cookie for #{job_id} to  #{@cookie_store[job_id]} "
+        @cookie_store.merge!(response['Set-Cookie']) if accept_cookies?
+        LOGGER.info "setting cookie to  #{@cookie_store} "
         return response, response_time
       rescue Timeout::Error, Net::HTTPBadResponse, EOFError => e
         puts e.inspect if verbose?
