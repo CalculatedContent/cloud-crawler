@@ -95,7 +95,10 @@ module CloudCrawler
     # if pipelined? then () else () end
     
     def self.process_batch(jobs_batch)
+       LOGGER.info " process batch  #{jobs_batch.size}"
+        
       next_jobs = jobs_batch.map do |hsh|
+        LOGGER.info " process hash  #{hsh}"
         @job=hsh # hack for dsl
         hsh.symbolize_keys!
         sleep(delay) if delay
@@ -116,11 +119,16 @@ module CloudCrawler
       # use @ for DSL ... crappy design
       @data = qjob.data.symbolize_keys
       jobs = JSON.parse(data[:batch])
-      LOGGER.info 'performing #{jobs.size} bacthed jobs '
+      LOGGER.info "performing #{jobs.size} batched jobs "
 
       while jobs.size > 0 do
         
+        LOGGER.info " #{jobs.size} jobs being processed"
+        
         jobs_batch = jobs.slice!(0,batch_size)
+        
+        LOGGER.info " #{jobs_batch.size} jobs_batch size"
+        
         next_jobs = process_batch(jobs_batch)
         LOGGER.info "next jobs like #{next_jobs.first}"
 
@@ -131,12 +139,14 @@ module CloudCrawler
             @queue.put(self, data)
           end
         else #long_run
-          LOGGER.info "running next jobs #{next_jobs.size} on same wormer"
+          LOGGER.info "running #{next_jobs.size}  next jobs on same worker"
           jobs << next_jobs
           jobs.flatten!.compact!
         end
 
         @s3_cache.s3.save! if save_batch? # for debugging
+        
+        LOGGER.info " #{jobs.size} jobs left"
 
       end #  while jobs.not_empty?
 

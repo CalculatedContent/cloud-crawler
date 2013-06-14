@@ -1,6 +1,6 @@
 require 'net/https'
 require 'cloud-crawler/page'
-require 'cloud-crawler/cookie_store'
+# require 'cloud-crawler/cookie_store'
 require 'cloud-crawler/logger'
 
 module CloudCrawler
@@ -16,7 +16,7 @@ module CloudCrawler
     def initialize(opts = {})
       @connections = {}
       @opts = opts
-      @cookie_store = CookieStore.new(@opts[:cookies])
+      @cookie_store =  CookieStore.new(@opts[:cookies])
     end
     
    
@@ -106,6 +106,10 @@ module CloudCrawler
     def read_timeout
       @opts[:read_timeout]
     end
+    
+    def job_id
+       @opts[:job_id]
+    end
 
     private
 
@@ -139,7 +143,11 @@ module CloudCrawler
       opts = {}
       opts['User-Agent'] = user_agent if user_agent
       opts['Referer'] = referer.to_s if referer
-      opts['Cookie'] =  @cookie_store.to_s unless @cookie_store.empty? || (!accept_cookies? && @opts[:cookies].nil?)
+    #  opts['Cookie'] =  @cookie_store.to_s unless @cookie_store.empty? || (!accept_cookies? && @opts[:cookies].nil?)
+      opts['Cookie'] =  @cookie_store[job_id] # unless @cookie_store.empty? || !accept_cookies? 
+
+      LOGGER.info "getting cookie for #{job_id} as  #{@cookie_store[job_id]} " 
+
 
      # logger.info "get_response #{opts['User-Agent']}  #{opts['Referer']}"
       retries = 0
@@ -152,7 +160,10 @@ module CloudCrawler
         response = connection(url).request(req)
         finish = Time.now()
         response_time = ((finish - start) * 1000).round
-        @cookie_store.merge!(response['Set-Cookie']) if accept_cookies?
+       
+       # @cookie_store.merge!(response['Set-Cookie']) if accept_cookies?
+        @cookie_store[job_id] = response['Set-Cookie'] if accept_cookies?
+        LOGGER.info "setting cookie for #{job_id} to  #{@cookie_store[job_id]} "
         return response, response_time
       rescue Timeout::Error, Net::HTTPBadResponse, EOFError => e
         puts e.inspect if verbose?

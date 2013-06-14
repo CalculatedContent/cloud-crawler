@@ -24,6 +24,7 @@ module CloudCrawler
     
 
     def self.process_job(job)
+      LOGGER.info "processing job #{job}"
       next_jobs = []
 
       link, referer, depth = job[:link], job[:referer], job[:depth]
@@ -31,10 +32,11 @@ module CloudCrawler
       return next_jobs if link.nil? or link.empty? or link == :END
       return next_jobs if @bloomfilter.visited_url?(link.to_s)
 
+      @opts[:job_id] = job[:qid]  # hack for cookies
       http = CloudCrawler::HTTP.new(@opts)
       return next_jobs if http.nil?
       
-      fetched_pages = http.fetch_pages(link, referer, depth, job[:qsid]) # hack for testing
+      fetched_pages = http.fetch_pages(link, referer, depth) # hack for testing
 
       fetched_pages.flatten!
       fetched_pages.compact!
