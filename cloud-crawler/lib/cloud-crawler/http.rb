@@ -35,6 +35,7 @@ module CloudCrawler
     # Create new Pages from the response of an HTTP request to *url*,
     # including redirects
     #
+    # TODO:  add id for root referer so cookies can be saved
     def fetch_pages(url, referer = nil, depth = nil)
       begin
         url = URI(url) unless url.is_a?(URI)
@@ -138,7 +139,7 @@ module CloudCrawler
       opts = {}
       opts['User-Agent'] = user_agent if user_agent
       opts['Referer'] = referer.to_s if referer
-      opts['Cookie'] = @cookie_store.to_s unless @cookie_store.empty? || (!accept_cookies? && @opts[:cookies].nil?)
+      opts['Cookie'] =  @cookie_store.to_s unless @cookie_store.empty? || (!accept_cookies? && @opts[:cookies].nil?)
 
      # logger.info "get_response #{opts['User-Agent']}  #{opts['Referer']}"
       retries = 0

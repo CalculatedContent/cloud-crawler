@@ -34,7 +34,7 @@ module CloudCrawler
       http = CloudCrawler::HTTP.new(@opts)
       return next_jobs if http.nil?
       
-      fetched_pages = http.fetch_pages(link, referer, depth)
+      fetched_pages = http.fetch_pages(link, referer, depth, job[:qsid]) # hack for testing
 
       fetched_pages.flatten!
       fetched_pages.compact!
@@ -49,12 +49,13 @@ module CloudCrawler
         # TODO:  normalize the url to avoid parameter shuffling
         url = page.url.to_s
 
-        links = links_to_follow(page)  #DSL
+        links = links_to_follow(page) 
         links.reject! { |lnk| @bloomfilter.visited_url?(lnk) }
         links.each do |lnk|
           # next if lnk.to_s==url  # avoid loop
           next if depth_limit and (page.depth + 1 > depth_limit)
-          next_job = { :link => lnk.to_s, :referer => page.referer.to_s, :depth => page.depth + 1}
+          #next_job = { :link => lnk.to_s, :referer => page.referer.to_s, :depth => page.depth + 1}
+          next_job = { :link => lnk.to_s, :referer => url , :depth => page.depth + 1}
           next_job.reverse_merge!(job)
           next_jobs << next_job
         end
