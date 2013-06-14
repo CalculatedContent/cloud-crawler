@@ -54,8 +54,8 @@ module CloudCrawler
         return pages
       rescue Exception => e
         if verbose?
-     #     logger.info e.inspect
-      #    logger.info e.backtrace
+            LOGGER.info e.inspect
+            LOGGER.info e.backtrace
         end
         return [Page.new(url, :error => e)]
       end
@@ -143,10 +143,8 @@ module CloudCrawler
       opts['Referer'] = referer.to_s if referer
       opts['Cookie'] =  @cookie_store.to_s unless @cookie_store.empty? || (!accept_cookies? && @opts[:cookies].nil?)
       
-      LOGGER.info "getting cookie  as  #{@cookie_store.to_s} " 
+      # LOGGER.info "getting cookie  as  #{@cookie_store.to_s} " 
 
-
-     # logger.info "get_response #{opts['User-Agent']}  #{opts['Referer']}"
       retries = 0
       begin
         start = Time.now()
@@ -159,7 +157,7 @@ module CloudCrawler
         response_time = ((finish - start) * 1000).round
        
         @cookie_store.merge!(response['Set-Cookie']) if accept_cookies?
-        LOGGER.info "setting cookie to  #{@cookie_store} "
+       # LOGGER.info "setting cookie to  #{@cookie_store} "
         return response, response_time
       rescue Timeout::Error, Net::HTTPBadResponse, EOFError => e
         puts e.inspect if verbose?

@@ -40,8 +40,8 @@ module CloudCrawler
       return next_jobs if @bloomfilter.visited_url?(link.to_s)
 
       # hack for cookies 
-      @http_cache[job[:qid] ] ||=  CloudCrawler::HTTP.new(@opts)
-      @http=@http_cache[job_id]
+      @http_cache[job[:qid]] ||=  CloudCrawler::HTTP.new(@opts)
+      @http=@http_cache[job[:qid]]
       
       return next_jobs if http.nil?
       
