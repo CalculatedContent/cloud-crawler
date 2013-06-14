@@ -9,17 +9,20 @@ module CloudCrawler
     
     # Maximum number of redirects to follow on each get_response
     REDIRECT_LIMIT = 5
+    
 
     # CookieStore for this HTTP client
     attr_reader :cookie_store
+    attr_accessor :job_id
     
     def initialize(opts = {})
       @connections = {}
       @opts = opts
-      @cookie_store =  CookieStore.new(@opts[:cookies])
+      @cookie_store =  {} #CookieStore.new(@opts[:cookies])
+      @job_id
     end
     
-   
+    
     def size
       @connections.size
     end
@@ -107,9 +110,6 @@ module CloudCrawler
       @opts[:read_timeout]
     end
     
-    def job_id
-       @opts[:job_id]
-    end
 
     private
 

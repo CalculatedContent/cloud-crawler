@@ -17,8 +17,15 @@ module CloudCrawler
       init_without_pagestore(qjob)
     end
     
+    def self.process_batch_with_http(jobs_batch)
+       @http = CloudCrawler::HTTP.new(@opts)
+       process_batch_without_http(jobs_batch)
+    end
+    
+    
     class << self
       alias_method_chain :init, :pagestore
+      alias_method_chain :process_batch, :http
     end
     
     
@@ -32,8 +39,7 @@ module CloudCrawler
       return next_jobs if link.nil? or link.empty? or link == :END
       return next_jobs if @bloomfilter.visited_url?(link.to_s)
 
-      @opts[:job_id] = job[:qid]  # hack for cookies
-      http = CloudCrawler::HTTP.new(@opts)
+      @http.job_id = job[:qid]  # hack for cookies
       return next_jobs if http.nil?
       
       fetched_pages = http.fetch_pages(link, referer, depth) # hack for testing
