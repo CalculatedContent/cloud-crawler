@@ -78,7 +78,7 @@ module CloudCrawler
       # must optionally turn off caching for testing
 
       # hard, synchronous flush  to s3 (or disk) here
-      saved_urls = if @flush then  @page_store.save! else @page_store.keys end
+      saved_urls = if save_batch?  then  @page_store.save! else @page_store.keys end
 
       # add pages to bloomfilter only if store to s3 succeeds
       saved_urls.each { |url|  @bloomfilter.visit_url(url) }

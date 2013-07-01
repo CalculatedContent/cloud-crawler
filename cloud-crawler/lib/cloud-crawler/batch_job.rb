@@ -84,6 +84,8 @@ module CloudCrawler
       @s3_cache
     end
 
+  
+    
     # child class should implement
     def self.process_job(hsh)
       next_jobs = []
@@ -144,7 +146,7 @@ module CloudCrawler
           jobs.flatten!.compact!
         end
 
-        @s3_cache.s3.save! if save_batch? # for debugging
+        @s3_cache.s3.save! if save_batch? 
         
         LOGGER.info " #{jobs.size} jobs left"
 
