@@ -7,8 +7,6 @@ require 'cloud-crawler/logger'
 
 module CloudCrawler
 
-#TODO
-  #@log = Logge.rnew(STDERR)
   
   module DslCore
     def self.included(base)
@@ -106,12 +104,13 @@ module CloudCrawler
       # Returns +false+ otherwise.
       #
       def visit_link?(link, from_page = nil)
-        !@bloomfilter.visited_url?(link) &&
         !skip_link?(link) &&
         !skip_query_string?(link) &&
         allowed(link) &&
         in_domain?(link, from_page) &&
-        !too_deep?(from_page)
+        !too_deep?(from_page) &&
+        # check local cache
+        !@bloomfilter.visited_url?(link) 
       end
 
       #

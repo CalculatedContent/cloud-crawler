@@ -4,8 +4,7 @@ require 'qless/worker'
 module CloudCrawler
   class Worker
     
-    def self.run(opts={})
-        
+    def self.run(opts={})      
       
       ENV['REDIS_URL']= "redis://#{opts[:qless_host]}:#{opts[:qless_port]}/#{opts[:qless_db]}"
       ENV['QUEUES'] = opts[:queue_name]

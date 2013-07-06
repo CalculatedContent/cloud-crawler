@@ -15,9 +15,11 @@ module CloudCrawler
   VERSION = '0.1';
   
   
+  
   #
   # Convenience methods to start a crawl
   #
+  
   
   def CloudCrawler.crawl(urls, opts = {}, &block)
     opts.reverse_merge! CloudCrawler::Driver::DRIVER_OPTS
@@ -27,6 +29,11 @@ module CloudCrawler
   def CloudCrawler.batch_crawl(urls, opts = {}, &block)
     opts.reverse_merge! CloudCrawler::Driver::DRIVER_OPTS
     Driver.batch_crawl(urls, opts, &block)
+  end
+  
+  def CloudCrawler.batch_curl(urls, opts = {}, &block)
+    opts.reverse_merge! CloudCrawler::Driver::DRIVER_OPTS
+    Driver.batch_curl(urls, opts, &block)
   end
   
   
@@ -98,6 +105,19 @@ module CloudCrawler
       data[:batch] = batch.to_json
       @queue.put( BatchCrawlJob, data )
     end
+    
+   def load_batch_curl(batch) 
+      data = block_sources
+      data[:opts] = @opts.to_json
+       
+      batch.each do |hsh| 
+         hsh[:link] = normalize_link( hsh[:url] )
+       end
+      
+      data[:batch] = batch.to_json
+      @queue.put( BatchCurlJob, data )
+    end
+     
      
       
     #
@@ -128,6 +148,17 @@ module CloudCrawler
       end
     end
 
+
+def self.batch_curll(urls, opts = {}, &block)
+      #logger.info "no urls to batch crawl" if urls.nil? or urls.empty?
+      self.new(opts) do |core|
+        yield core if block_given?
+
+        jobs = [urls].flatten
+        jobs.map!{ |url| { :url => url } }  unless jobs.first.is_a? Hash
+        core.load_batch_curl(jobs)
+      end
+    end
    
 
   end # Driver

@@ -8,12 +8,13 @@ require 'active_support/inflector'
 require 'active_support/core_ext'
 require 'redis-caches/s3_cache'
 
+# Like a batch crawl job, but does not check the bloomfilter or follow any links
+# used to simple retrieve a list of URLs
 module CloudCrawler
-  class BatchCrawlJob < BatchJob
+  class BatchCurlJob < BatchJob
     
     def self.init_with_pagestore(qjob)   
       @page_store = RedisPageStore.new(@local_redis,@opts)
-      @bloomfilter = RedisUrlBloomfilter.new(@redis)
       @http_cache={}
       @http=nil
       init_without_pagestore(qjob)
@@ -31,7 +32,7 @@ module CloudCrawler
     
 
     def self.process_job(job)
-      LOGGER.info "processing job #{job}"
+      LOGGER.info "processing curl job #{job}"
       next_jobs = []
 
       link, referer, depth = job[:link], job[:referer], job[:depth]
@@ -49,43 +50,24 @@ module CloudCrawler
 
       fetched_pages.flatten!
       fetched_pages.compact!
-      fetched_pages.reject! { |page|  @bloomfilter.visited_url?(page.url.to_s) }
 
-      # do not do N instance evals...do i instance eval ??
       fetched_pages.each do |page|
         next if page.nil?
-        do_page_blocks(page)  #DSL
+        do_page_blocks(page)  #DSL  should optimize .. see 
       end
 
       fetched_pages.each do |page|
         # TODO:  normalize the url to avoid parameter shuffling
         url = page.url.to_s
 
-        links = links_to_follow(page) 
-        links.reject! { |lnk| @bloomfilter.visited_url?(lnk) }  #redudant?
-        links.each do |lnk|
-          # next if lnk.to_s==url  # avoid loop
-          next if depth_limit and (page.depth + 1 > depth_limit)
-          #next_job = { :link => lnk.to_s, :referer => page.referer.to_s, :depth => page.depth + 1}
-          next_job = { :link => lnk.to_s, :referer => url , :depth => page.depth + 1}
-          next_job.reverse_merge!(job)
-          next_jobs << next_job
-        end
-
         page.discard_doc! if @opts[:discard_page_bodies]
-        @page_store[url] = page  # will stil store links, for depth analysis later .. not critical to store
+        @page_store[url] = page @opts[:discard_page]
       end
 
       # must optionally turn off caching for testing
 
       # hard, synchronous flush  to s3 (or disk) here
       saved_urls = if save_batch?  then  @page_store.save! else @page_store.keys end
-
-      # add pages to bloomfilter only if store to s3 succeeds
-      saved_urls.each { |url|  @bloomfilter.visit_url(url) }
-      
-      next_jobs.flatten!
-      next_jobs.compact!
 
       return next_jobs
     end
@@ -94,3 +76,5 @@ module CloudCrawler
 
 end
 
+#TODO: add timestamp to logging
+#  test

@@ -10,5 +10,7 @@ require 'cloud-crawler/driver'
 require 'cloud-crawler/dsl_core'
 require 'cloud-crawler/dsl_front_end'
 require 'cloud-crawler/crawl_job'
+require 'cloud-crawler/batch_crawl_job'
+require 'cloud-crawler/batch_curl_job'
 require 'cloud-crawler/worker'
 
