@@ -102,8 +102,8 @@ module CloudCrawler
     # xpath or css 
     def select_links_by(expr)
       @links ||= []
-      
       @doms_for_link = {}
+      return [] if doc.nil?
       doc.search(expr).each do |a|
         u = a['href']
         next if u.nil? or u.empty?
