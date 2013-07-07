@@ -149,7 +149,7 @@ module CloudCrawler
     end
 
 
-def self.batch_curll(urls, opts = {}, &block)
+def self.batch_curl(urls, opts = {}, &block)
       #logger.info "no urls to batch crawl" if urls.nil? or urls.empty?
       self.new(opts) do |core|
         yield core if block_given?
