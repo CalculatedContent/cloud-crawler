@@ -53,7 +53,7 @@ module CloudCrawler
 
       fetched_pages.each do |page|
         next if page.nil?
-        do_page_blocks(page)  #DSL  should optimize .. see 
+        do_page_blocks(page)  #DSL  should optimize .. can i convert to a singleton method
       end
 
       fetched_pages.each do |page|
