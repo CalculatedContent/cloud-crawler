@@ -31,9 +31,9 @@ module CloudCrawler
     Driver.batch_crawl(urls, opts, &block)
   end
   
-  def CloudCrawler.batch_curl(urls, opts = {}, &block)
+  def CloudCrawler.batch_curl(batch, opts = {}, &block)
     opts.reverse_merge! CloudCrawler::Driver::DRIVER_OPTS
-    Driver.batch_curl(urls, opts, &block)
+    Driver.batch_curl(batch, opts, &block)
   end
   
   
