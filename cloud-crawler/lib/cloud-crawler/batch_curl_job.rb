@@ -60,8 +60,7 @@ module CloudCrawler
         # TODO:  normalize the url to avoid parameter shuffling
         url = page.url.to_s
 
-        page.discard_doc! if @opts[:discard_page_bodies]
-        @page_store[url] = page @opts[:discard_page]
+        @page_store[url] = page unless @opts[:discard_page]
       end
 
       # must optionally turn off caching for testing
