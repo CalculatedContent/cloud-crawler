@@ -63,10 +63,11 @@ module CloudCrawler
       end
 
       #
+      # TODO:  make a single method on the class and optimize 
       # Execute the on_every_page blocks for *page*
       #
       def do_page_blocks(page)
-        @on_every_page_blocks.each do |block|
+        @on_every_page_blocks.each do |block|   
           instance_eval(block).call(page)
         end
 

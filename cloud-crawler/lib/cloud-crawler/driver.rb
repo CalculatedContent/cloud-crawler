@@ -13,9 +13,7 @@ require 'qless'
 
 module CloudCrawler
   VERSION = '0.1';
-  
-  
-  
+    
   #
   # Convenience methods to start a crawl
   #
@@ -31,9 +29,9 @@ module CloudCrawler
     Driver.batch_crawl(urls, opts, &block)
   end
   
-  def CloudCrawler.batch_curl(batch, opts = {}, &block)
+  def CloudCrawler.batch_curl(urls, opts = {}, &block)
     opts.reverse_merge! CloudCrawler::Driver::DRIVER_OPTS
-    Driver.batch_curl(batch, opts, &block)
+    Driver.batch_curl(urls, opts, &block)
   end
   
   
@@ -47,6 +45,12 @@ module CloudCrawler
   def CloudCrawler.standalone_batch_crawl(urls, opts = {}, &block)
     opts.reverse_merge! CloudCrawler::Driver::DRIVER_OPTS
     Driver.batch_crawl(urls, opts, &block)
+    Worker.run(opts)
+  end
+  
+  def CloudCrawler.standalone_batch_curl(urls, opts = {}, &block)
+    opts.reverse_merge! CloudCrawler::Driver::DRIVER_OPTS
+    Driver.batch_curl(urls, opts, &block)
     Worker.run(opts)
   end
   
@@ -106,7 +110,9 @@ module CloudCrawler
       @queue.put( BatchCrawlJob, data )
     end
     
+    
    def load_batch_curl(batch) 
+      LOGGER.info "loading batch curl job #{batch}"
       data = block_sources
       data[:opts] = @opts.to_json
        
@@ -124,7 +130,7 @@ module CloudCrawler
     # Convenience method to start a new crawl
     #
     def self.crawl(urls, opts = {}, &block)
-     # logger.info "no urls to crawl" if urls.nil? or urls.empty?
+      LOGGER.info "no urls to crawl" if urls.nil? or urls.empty?
       self.new(opts) do |core|
         yield core if block_given?
 
@@ -138,7 +144,7 @@ module CloudCrawler
     end
 
     def self.batch_crawl(urls, opts = {}, &block)
-      #logger.info "no urls to batch crawl" if urls.nil? or urls.empty?
+      LOGGER.info "no urls to batch crawl" if urls.nil? or urls.empty?
       self.new(opts) do |core|
         yield core if block_given?
 
@@ -149,8 +155,8 @@ module CloudCrawler
     end
 
 
-def self.batch_curl(urls, opts = {}, &block)
-      #logger.info "no urls to batch crawl" if urls.nil? or urls.empty?
+   def self.batch_curl(urls, opts = {}, &block)
+      LOGGER.info "no urls to batch crawl" if urls.nil? or urls.empty?
       self.new(opts) do |core|
         yield core if block_given?
 
