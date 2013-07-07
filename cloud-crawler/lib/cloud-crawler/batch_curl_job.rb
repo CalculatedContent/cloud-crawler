@@ -38,7 +38,6 @@ module CloudCrawler
       link, referer, depth = job[:link], job[:referer], job[:depth]
       
       return next_jobs if link.nil? or link.empty? or link == :END
-      return next_jobs if @bloomfilter.visited_url?(link.to_s)
 
       # hack for cookies 
       @http_cache[job[:qid]] ||=  CloudCrawler::HTTP.new(@opts)
