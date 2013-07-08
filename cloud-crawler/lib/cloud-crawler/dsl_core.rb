@@ -27,6 +27,8 @@ module CloudCrawler
         @skip_link_patterns = JSON.parse(data[:skip_link_patterns])        
       # for performance, should construct REGEXPs here, not with /#{pattern}/
       #  @after_crawl_blocks = JSON.parse(data[:after_crawl_blocks])
+      rescue
+        LOGGER.fatal e.backtrace
       end
 
      # accessors for DSL, but not thread safe?

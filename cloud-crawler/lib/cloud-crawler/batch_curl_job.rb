@@ -39,7 +39,8 @@ module CloudCrawler
       
       return next_jobs if link.nil? or link.empty? or link == :END
 
-      # hack for cookies 
+      # hack for cookies .. should be jid  is this correct?
+      # VERY BAD
       @http_cache[job[:qid]] ||=  CloudCrawler::HTTP.new(@opts)
       @http=@http_cache[job[:qid]]
       

@@ -6,6 +6,6 @@ log_dir = "#{cc_dir}/logs"
 # otherwise the default should be the local host
 
 every :reboot do
-   command "cd #{cc_dir}; sudo -E bundle exec  #{bin_dir}/run_worker.rb -h #{@master_ip_address}", :output => "#{log_dir}/worker.log"
+   command "cd #{cc_dir};  sudo -E bundle exec  #{bin_dir}/run_worker.rb -h #{@master_ip_address}", :output => "#{log_dir}/worker.log"
 end
 

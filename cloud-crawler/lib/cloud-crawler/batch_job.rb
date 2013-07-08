@@ -115,6 +115,7 @@ module CloudCrawler
     
 
     def self.perform(qjob)
+      LOGGER.info "inside batch job #{qjob}"
       super(qjob)
       init(qjob)
 
