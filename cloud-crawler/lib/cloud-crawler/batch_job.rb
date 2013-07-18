@@ -153,6 +153,7 @@ module CloudCrawler
 
       end #  while jobs.not_empty?
 
+LOGGER.info " completed job #{jobs.inspect}  "
     end
   end
 

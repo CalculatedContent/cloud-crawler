@@ -18,7 +18,8 @@ opts = Trollop::options do
   
   #opt :qless_queue, "", :short => "-q", :default => "crawl"   # :multi => true 
 
-  opt :interval, "time delay interval", :short => "-i", :default => 0
+  # must be 1 or worker will break...also why we have batch jobs!
+  opt :interval, "time delay interval", :short => "-i", :default => 1
   opt :job_reserver, "Ordered or RoundRobin", :short => "-r", :default => 'Ordered'
   opt :verbose, "verbos", :short => "-v", :default => true
   opt :single_process, "run as single process", :short => "-s", :default => false  
