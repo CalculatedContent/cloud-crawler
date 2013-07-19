@@ -147,13 +147,14 @@ module CloudCrawler
           jobs.flatten!.compact!
         end
 
-        @s3_cache.s3.save! if save_batch? 
         
         LOGGER.info " #{jobs.size} jobs left"
 
       end #  while jobs.not_empty?
+      @s3_cache.s3.save! if save_batch? 
 
-LOGGER.info " completed job #{jobs.inspect}  "
+
+      LOGGER.info " completed job #{jobs.inspect}  "
     end
   end
 
