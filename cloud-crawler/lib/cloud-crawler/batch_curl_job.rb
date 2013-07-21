@@ -59,14 +59,9 @@ module CloudCrawler
       fetched_pages.each do |page|
         # TODO:  normalize the url to avoid parameter shuffling
         url = page.url.to_s
-
         @page_store[url] = page unless @opts[:discard_page]
       end
 
-      # must optionally turn off caching for testing
-
-      # hard, synchronous flush  to s3 (or disk) here
-      saved_urls = if save_batch?  then  @page_store.save! else @page_store.keys end
 
       return next_jobs
     end
