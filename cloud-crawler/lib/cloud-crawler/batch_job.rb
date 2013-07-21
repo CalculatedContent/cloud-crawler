@@ -151,10 +151,9 @@ module CloudCrawler
         LOGGER.info " #{jobs.size} jobs left"
 
       end #  while jobs.not_empty?
+      LOGGER.info " saving #{@s3_cache.keys.size} keys " if save_batch?  #and if verbose?
       @s3_cache.s3.save! if save_batch? 
 
-
-      LOGGER.info " completed job #{jobs.inspect}  "
     end
   end
 
