@@ -33,18 +33,17 @@ module CloudCrawler
 
     def self.process_job(job)
       LOGGER.info "processing curl job #{job}"
-      next_jobs = []
 
       link, referer, depth = job[:link], job[:referer], job[:depth]
       
-      return next_jobs if link.nil? or link.empty? or link == :END
+      return [] if link.nil? or link.empty? or link == :END
 
       # hack for cookies .. should be jid  is this correct?
       # VERY BAD
       @http_cache[job[:qid]] ||=  CloudCrawler::HTTP.new(@opts)
       @http=@http_cache[job[:qid]]
       
-      return next_jobs if http.nil?
+      return [] if http.nil?
       
       fetched_pages = http.fetch_pages(link, referer, depth) # hack for testing
 
@@ -62,8 +61,7 @@ module CloudCrawler
         @page_store[url] = page unless @opts[:discard_page]
       end
 
-
-      return next_jobs
+      return []
     end
 
   end

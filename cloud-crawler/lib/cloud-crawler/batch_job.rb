@@ -23,7 +23,9 @@ module CloudCrawler
   class BatchJob
     include DslCore
 
-    MAX_BATCH_SIZE = 1000
+    #MAX_BATCH_SIZE = 1000
+    #MAX_HEARTBEAT = MAX_BATCH_SIZE*10
+
 
     #TODO: make sure this is thread and process safe
     #  make this a singleton ?
@@ -43,6 +45,7 @@ module CloudCrawler
       @queue = qjob.client.queues[@queue_name]
       @batch_size = @opts[:batch_size] || MAX_BATCH_SIZE
       @depth_limit = @opts[:depth_limit]
+      
 
     end
 
@@ -148,11 +151,12 @@ module CloudCrawler
         end
 
         
-        LOGGER.info " #{jobs.size} jobs left"
+      LOGGER.info " #{jobs.size} jobs left"
 
       end #  while jobs.not_empty?
       LOGGER.info " saving #{@s3_cache.keys.size} keys " if save_batch?  #and if verbose?
       @s3_cache.s3.save! if save_batch? 
+      LOGGER.info " num keys left #{@s3_cache.keys.size} "
 
     end
   end

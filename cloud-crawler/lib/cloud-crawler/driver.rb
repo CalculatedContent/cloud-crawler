@@ -59,6 +59,9 @@ module CloudCrawler
   class Driver
     include DslFrontEnd
 
+    # time a batch job has before it times out
+    DEFAULT_HEARTBEAT_IN_SEC = 600
+
     DRIVER_OPTS = {
       :job_name => "cc",
       :queue_name => "crawls",
@@ -76,6 +79,7 @@ module CloudCrawler
       init(opts)
       @client = Qless::Client.new( :host => opts[:qless_host], :port => opts[:qless_port] )
       @queue = @client.queues[opts[:queue_name]]
+      @client.config['heartbeat'] = opts[:timeout] || DEFAULT_HEARTBEAT_IN_SEC
 
       yield self if block_given?
     end
