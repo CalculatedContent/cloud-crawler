@@ -158,7 +158,7 @@ module CloudCrawler
           
           # TODO:  save batch on every n jobs
           # this is a hack!!!
-          do_save_batch
+          do_save_batch!
         end
 
         
