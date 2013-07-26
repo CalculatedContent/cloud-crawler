@@ -116,7 +116,14 @@ module CloudCrawler
     end
     
     
-
+    def do_save_batch!
+      return unless save_batch?
+      LOGGER.info " saving #{@s3_cache.keys.size} keys " 
+      @s3_cache.s3.save! 
+      LOGGER.info " num keys left #{@s3_cache.keys.size} "     
+    end
+    
+    
     def self.perform(qjob)
       LOGGER.info "inside batch job #{qjob}"
       super(qjob)
@@ -148,15 +155,21 @@ module CloudCrawler
           LOGGER.info "running #{next_jobs.size}  next jobs on same worker"
           jobs << next_jobs
           jobs.flatten!.compact!
+          
+          # TODO:  save batch on every n jobs
+          # this is a hack!!!
+          do_save_batch
         end
 
         
       LOGGER.info " #{jobs.size} jobs left"
 
       end #  while jobs.not_empty?
-      LOGGER.info " saving #{@s3_cache.keys.size} keys " if save_batch?  #and if verbose?
-      @s3_cache.s3.save! if save_batch? 
-      LOGGER.info " num keys left #{@s3_cache.keys.size} "
+      
+      # where are pages saved?
+      
+      do_save_batch!
+      
 
     end
   end

@@ -40,6 +40,8 @@ module CloudCrawler
       return next_jobs if @bloomfilter.visited_url?(link.to_s)
 
       # hack for cookies 
+      # belongs in batch job itself
+      
       @http_cache[job[:qid]] ||=  CloudCrawler::HTTP.new(@opts)
       @http=@http_cache[job[:qid]]
       
@@ -72,8 +74,8 @@ module CloudCrawler
           next_jobs << next_job
         end
 
-        page.discard_doc! if @opts[:discard_page_bodies]
-        @page_store[url] = page  # will stil store links, for depth analysis later .. not critical to store
+       
+        @page_store[url] = page unless opts[:discard_page]
       end
 
       # must optionally turn off caching for testing
