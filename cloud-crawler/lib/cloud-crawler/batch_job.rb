@@ -116,7 +116,7 @@ module CloudCrawler
     end
     
     
-    def do_save_batch!
+    def self.do_save_batch!
       return unless save_batch?
       LOGGER.info " saving #{@s3_cache.keys.size} keys " 
       @s3_cache.s3.save! 
