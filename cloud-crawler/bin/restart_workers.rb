@@ -19,7 +19,7 @@ require 'fog'
 require 'socket'
 require 'logger'
 
-cc_dir = "/home/ubuntu/apps/cloud-crawler"
+cc_dir = "/home/ubuntu/cc/cloud-crawler"
 log_dir = "#{cc_dir}/logs"
 
 log = Logger.new("#{log_dir}/master.log")
