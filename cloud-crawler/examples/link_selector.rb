@@ -9,15 +9,15 @@ qurl = URI::encode("http://www.ebay.com/sch/&_nkw=digital+camera")
 
 opts = Trollop::options do
   opt :urls, "urls to crawl", :short => "-u", :multi => true,  :default => qurl
-  opt :name, "name of crawl", :short => "-n", :default => "link-selector"  # does not work yet
+  opt :job_name, "name of crawl", :short => "-n", :default => "link-selector"  # does not work yet
   opt :flush,  "", :short => "-f", :default => true
-  opt :max_slice, "", :short => "-m", :default => 10
+  opt :batch_size, "", :short => "-m", :default => 10
   
   opt :s3_bucket, "save intermediate results to s3 bucket",  :short => "-s", :default => "cc-examples"
   opt :keep_tmp_files, "save intermediate files to local dir", :short => "-t",  :type => :string, :default => false
 
   opt :depth_limit, "limit the depth of the crawl", :short => "-l", :type => :int, :default => 1 
-  opt :discard_page_bodies, "discard page bodies after processing?",  :short => "-d", :default => true
+  opt :discard_page, "discard page bodies after processing?",  :short => "-d", :default => true
   opt :skip_query_strings, "skip any link with a query string? e.g. http://foo.com/?u=user ",  :short => "-Q", :default => false
 end
 

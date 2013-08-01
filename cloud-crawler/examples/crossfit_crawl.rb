@@ -9,12 +9,12 @@ qurl = URI::encode("http://www.crossfit.com")
 
 opts = Trollop::options do
   opt :urls, "urls to crawl", :short => "-u", :multi => true,  :default => qurl
-  opt :name, "name of crawl", :short => "-n", :default => "crossfit-crawl"  # does not work yet
+  opt :job_name, "name of crawl", :short => "-n", :default => "crossfit"
   opt :flush,  "", :short => "-f", :default => true
   
 
   opt :depth_limit, "limit the depth of the crawl", :short => "-l", :type => :int, :default => 2
-  opt :discard_page_bodies, "discard page bodies after processing?",  :short => "-d", :default => true
+  opt :discard_page, "discard page bodies after processing?",  :short => "-d", :default => true
   opt :skip_query_strings, "skip any link with a query string? e.g. http://foo.com/?u=user ",  :short => "-Q", :default => false
 
   # only crawl outside links
@@ -27,15 +27,17 @@ end
 
 CloudCrawler::crawl(opts[:urls], opts)  do |cc|
   
+   cc.on_every_page do |page|
+     puts page.url.to_s
+   end
+   
   cc.focus_crawl do |page|
     page.links.keep_if do |lnk| 
        text_for(lnk) =~ /Level 1/i
     end
   end
 
-   cc.on_every_page do |page|
-     puts page.url.to_s
-   end
+  
   
 end
 

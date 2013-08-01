@@ -73,19 +73,13 @@ module CloudCrawler
           next_job.reverse_merge!(job)
           next_jobs << next_job
         end
-
-       
+    
         @page_store[url] = page unless opts[:discard_page]
       end
 
       # must optionally turn off caching for testing
 
-      # hard, synchronous flush  to s3 (or disk) here
-      saved_urls = if save_batch?  then  @page_store.save! else @page_store.keys end
-
-      # add pages to bloomfilter only if store to s3 succeeds
-      saved_urls.each { |url|  @bloomfilter.visit_url(url) }
-      
+      # TODO;  mark bloom filter now?
       next_jobs.flatten!
       next_jobs.compact!
 
@@ -93,6 +87,20 @@ module CloudCrawler
     end
 
   end
+     
+    # TODO; change to post-batch
+    def self.do_save_batch!
+      return unless save_batch?
+      super.do_save_batch!
+      LOGGER.info " saving #{@oage_store.keys.size} pages " 
+      saved_urls = @page_store.s3.save! 
+ 
+      # add pages to bloomfilter only if store to s3 succeeds
+      saved_urls.each { |url|  @bloomfilter.visit_url(url) }     
+    end
+    
+    
+    
 
 end
 

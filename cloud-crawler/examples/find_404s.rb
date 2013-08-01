@@ -9,9 +9,9 @@ qurl = URI::encode("http://www.ebay.com/sch/&_nkw=digital+camera")
 
 opts = Trollop::options do
   opt :urls, "urls to crawl", :short => "-u", :multi => true,  :default => qurl
-  opt :name, "name of crawl", :short => "-n", :default => "find_404s"  # does not work yet
+  opt :job_name, "name of crawl", :short => "-n", :default => "find_404s"  # does not work yet
   opt :flush,  "", :short => "-f", :default => true
-  opt :max_slice, "", :short => "-m", :default => 10
+  opt :batch_size, "", :short => "-m", :default => 10
   
   opt :s3_bucket, "save intermediate results to s3 bucket",  :short => "-s", :default => "cc-examples"
   opt :keep_tmp_files, "save intermediate files to local dir", :short => "-t",  :type => :string, :default => false

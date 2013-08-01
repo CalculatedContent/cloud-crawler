@@ -9,9 +9,9 @@ qurl = URI::encode("http://www.livestrong.com")
 
 opts = Trollop::options do
   opt :urls, "urls to crawl", :short => "-u", :multi => true,  :default => qurl
-  opt :name, "name of crawl", :short => "-n", :default => "word-count"
+  opt :job_name, "name of crawl", :short => "-n", :default => "word-count"
   opt :flush,  "", :short => "-f", :default => true
-  opt :max_slice, "", :short => "-m", :default => 1000
+  opt :batch_size, "", :short => "-m", :default => 100
 
   opt :s3_bucket, "save intermediate results to s3 bucket",  :short => "-s", :default => "cc-examples"
   opt :keep_tmp_files, "save intermediate files to local dir", :short => "-t",  :type => :string, :default => nil
