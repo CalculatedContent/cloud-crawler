@@ -1,0 +1,103 @@
+
+features: .. transfer to todo on task list or bugzilla or online tada list
+
+1. stop worker nodes at the end of a long crawl
+ can add to dsl directly as a call or a system call for now
+   at least the start
+   
+ stop worker nodes  how?  how do we know the crawl is over?
+ 
+ 
+2. start worker nodes before a long crawl
+
+3. fix sinatra deployer
+
+4. before_batch, after_batch hooks
+  or just make part of the general dsl => anything inside the do block is non-local
+
+5.  1 single recipe crawler
+  => modify json , add css selectors at top of files
+  
+6.  add batch curl ./ job loader to driver
+  should be in dsl, not part of basic script
+  
+7.  batch monitors to master
+
+8.  batch updates to master cache
+
+9  unit test fors asll
+
+10.  amazon warnings
+
+11.  private github w ssh key
+
+12.  dsl -> singleton optimization
+
+13. optional string scanner for high performace extraction
+
+14.  batch bloom filter /redis checks at beginning of crawl
+
+15.  new bloom filter
+
+16.  fix deployer for sinatra
+
+17.  batch stats 
+
+18.  stats on sinatra interface.  better monitor of batch jobs
+
+19.  allow workers to subscribe to channels
+
+20.  test link crawler on yummy ... just anemone first just to see i it can be crawled
+
+21.  fix up and test standalone crawls
+
+22.  implement bing crawler , perhaps with api hook
+
+23.  crawl price estmator
+
+24.  test xapian search loader on all recipies
+
+25.  test option for crawler...crawl one batch, wait, retrive it, look and analyze
+
+26.   related links crawler .. useful for other sites too like related searches on yummly
+
+27.  learn to burn an AMI
+
+28.  Azure.  set up cloud and remove all .s3cmd dependencies
+     get this cloud platform agnostic
+     
+29.  security runthrough
+
+30.  proxies?  tor?  can we just attach?
+
+31.  dave's javsxript renderer ... can we just hookup
+
+32.  any dsl will do... capybara cralwer
+
+33.  how do i redeploy source with git?  
+  on node?
+  via chef capistrano style?
+  
+34.  ehow / livestrong / content farm crawlers and predictors
+  SEO analyzers?
+  how set up a real and useful SEO tool?
+  
+ 35 mashape api?
+ 
+36.  retrieve index from common crawl url search tool automatically
+(maybe not part of DSL but a useful unix tool)
+
+37.  running the crawler with GNU parallel
+  would it work?
+  
+  inside or outside
+  kinda pointless without redis
+  but a good test of the ruby gnu parallel tool on the cloud
+  
+38. crawl FB?
+
+39. can the DSL be decoupled from qless to run on Gearman?
+  complete seperation of worker and queuing system?
+  what might this look like?
+  
+  

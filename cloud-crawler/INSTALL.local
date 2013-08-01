@@ -48,12 +48,14 @@ III.1  start the redis server
 III.2  run rake 
 
   bundle exec rake
- 
+  
+  This should run the local unit tests, but they are probably all broken by now :P
+  
 
 III.3  run a test crawl
 
   bundle exec ./test/test_crawl.rb
-  
+    
 IV  try a real crawl using the DSL
 
 flush the redis database 
@@ -67,6 +69,7 @@ load the first job into redis
 run the worker job
   
   bundle exec ./bin/run_worker.rb -n crossfit-crawl
+  
   
 V.  To view the queue monitor in a browser
   
