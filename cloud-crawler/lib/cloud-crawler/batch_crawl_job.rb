@@ -91,7 +91,7 @@ module CloudCrawler
     # TODO; change to post-batch
     def self.do_save_batch!
       return unless save_batch?
-      super.do_save_batch!
+      super.save_batch!
       LOGGER.info " saving #{@oage_store.keys.size} pages " 
       saved_urls = @page_store.s3.save! 
  

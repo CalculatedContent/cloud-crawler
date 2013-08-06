@@ -31,7 +31,7 @@ module CloudCrawler
     
     
        
-    def self.do_save_batch!
+    def self.save_batch!
       return unless save_batch?
       super.do_save_batch!
       LOGGER.info " saving #{@oage_store.keys.size} pages " 
