@@ -1,16 +1,16 @@
 $:.unshift(File.dirname(__FILE__))
 require 'spec_helper'
-require 'simple_batch_job'
+require 'child_spawning_batch_job'
 
 module CloudCrawler
-  describe SimpleBatchJob do
+  describe ChildSpawningBatchJob do
 
     it "should create the correct number of child jobs" do
 
       m, n = 3, 3
       num = (1..m).inject(0) { |s,i| s=s+n**i }
 
-      children = SimpleBatchJob.make_children({:depth=>0})
+      children = ChildSpawningBatchJob.make_children({:depth=>0})
       children.size.should == num
 
     end
@@ -19,7 +19,7 @@ module CloudCrawler
     
       depth = 3
       
-      children = SimpleBatchJob.make_children({:depth=>0})
+      children = ChildSpawningBatchJob.make_children({:depth=>0})
       children.each do |hsh|
         hsh[:depth].should be <= depth
         hsh[:prev].should_not be_nil

@@ -9,26 +9,30 @@ require 'active_support/core_ext'
 require 'redis-caches/s3_cache'
 
 module CloudCrawler
+  
+
+
+
   class BatchCrawlJob < BatchJob
     
-    def self.init_with_pagestore(qjob)   
+    
+    def self.init_with_pagestore(qless_job)   
       @page_store = RedisPageStore.new(@local_redis,@opts)
       @bloomfilter = RedisUrlBloomfilter.new(@redis)
       @http_cache={}
       @http=nil
-      init_without_pagestore(qjob)
+      init_without_pagestore(qless_job)
     end
-    
-   
-    def self.http
-       @http
-    end
-    
+     
     class << self
       alias_method_chain :init, :pagestore
     end
     
     
+     
+    def self.http
+       @http
+    end
 
     def self.process_job(job)
       LOGGER.info "processing job #{job}"
@@ -88,18 +92,17 @@ module CloudCrawler
 
   end
      
-    # TODO; change to post-batch
-    def self.do_save_batch!
-      return unless save_batch?
-      super.save_batch!
-      LOGGER.info " saving #{@oage_store.keys.size} pages " 
+    def self.do_post_batch
+      super()
+      do_post_batch_without_pagestore
+      LOGGER.info " saving #{@page_store.keys.size} pages " 
       saved_urls = @page_store.s3.save! 
  
       # add pages to bloomfilter only if store to s3 succeeds
       saved_urls.each { |url|  @bloomfilter.visit_url(url) }     
     end
     
-    
+ 
     
 
 end

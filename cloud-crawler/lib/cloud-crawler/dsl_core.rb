@@ -14,13 +14,21 @@ module CloudCrawler
      # base.send :extend, InstanceMethods
     end
 
+   
     module ClassMethods
       # Qless hook
-      def perform(job)
-        @data = job.data.symbolize_keys
+      
+      # could also optimize dsl as a singleton method
+      # for crawling, may not help
+      # ask chm , see dsl_test
+      def perform(qless_job)
+       LOGGER.info "perform dsl core"
+
+        @data = qless_job.data.symbolize_keys
         @opts = JSON.parse(data[:opts]).symbolize_keys
         @robots = Robotex.new(@opts[:user_agent]) if @opts[:obey_robots_txt]
 
+        # should this be 1 giant parse?
         @focus_crawl_block = JSON.parse(data[:focus_crawl_block]).first
         @on_every_page_blocks = JSON.parse(data[:on_every_page_blocks])
         @on_pages_like_blocks = JSON.parse(data[:on_pages_like_blocks])

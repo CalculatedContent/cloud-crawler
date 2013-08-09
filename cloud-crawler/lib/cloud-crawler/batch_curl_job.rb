@@ -12,34 +12,23 @@ require 'redis-caches/s3_cache'
 # used to simple retrieve a list of URLs
 module CloudCrawler
   class BatchCurlJob < BatchJob
-    
-    def self.init_with_pagestore(qjob)   
+     
+    def self.init_with_pagestore(qless_job)   
       @page_store = RedisPageStore.new(@local_redis,@opts)
       @http_cache={}
       @http=nil
-      init_without_pagestore(qjob)
+      init_without_pagestore(qless_job)
     end
-    
-   
-    def self.http
-       @http
-    end
-    
+     
     class << self
       alias_method_chain :init, :pagestore
     end
     
-    
-       
-    def self.save_batch!
-      return unless save_batch?
-      super.do_save_batch!
-      LOGGER.info " saving #{@oage_store.keys.size} pages " 
-      @page_store.s3.save! 
+    def self.http
+       @http
     end
     
     
-   
 
     def self.process_job(job)
       LOGGER.info "processing curl job #{job}"

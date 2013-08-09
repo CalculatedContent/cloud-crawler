@@ -1,24 +1,19 @@
 require 'cloud-crawler/logger'
 require 'cloud-crawler/batch_job'
-require 'simple_batch_job'
 require 'active_support/core_ext'
 
 module CloudCrawler
-  class SimpleBatchJob < BatchJob
+  
+  # bacth jobs will spawn
+  
+  class ChildSpawningBatchJob < BatchJob
     
-
-
-    def self.process_batch_with_counter(jobs_batch)
-    #  puts "processing batch #{jobs_batch.size}"
+    NUM_CHILDREN_SPAWNED = 22
+    
+    def self.process_batch(batch)
       m_cache.incr "num_batches"
       w_cache.incr "num_batches"
-         
-      process_batch_without_counter(jobs_batch)
-    end
-
-    # did not work as hoped
-    class << self
-      alias_method_chain :process_batch, :counter
+      super(batch)
     end
 
     # creates 3 sets of 3 new jobs
@@ -35,6 +30,10 @@ module CloudCrawler
     end
 
     # num nodes total (1..m).inject(0) { |s,i| s=s+n**i }
+    #  for depth => num_children
+    #   {1=>3, 2=>9, 3=>27}
+    #  NOTE:  this does not quite work as expected
+    #     batch of 10 => 220 jobs
     def self.make_children(hsh, n=3, m=3)
       children = []
       return children if hsh[:depth] >= m
@@ -48,4 +47,5 @@ module CloudCrawler
   end
 
 end
+
 
