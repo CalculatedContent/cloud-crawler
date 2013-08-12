@@ -37,7 +37,6 @@ opts = Trollop::options do
   opt :s3_bucket, "s3 bucket name, nil if not to save", :short => "-s", :default => "cloud-crawler"
 
   opt :depth_limit, "limit the depth of the crawl", :short => "-l", :type => :int, :default => 0
-  opt :user_agent, "identify self", :short => "-A", :default => user_agent
   opt :discard_page, "discard page  after processing?",  :short => "-d", :default => false
 
   opt :accept_cookies, "accept cookies", :short => "-C", :default => false
