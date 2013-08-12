@@ -9,9 +9,7 @@ qurl = URI::encode("http://www.crossfit.com")
 
 opts = Trollop::options do
   opt :urls, "urls to crawl", :short => "-u", :multi => true,  :default => qurl
-  opt :job_name, "name of crawl", :short => "-n", :default => "crossfit"
-  opt :flush,  "", :short => "-f", :default => true
-  
+  opt :job_name, "name of crawl", :short => "-n", :default => "crossfit"  
 
   opt :depth_limit, "limit the depth of the crawl", :short => "-l", :type => :int, :default => 2
   opt :discard_page, "discard page bodies after processing?",  :short => "-d", :default => true

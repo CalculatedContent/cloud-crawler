@@ -1,8 +1,13 @@
 #!/usr/bin/env ruby
-
-# Copyright (c) 2013, Calculated Content (TM)
+#
+# Copyright (c) 2013 Charles H Martin, PhD
+#  
+#  Calculated Content (TN)
+#  http://calculatedcontent.com
+#  charles@calculatedcontent.com
+#
 # All rights reserved.
-
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
