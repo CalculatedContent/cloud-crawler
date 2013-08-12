@@ -8,7 +8,7 @@ spec = Gem::Specification.new do |s|
   s.summary = "Cloud Crawler distributed web-spider framework"
   s.executables = %w[start_batch_crawl.rb run_worker.rb] 
   s.require_path = "lib"
-  s.has_rdoc = true
+  s.has_rdoc = false
   s.rdoc_options << '-m' << 'README.rdoc' << '-t' << 'CloudCrawler'
   s.extra_rdoc_files = ["README.rdoc"]
   s.add_dependency "nokogiri", ">= 1.5.6"
