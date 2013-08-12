@@ -25,7 +25,7 @@ require 'cloud-crawler'
 require 'trollop'
 require 'open-uri'
 
-qurl = URI::encode("http://www.livestrong.com")
+url = URI::encode("http://www.livestrong.com")
 
 opts = Trollop::options do
   opt :job_name, "name of crawl", :short => "-n", :default => "word-count"
@@ -41,23 +41,27 @@ opts = Trollop::options do
 
   opt :accept_cookies, "accept cookies", :short => "-C", :default => false
 end
-Trollop::die :s3_bucket, "s3 bucket #{opts[:s3_bucket]} not found, please make first" if `s3cmd ls | grep "#{opts[:s3_bucket]}"`.empty?
+#Trollop::die :s3_bucket, "s3 bucket #{opts[:s3_bucket]} not found, please make first" if `s3cmd ls | grep "#{opts[:s3_bucket]}"`.empty?
 Trollop::die :delay, "delay  #{opts[:delay]} must be > 0" if opts[:delay].nil? or  opts[:delay] < 1
 
-
-
+  job = {}
+  job[:url] = URI::encode(url)
+  job[:qid] = 1
+  job[:batch_id] = 1
+  
+batch = [job]
 
 # classic word counting application
 # unfornately master cache pipelining can not be turned on
 # should is 
-CloudCrawler::batch_crawl(opts[:urls], opts )  do |cc|
+CloudCrawler::batch_crawl([qurl], opts )  do |cc|
 
   cc.on_every_page do |page|
       # skip if page xml, or only process xml with crawler
       #  somehow xml slips in
       next unless page.document and page.document.title
       page.document.title.downcase.split(/\s/).each do |tok|
-       s3_cache.incr(tok)
+       m_cache.incr(tok)
     end
   end
   
