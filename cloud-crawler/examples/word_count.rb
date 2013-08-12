@@ -36,7 +36,7 @@ opts = Trollop::options do
   opt :delay, "delay between each http request (not batch jobs)",  :short => "-i", :default => 1
   opt :s3_bucket, "s3 bucket name, nil if not to save", :short => "-s", :default => "cloud-crawler"
 
-  opt :depth_limit, "limit the depth of the crawl", :short => "-l", :type => :int, :default => 0
+  opt :depth_limit, "limit the depth of the crawl", :short => "-l", :type => :int, :default => 100
   opt :discard_page, "discard page  after processing?",  :short => "-d", :default => false
 
   opt :accept_cookies, "accept cookies", :short => "-C", :default => false
