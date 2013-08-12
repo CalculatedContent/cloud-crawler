@@ -28,18 +28,25 @@ require 'open-uri'
 qurl = URI::encode("http://www.livestrong.com")
 
 opts = Trollop::options do
-  opt :urls, "urls to crawl", :short => "-u", :multi => true,  :default => qurl
   opt :job_name, "name of crawl", :short => "-n", :default => "word-count"
-  opt :flush,  "", :short => "-f", :default => true
-  opt :batch_size, "", :short => "-m", :default => 100
+  opt :batch_size, "size of bulk crawl job", :short => "-b", :default => 10
 
-  opt :s3_bucket, "save intermediate results to s3 bucket",  :short => "-s", :default => "cc-examples"
-  opt :keep_tmp_files, "save intermediate files to local dir", :short => "-t",  :type => :string, :default => nil
+  opt :save_batch, "save bulk crawl job", :short => "-B", :default => false
 
-  opt :depth_limit, "limit the depth of the crawl", :short => "-l", :type => :int, :default => nil
-  opt :discard_page_bodies, "discard page bodies after processing?",  :short => "-d", :default => true
-  opt :skip_query_strings, "skip any link with a query string? e.g. http://foo.com/?u=user ",  :short => "-Q", :default => false
+  opt :delay, "delay between each http request (not batch jobs)",  :short => "-i", :default => 1
+  opt :s3_bucket, "s3 bucket name, nil if not to save", :short => "-s", :default => "cloud-crawler"
+
+  opt :depth_limit, "limit the depth of the crawl", :short => "-l", :type => :int, :default => 0
+  opt :user_agent, "identify self", :short => "-A", :default => user_agent
+  opt :discard_page, "discard page  after processing?",  :short => "-d", :default => false
+
+  opt :accept_cookies, "accept cookies", :short => "-C", :default => false
 end
+Trollop::die :s3_bucket, "s3 bucket #{opts[:s3_bucket]} not found, please make first" if `s3cmd ls | grep "#{opts[:s3_bucket]}"`.empty?
+Trollop::die :delay, "delay  #{opts[:delay]} must be > 0" if opts[:delay].nil? or  opts[:delay] < 1
+
+
+
 
 # classic word counting application
 # unfornately master cache pipelining can not be turned on
