@@ -48,3 +48,22 @@ same as we did for  Katie
 
   deploy_cloud_worker.sh
 
+
+
+4.  add support for JSON
+   jsons store, not page store?
+    store raw html, xml, or json in long term storage
+    crawl => page is an json doc, so might need different call
+    api_crawl => different dsl, only json, and not follow links
+      expose json directly
+      expose common apis with translation table if possible
+      crunchbase.search
+      crunchbase.xxx
+      
+      these can be 'dsl plugins' for each api
+      
+5.  make a real buglist ... set up bugzilla or list github issues
+
+6.  make sure crawler still works for recipies
+    set up large recipe crawls and run  
+  

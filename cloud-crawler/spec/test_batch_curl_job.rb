@@ -7,15 +7,12 @@
 #
 require 'rubygems'
 require 'bundler/setup'
+require 'qless'
 require 'json'
 require 'active_support/core_ext'
-require 'cloud-crawler/batch_job'
 
-#
-# A batch of jobs.  The data 
-#
 module CloudCrawler
-  class TestBatchJob < BatchJob
+  class TestBatchCrawlJob 
 
     attr_accessor :data, :client, :queue
     def initialize(links, opts, blocks)

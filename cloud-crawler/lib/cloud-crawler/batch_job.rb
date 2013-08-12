@@ -1,3 +1,10 @@
+#
+# Copyright (c) 2013 Charles H Martin, PhD
+#  
+#  Calculated Content 
+#  http://calculatedcontent.com
+#  charles@calculatedcontent.com
+#
 require 'cloud-crawler/logger'
 require 'cloud-crawler/http'
 require 'cloud-crawler/redis_page_store'

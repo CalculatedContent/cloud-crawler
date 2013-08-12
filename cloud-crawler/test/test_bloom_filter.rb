@@ -1,4 +1,12 @@
 #!/usr/bin/env ruby
+#
+# Copyright (c) 2013 Charles H Martin, PhD
+#  
+#  Calculated Content 
+#  http://calculatedcontent.com
+#  charles@calculatedcontent.com
+#
+
 require 'cloud-crawler/exceptions'
 require 'cloud-crawler/redis_url_bloomfilter'
 require 'trollop'

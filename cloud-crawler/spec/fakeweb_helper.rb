@@ -1,3 +1,10 @@
+#
+# Copyright (c) 2013 Charles H Martin, PhD
+#  
+#  Calculated Content 
+#  http://calculatedcontent.com
+#  charles@calculatedcontent.com
+#
 FakeWeb.allow_net_connect = false
 
 module CloudCrawler
