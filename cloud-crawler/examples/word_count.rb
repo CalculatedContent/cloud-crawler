@@ -44,17 +44,13 @@ end
 #Trollop::die :s3_bucket, "s3 bucket #{opts[:s3_bucket]} not found, please make first" if `s3cmd ls | grep "#{opts[:s3_bucket]}"`.empty?
 Trollop::die :delay, "delay  #{opts[:delay]} must be > 0" if opts[:delay].nil? or  opts[:delay] < 1
 
-  job = {}
-  job[:url] = URI::encode(url)
-  job[:qid] = 1
-  job[:batch_id] = 1
-  
+job = {:url => URI::encode(url), :qid => 1 ,  :batch_id => 1 }  
 batch = [job]
 
 # classic word counting application
 # unfornately master cache pipelining can not be turned on
 # should is 
-CloudCrawler::batch_crawl([qurl], opts )  do |cc|
+CloudCrawler::batch_crawl(batch, opts)  do |cc|
 
   cc.on_every_page do |page|
       # skip if page xml, or only process xml with crawler
