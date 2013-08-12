@@ -51,12 +51,11 @@ batch = [job]
 CloudCrawler::batch_crawl(batch, opts)  do |cc|
 
   cc.on_every_page do |page|
-      next unless page.html? and page.document and page.document.title
-      page.document.title.downcase.split(/\s/).each do |tok|
-       m_cache.incr(tok)
+    next unless page.html? and page.document and page.document.title
+    page.document.title.downcase.split(/\s/).each do |tok|
+      m_cache.incr(tok)
     end
-  end
-  
+  end  
   
 end
 
