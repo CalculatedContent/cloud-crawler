@@ -48,14 +48,10 @@ job = {:url => URI::encode(url), :qid => 1 ,  :batch_id => 1 }
 batch = [job]
 
 # classic word counting application
-# unfornately master cache pipelining can not be turned on
-# should is 
 CloudCrawler::batch_crawl(batch, opts)  do |cc|
 
   cc.on_every_page do |page|
-      # skip if page xml, or only process xml with crawler
-      #  somehow xml slips in
-      next unless page.document and page.document.title
+      next unless page.html? and page.document and page.document.title
       page.document.title.downcase.split(/\s/).each do |tok|
        m_cache.incr(tok)
     end
