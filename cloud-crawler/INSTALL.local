@@ -1,94 +1,104 @@
-#
-# Copyright (c) 2013 Charles H Martin, PhD
-#  
-#  Calculated Content 
-#  http://calculatedcontent.com
-#  charles@calculatedcontent.com
-#
+Installing Cloud Crawler on a Local Machine
+===========================================
 
-To install on a local machine 
-(i.e Mac or Linux, Ruby does not play well with Windows)
+# Dependencies
 
-I. Dependencies
+* Mac or Linux (Windows not supported)
+* Ruby 1.9.3 with Bundler   http://gembundler.com/
+* Redis 2.6.x  (stable)     http://redis.io/download
 
-Ruby 1.9.3 with Bundler   http://gembundler.com/
-Redis 2.6.x  (stable)     http://redis.io/download
-
-it is suggested to use RVM to install ruby
+It is suggested to use RVM to install ruby
 https://rvm.io/
 
 and to use git to obtain the source
 http://git-scm.com/
 
 
-II.  Installation Steps
+# Installation
 
-II.0  install ruby 1.9.3, and redis 2.6.x
+1. Install ruby 1.9.3, and redis 2.6.x
 
-II.1  install bundler
-  gem install bundler
+```
+	bash$ curl -L https://get.rvm.io | bash -s stable --ruby=1.9.3
+	bash$ export PATH=$PATH:~/.rvm/bin/
+	bash$ rvm use 1.9.3
+	bash$ sudo apt-get install redis-server
+	bash$ sudo apt-get install git
+```
 
-
-II.2 clone the git source
-git clone git://github.com/CalculatedContent/cloud-crawler.git
-
-II.3  install the required gems and sources
-change directories to where the Gemfile.lock file is located
-
-  cd cloud_crawler/cloud-crawler
-
-install the gems and required source and build the gem
-   bundle install 
-
-to create a complete, sandbox, you can say
-  bundle install --path vendor/bundle
+2. Install bundler
   
-this will install the cloud_crawler in a local bundle gem repository
-we use bundler locally because we also use this on amazon aws / ec2 machines
+	bash$ gem install bundler --no-rdoc --no-ri
 
+3. Clone the git source
 
-III. Testing the Install
+	bash$ git clone git://github.com/CalculatedContent/cloud-crawler.git
 
-III.1  start the redis server
+4. Install the required gems and sources
 
-  redis-server &
+	1. Change directories to where the Gemfile.lock file is located
+
+		bash$ cd cloud_crawler/cloud-crawler
+
+	2. Install the gems and required source and build the gem
+
+		bash$ bundle install
+
+		or to create a complete, sandbox:
+
+		bash$ bundle install --path vendor/bundle
   
-III.2  run rake 
+		This will install the cloud_crawler in a local bundle gem repository.
 
-  bundle exec rake
+		We use bundler locally because we also use this on Amazon AWS / ec2 machines.
+
+
+# Testing the Installation
+
+1. Start the redis server (if not started automatically at install)
+
+	bash$ redis-server &
   
-  This should run the local unit tests, but they are probably all broken by now :P
+2. Run the Unit Tests
+
+	bash$ bundle exec rake
   
+	This should run the local unit tests, but they are probably all broken by now :P
 
-III.3  run a test crawl
+3. Run a test crawl
 
-  bundle exec ./test/test_crawl.rb
-    
-IV  try a real crawl using the DSL
+	bash$ bundle exec ./test/test_crawl.rb -u http://calculatedcontent.com
 
-flush the redis database 
+4. Check the pages are in redis
 
-  redis-cli flushdb
+```
+	bash$ redis-cli
+	redis> keys *
+	redis> get "cc:pages:http://calculatedcontent.com/"   
+```
 
-load the first job into redis
+# Try a real crawl using the DSL
 
-  bundle exec ./examples/crossfit_crawl.rb 
+1. Flush the redis database 
+
+	bash$ redis-cli flushdb
+
+2. Load the first job into redis
+
+	bash$ bundle exec ./examples/crossfit_crawl.rb
   
-run the worker job
+3. Run the worker job
   
-  bundle exec ./bin/run_worker.rb -n crossfit-crawl
+	bash$ bundle exec ./bin/run_worker.rb
   
-  
-V.  To view the queue monitor in a browser
-  
-   bundle exec qless-web
-   
-this should launch a tab in the web browser
-if this fails, the monitor may still work , and 
-may be visible in your browser at
+# Monitoring jobs
+ 
+	To view the queue monitor in a browser
 
-   localhost:5678
+	bash$ bundle exec qless-web
 
-  
+	This should launch a tab in the web browser.
 
+	If this fails, the monitor may still work, and may be visible in your browser at
 
+	http://localhost:5678
