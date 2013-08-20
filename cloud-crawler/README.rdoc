@@ -34,7 +34,7 @@ Use this step if you intend to bring to your own fork the changes happenning on 
 
 	$ git fetch upstream
 
-	Note that this step is useful later on if some changes have been made to the upstream repository, not if you have just executed Steps 1. and 2.
+Note that this step is useful later on if some changes have been made to the upstream repository, not if you have just executed Steps 1. and 2.
 
 === 4. Create and checkout a new branch off the master branch for your changes:
 
@@ -79,19 +79,19 @@ Thank you for your contribution!
 
 9.1. To delete the branch in GitHub:
 
-		$ git push origin :my-fix-branch
+	$ git push origin :my-fix-branch
 
 9.2. To check out the master branch:
 
-		$ git checkout master
+	$ git checkout master
 
 9.3. To delete a local branch:
 
-		$ git branch -D my-fix-branch
+	$ git branch -D my-fix-branch
 
 9.4. To update your master with the latest upstream version:
 
-		$ git pull --ff upstream master
+	$ git pull --ff upstream master
 
 === 10. (Optional) Continue contributing
 
