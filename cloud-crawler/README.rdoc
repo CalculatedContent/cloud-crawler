@@ -19,8 +19,8 @@ Distributed Ruby Web Crawler, backed up by Redis
 
 === 2. Clone your newly created fork
 
-	$ git clone https://github.com/**YOU_USERNAME**/cloud-crawler.git
-	$ cd cloud-crawler/
+ $ git clone https://github.com/**YOU_USERNAME**/cloud-crawler.git
+ $ cd cloud-crawler/
 
 === 3. (Optional) Add the upstream Cloud Crawler repository as remote
 
@@ -28,17 +28,17 @@ Use this step if you intend to bring to your own fork the changes happenning on 
 
 3.1 Assign the upstream Cloud Crawler repository to a remote called "upstream"
 
-	$ git remote add upstream https://github.com/CalculatedContent/cloud-crawler.git
+ $ git remote add upstream https://github.com/CalculatedContent/cloud-crawler.git
 
 3.2 Pull the changes not present in your fork, without modifying your files
 
-	$ git fetch upstream
+ $ git fetch upstream
 
 Note that this step is useful later on if some changes have been made to the upstream repository, not if you have just executed Steps 1. and 2.
 
 === 4. Create and checkout a new branch off the master branch for your changes:
 
-	$ git checkout -b my-fix-branch master
+ $ git checkout -b my-fix-branch master
 
 === 5. Change the code
 
@@ -49,15 +49,15 @@ Note that this step is useful later on if some changes have been made to the ups
 
 === 6. Commit your changes to your local dev machine with a meaningful message
 
-	$ git commit -am "feat(core) Added feature XYZ"
+ $ git commit -am "feat(core) Added feature XYZ"
 
 or
 
-	$ git commit -am "fix(DSL) HTML parser was breaking (Closes #666)"
+ $ git commit -am "fix(DSL) HTML parser was breaking (Closes #666)"
 
 === 7. Push your changes to GitHub:
 
-	$ git push origin my-fix-branch
+ $ git push origin my-fix-branch
 
 === 8. Open a {Pull Request}[https://help.github.com/articles/using-pull-requests] on the upstream Cloud Crawler repository
 
@@ -79,19 +79,19 @@ Thank you for your contribution!
 
 9.1. To delete the branch in GitHub:
 
-	$ git push origin :my-fix-branch
+ $ git push origin :my-fix-branch
 
 9.2. To check out the master branch:
 
-	$ git checkout master
+ $ git checkout master
 
 9.3. To delete a local branch:
 
-	$ git branch -D my-fix-branch
+ $ git branch -D my-fix-branch
 
 9.4. To update your master with the latest upstream version:
 
-	$ git pull --ff upstream master
+ $ git pull --ff upstream master
 
 === 10. (Optional) Continue contributing
 
