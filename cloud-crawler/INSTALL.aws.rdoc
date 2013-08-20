@@ -18,24 +18,25 @@ Currently, the Master instance must be started before any Worker.
 == DEPENDENCIES
 
 * Ruby 1.9.3
-* knife ec2 gem (`gem install knife-ec2 --no-rdoc --no-ri`)
+* knife ec2 gem
+ $ gem install knife-ec2 --no-rdoc --no-ri
 * Amazon AWS
 * Amazon S3 for long term storage (optional)
 
 == INSTALLATION
 
-=== Chef Server
+=== 1. Chef Server
 
-1. Clone the git repo for Chef:
+1.1 Clone the git repo for Chef:
 
  $ git clone https://github.com/CalculatedContent/chef-repo.git
 
-2. Create a Key Pair from the AWS Management Console
+1.2 Create a Key Pair from the AWS Management Console
 
 Name it 'ec2-cc-chef' for example.
 Save ec2-cc-chef.pem in ~/.ssh/ with the correct permissions (chmod 400).
 
-3. Create a Security Groups 'chefami'
+1.3 Create a Security Groups 'chefami'
 
 Open these ports:
 * 22 (SSH)
@@ -43,7 +44,7 @@ Open these ports:
 * 443 (HTTPS)
 * 6379 (Redis)
 
-4. Set the environment variables. In your ~/.bashrc it looks like this:
+1.4 Set the environment variables. In your ~/.bashrc it looks like this:
 
  export CHEF_AMI_ID='ami-d70c2892'
  export CHEF_USER='ubuntu'
@@ -59,7 +60,7 @@ AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY are your master credentials for your
 
 IAM users will not work, even with Administrator Access.
 
-5. Set up the default knife configuration
+1.5 Set up the default knife configuration
 
  $ cat ~/.chef/knife.rb
  knife[:identity_file]="#{ENV['CHEF_PEM']}"
@@ -68,7 +69,7 @@ IAM users will not work, even with Administrator Access.
  knife[:aws_secret_access_key]="#{ENV['AWS_SECRET_ACCESS_KEY']}"
  knife[:region]="#{ENV['EC2_REGION']}"
 
-6. Run the Chef Server deployer:
+1.6 Run the Chef Server deployer:
 
  $ cd chef-repo/
  $ ./deploy_chef_server.sh
@@ -76,11 +77,11 @@ IAM users will not work, even with Administrator Access.
 Follow the instructions in case of failure.
 You will be asked to enter a password at some point.
 
-=== Master Server
+=== 2. Master Server
 
  $ deploy_cloud_master.sh
 
-=== Worker instance
+=== 3. Worker instance
 
  $ deploy_cloud_worker.sh
 
@@ -91,15 +92,15 @@ Each worker instance, upon creation and configuration, will ask the Master insta
 
 == RUNNING JOBS
 
-1. Pre-requsite
+=== 1. Pre-requsite
 
 Make sure you have created the Chef Server, the Master Server and at least one Worker (see INSTALLATION above)
 
-2. Log on the Master Server
+=== 2. Log on the Master Server
 
  $ ssh -i $CHEF_PEM ubuntu@MasterServer
 
-3. On the Master Server, populate the Job Queue
+=== 3. On the Master Server, populate the Job Queue
 
  $ cd ~/cc/cloud-crawler/
  $ sudo bundle exec examples/find_404s.rb -u http://calculatedcontent.com
@@ -108,6 +109,6 @@ The running Worker(s) will automatically pick up jobs from the Queue.
 
 Spawn as many Workers as you need to execute the jobs faster.
 
-4. Monitor the Job Queue by pointing your browser to the Master
+=== 4. Monitor the Job Queue by pointing your browser to the Master
 
  $ lynx http://Master_IP_Address

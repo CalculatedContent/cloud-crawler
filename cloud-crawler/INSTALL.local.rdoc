@@ -3,14 +3,14 @@
 == DEPENDENCIES
 
 * Mac or Linux (Windows not supported)
-* Ruby 1.9.3 with Bundler   http://gembundler.com/
+* Ruby 1.9.3 with Bundler   http://gembundler.com
 * Redis 2.6.x  (stable)     http://redis.io/download
 
 It is suggested to use RVM to install ruby
-https://rvm.io/
+https://rvm.io
 
 and to use git to obtain the source
-http://git-scm.com/
+http://git-scm.com
 
 == INSTALLATION
 
