@@ -1,0 +1,97 @@
+= Installing Cloud Crawler on a Local Machine
+
+== DEPENDENCIES
+
+* Mac or Linux (Windows not supported)
+* Ruby 1.9.3 with Bundler   http://gembundler.com/
+* Redis 2.6.x  (stable)     http://redis.io/download
+
+It is suggested to use RVM to install ruby
+https://rvm.io/
+
+and to use git to obtain the source
+http://git-scm.com/
+
+== INSTALLATION
+
+=== 1. Install ruby 1.9.3, and redis 2.6.x
+
+ $ curl -L https://get.rvm.io | bash -s stable --ruby=1.9.3
+ $ export PATH=$PATH:~/.rvm/bin/
+ $ rvm use 1.9.3
+ $ sudo apt-get install redis-server
+ $ sudo apt-get install git
+
+=== 2. Install bundler
+  
+ $ gem install bundler --no-rdoc --no-ri
+
+=== 3. Clone the git source
+
+ $ git clone git://github.com/CalculatedContent/cloud-crawler.git
+
+=== 4. Install the required gems and sources
+
+4.1. Change directories to where the Gemfile.lock file is located
+
+ $ cd cloud_crawler/cloud-crawler
+
+4.2. Install the gems and required source and build the gem
+
+ $ bundle install
+
+or to create a complete, sandbox:
+
+ $ bundle install --path vendor/bundle
+  
+This will install the cloud_crawler in a local bundle gem repository.
+
+We use bundler locally because we also use this on Amazon AWS / ec2 machines.
+
+== TESTING THE INSTALLATION
+
+=== 1. Start the redis server (if not started automatically at install)
+
+ $ redis-server &
+  
+=== 2. Run the Unit Tests
+
+ $ bundle exec rake
+  
+This should run the local unit tests, but they are probably all broken by now :P
+
+=== 3. Run a test crawl
+
+ $ bundle exec ./test/test_crawl.rb -u http://calculatedcontent.com
+
+=== 4. Check the pages are in redis
+
+ $ redis-cli
+ redis> keys *
+ redis> get "cc:pages:http://calculatedcontent.com/"   
+
+== TRY A REAL CRAWL USING THE DSL
+
+=== 1. Flush the redis database 
+
+ $ redis-cli flushdb
+
+=== 2. Load the first job into redis
+
+ $ bundle exec ./examples/crossfit_crawl.rb
+  
+=== 3. Run the worker job
+  
+ $ bundle exec ./bin/run_worker.rb
+  
+== MONITORING JOBS
+ 
+To view the queue monitor in a browser
+
+ $ bundle exec qless-web
+
+This should launch a tab in the web browser.
+
+If this fails, the monitor may still work, and may be visible in your browser at
+
+http://localhost:5678

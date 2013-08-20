@@ -4,8 +4,8 @@ Distributed Ruby Web Crawler, backed up by Redis
 
 == INSTALLATION
 
-* see *INSTALL.aws* for deployment on Amazon AWS using Chef (Production)
-* see *INSTALL.local* for deployment on your local machine (Development)
+* see *INSTALL.aws.rdoc* for deployment on Amazon AWS using Chef (Production)
+* see *INSTALL.local.rdoc* for deployment on your local machine (Development)
 
 == CONTRIBUTING
 
@@ -75,7 +75,9 @@ or
 
 Thank you for your contribution!
 
-=== 9. (Optional) When the patch is reviewed and merged, delete your branch and pull your (and others') changes from the main (upstream) repository:
+=== 9. (Optional) Delete your temporary branch 'my-fix-branch'
+
+When the patch is reviewed and merged, delete your branch and pull your (and others') changes from the main (upstream) repository:
 
 9.1. To delete the branch in GitHub:
 
