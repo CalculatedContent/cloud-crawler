@@ -1,9 +1,104 @@
-#
-# Copyright (c) 2013 Charles H Martin, PhD
-#  
-#  Calculated Content 
-#  http://calculatedcontent.com
-#  charles@calculatedcontent.com
-#
-Please see the INSTALL file for instructions on how to install 
-the Cloud Crawler, both locally and on Amazon AWS
+= Cloud Crawler by {Calculated Content}[http://calculatedcontent.com]
+
+Distributed Ruby Web Crawler, backed up by Redis  
+
+== INSTALLATION
+
+* see *INSTALL.aws.rdoc* for deployment on Amazon AWS using Chef (Production)
+* see *INSTALL.local.rdoc* for deployment on your local machine (Development)
+
+== CONTRIBUTING
+
+=== 1. Fork the upstream Cloud Crawler repository:
+
+(For detailed explanations see the GitHub help to {Fork A Repo}[https://help.github.com/articles/fork-a-repo])
+
+1.1. In your favorite browser, log in to GitHub and navigate to the upstream Cloud Crawler repository at https://github.com/CalculatedContent/cloud-crawler
+
+1.2. On the top right of the page, click the 'Fork' button
+
+=== 2. Clone your newly created fork
+
+ $ git clone https://github.com/**YOU_USERNAME**/cloud-crawler.git
+ $ cd cloud-crawler/
+
+=== 3. (Optional) Add the upstream Cloud Crawler repository as remote
+
+Use this step if you intend to bring to your own fork the changes happenning on the upstream Cloud Crawler repository.
+
+3.1 Assign the upstream Cloud Crawler repository to a remote called "upstream"
+
+ $ git remote add upstream https://github.com/CalculatedContent/cloud-crawler.git
+
+3.2 Pull the changes not present in your fork, without modifying your files
+
+ $ git fetch upstream
+
+Note that this step is useful later on if some changes have been made to the upstream repository, not if you have just executed Steps 1. and 2.
+
+=== 4. Create and checkout a new branch off the master branch for your changes:
+
+ $ git checkout -b my-fix-branch master
+
+=== 5. Change the code
+
+* fix bugs
+* add features
+* ...
+* write test cases to test your changes
+
+=== 6. Commit your changes to your local dev machine with a meaningful message
+
+ $ git commit -am "feat(core) Added feature XYZ"
+
+or
+
+ $ git commit -am "fix(DSL) HTML parser was breaking (Closes #666)"
+
+=== 7. Push your changes to GitHub:
+
+ $ git push origin my-fix-branch
+
+=== 8. Open a {Pull Request}[https://help.github.com/articles/using-pull-requests] on the upstream Cloud Crawler repository
+
+(For detailed explanations see the GitHub help to {Using Pull Requests}[https://help.github.com/articles/using-pull-requests])
+
+8.1 In your favorite browser, navigate to the {pull page}[https://github.com/CalculatedContent/cloud-crawler/pulls] of the upstream Cloud Crawler repository
+
+8.2 Click "New pull request"
+
+8.3 Set the 'base branch' to where you think changes should be applied (it will default to 'master' which will most likely be correct)
+
+8.4 Set the 'head branch' to 'my-fix-branch'
+
+8.5 Send the Pull Request by writing a title and description for your changes then clicking on 'Send pull request'
+
+Thank you for your contribution!
+
+=== 9. (Optional) Delete your temporary branch 'my-fix-branch'
+
+When the patch is reviewed and merged, delete your branch and pull your (and others') changes from the main (upstream) repository:
+
+9.1. To delete the branch in GitHub:
+
+ $ git push origin :my-fix-branch
+
+9.2. To check out the master branch:
+
+ $ git checkout master
+
+9.3. To delete a local branch:
+
+ $ git branch -D my-fix-branch
+
+9.4. To update your master with the latest upstream version:
+
+ $ git pull --ff upstream master
+
+=== 10. (Optional) Continue contributing
+
+If you have more changes to contribute later on, repeat the steps above from Step 4.
+
+== COPYRIGHT
+
+Copyright (c) 2013 Calculated Content. See LICENSE for details.
