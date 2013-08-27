@@ -33,7 +33,7 @@ module CloudCrawler
     # disable verbose output
     :verbose => false,
     #  throw away the page response body after scanning it for links
-    :discard_page_bodies => false,
+    :discard_page => false,
     # identify self as CloudCrawler
     :user_agent => "CloudCrawler",
     # no delay between requests
