@@ -2,7 +2,7 @@
 #
 # Copyright (c) 2013 Charles H Martin, PhD
 #  
-#  Calculated Content (TN)
+#  Calculated Content (TM)
 #  http://calculatedcontent.com
 #  charles@calculatedcontent.com
 #

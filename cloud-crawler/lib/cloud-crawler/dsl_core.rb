@@ -137,9 +137,15 @@ module CloudCrawler
         !skip_query_string?(link) &&
         allowed(link) &&
         in_domain?(link, from_page) &&
-        !too_deep?(from_page) &&
-        # check local cache
-        !@bloomfilter.visited_url?(link) 
+        !too_deep?(from_page) 
+        
+        #&&
+        
+        # patched in crawl job
+        # check local cache:  piere's optimization
+        #  allow recrawls
+        # check bloomfilter moves to batch_crawl (and should be in crawl also, unit tests will break)
+         
       end
 
       #

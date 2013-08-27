@@ -32,6 +32,7 @@ module CloudCrawler
     include Enumerable
     
     attr_reader :namespace
+    attr_accessor :disabled
     
     def initialize(redis, opts = {})
       @redis = redis
@@ -43,6 +44,10 @@ module CloudCrawler
       opts[:namespace] = "#{name}"
       opts[:db] = redis
       opts[:seed] = 1364249661
+            
+      # default is false
+      @disabled =  opts[:disabled] || false
+       
       
       # 2.5 mb? 
      @bloomfilter = BloomFilter::Redis.new(opts)
@@ -53,6 +58,15 @@ module CloudCrawler
       "#{@namespace}:bf"
     end
 
+    def enabled?
+      true if @disabled.nil? or not @disabled
+      false
+    end
+    
+    def disabled?
+      @disabled
+    end
+    
     # same as page store
     def key_for(url)
       url.to_s.downcase.gsub("https",'http').gsub(/\s+/,' ')
@@ -62,6 +76,7 @@ module CloudCrawler
     # bloom filter methods
    
     def insert(url)
+     return if disabled?
      @bloomfilter.insert(key_for url)
     end
     alias_method :visit_url, :insert
@@ -69,12 +84,14 @@ module CloudCrawler
 
 
     def touch_urls(urls)
+      return if disabled?
       urls.each { |u| touch_url(u) }
     end
     alias_method :visit_urls, :touch_urls 
 
 
     def include?(url)
+      return true if disabled?
       @bloomfilter.include?(key_for url)
     end
     alias_method :visited_url?, :include?

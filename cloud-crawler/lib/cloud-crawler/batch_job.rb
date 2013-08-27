@@ -161,6 +161,12 @@ module CloudCrawler
     def self.do_pre_batch  
       LOGGER.info " do pre batch for #{batch_id}"
         
+      # is this the root job?
+      #  driver marks the job
+      if @data[:root_job] then
+        #eval before_crawl()
+      end
+      
     end
     
     
@@ -189,6 +195,7 @@ module CloudCrawler
           LOGGER.info "queing up next batched_jobs #{next_batch.size}"
           next_batch.each_slice(batch_size) do |batch|
             data[:batch] = batch.to_json
+            data[:root_job] = false
             @queue.put(self, data)
           end
         else #long_run

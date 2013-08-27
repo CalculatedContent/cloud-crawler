@@ -34,10 +34,10 @@ module CloudCrawler
   class BatchCurlJob < BatchJob
      
     def self.init_with_pagestore(qless_job)   
+      init_without_pagestore(qless_job)
       @page_store = RedisPageStore.new(@local_redis,@opts)
       @http_cache={}
       @http=nil
-      init_without_pagestore(qless_job)
     end
      
     class << self

@@ -1,7 +1,7 @@
 #
 # Copyright (c) 2013 Charles H Martin, PhD
 #  
-#  Calculated Content (TN)
+#  Calculated Content (TM)
 #  http://calculatedcontent.com
 #  charles@calculatedcontent.com
 #
@@ -28,8 +28,13 @@ require 'cloud-crawler/redis_page_store'
 #  crawl with blocks
 #  crawl options
 
-#TODO:  why is this totally broken?
-#  
+#TODO: Problem:  redisdb completely flushed at every test run
+#      need to namespace redis somehow ? 
+#      to avoid blowing away the redis db when running rake on a prod machine
+#
+
+#TODO:  write a test to deal with local and master redis
+#
 module CloudCrawler
   describe Driver do
 
@@ -59,8 +64,8 @@ module CloudCrawler
       pages = []
       pages << FakePage.new('0', :links => ['1', '2'])
       pages << FakePage.new('1', :links => ['3'])
-      pages << FakePage.new('2')
-      pages << FakePage.new('3')
+   #   pages << FakePage.new('2')
+    #  pages << FakePage.new('3')  we dont need this page
 
       Driver.crawl(pages[0].url) do |a|
         a.focus_crawl do |p|
@@ -71,7 +76,20 @@ module CloudCrawler
       run_jobs
       @page_store.size.should == 4
     end
+  
 
+    it 'should support recuring crawl job'
+    
+       @opts[:recur] = 60
+       # crawl some links
+       # check size of page store
+       # flush the db
+       # wait
+    
+       # check size of pagestore again
+       
+    end
+  
 
     it "should crawl all the html pages loaded as hashes" do
       pages = []

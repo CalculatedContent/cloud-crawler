@@ -22,7 +22,6 @@ require 'redis'
 require 'redis-namespace'
 require 'redis-caches/s3_cache'
 
-require 'bloomfilter-rb'
 require 'json'
 require 'zlib'
 require 'socket'

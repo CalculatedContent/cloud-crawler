@@ -119,7 +119,7 @@ module CloudCrawler
       data[:link] = normalize_link( hsh[:url])
       data.reverse_merge!(hsh)
       
-      @queue.put( CrawlJob, data )
+      submit( CrawlJob, data, @opts )
     end
     
     def load_batch_crawl(batch) 
@@ -131,7 +131,7 @@ module CloudCrawler
        end
       
       data[:batch] = batch.to_json
-      @queue.put( BatchCrawlJob, data )
+      submit( BatchCrawlJob, data, @opts )
     end
     
     
@@ -145,10 +145,24 @@ module CloudCrawler
        end
       
       data[:batch] = batch.to_json
-      @queue.put( BatchCurlJob, data )
+      submit( BatchCurlJob, data, @opts )   
+     
     end
      
-     
+    # klass = CrawlJob | BatchCrawlJob | BatchCurlJob
+    def submit( klass, data, opts)
+       data[:root_job] = true
+       if @opts[:recur] then    
+        recur_time =  @opts[:recur].to_i
+        LOGGER.info "submitting #{klass} job, every #{recur_time} seconds" 
+        # add timestamp :  submit_time   
+         @queue.recur( klass, data, recur_time )
+      else
+         LOGGER.info "submitting #{klass} single (non recurring) job"   
+          
+         @queue.put(klass, data )
+      end
+    end
       
     #
     # Convenience method to start a new crawl

@@ -29,13 +29,8 @@ require 'active_support/core_ext'
 require 'redis-caches/s3_cache'
 
 module CloudCrawler
-  
-
-
-
   class BatchCrawlJob < BatchJob
-    
-    
+        
     def self.init_with_pagestore(qless_job)   
       @page_store = RedisPageStore.new(@local_redis,@opts)
       @bloomfilter = RedisUrlBloomfilter.new(@redis)
@@ -43,12 +38,26 @@ module CloudCrawler
       @http=nil
       init_without_pagestore(qless_job)
     end
-     
-    class << self
-      alias_method_chain :init, :pagestore
+    
+    
+    def self.visit_link_with_bloomfilter?(link, from_page = nil) 
+        visit = visit_link_without_bloomfilter?(link)  
+        return visit if recrawl? link  
+        return visit && !@bloomfilter.visited_url?(link)
+    end
+    
+    def self.recrawl?(link)
+      false
     end
     
     
+     
+    class << self
+      alias_method_chain :init, :pagestore
+      alias_method_chain :visit_link?, :bloomfilter
+    end
+    
+        
      
     def self.http
        @http
@@ -75,20 +84,15 @@ module CloudCrawler
 
       fetched_pages.flatten!
       fetched_pages.compact!
-      fetched_pages.reject! { |page|  @bloomfilter.visited_url?(page.url.to_s) }
-
-      # do not do N instance evals...do i instance eval ??
       fetched_pages.each do |page|
-        next if page.nil?
-        do_page_blocks(page)  #DSL
-      end
-
-      fetched_pages.each do |page|
-        # TODO:  normalize the url to avoid parameter shuffling
+        # TODO:  Fecnh idea :  normalize the url to avoid parameter shuffling
         url = page.url.to_s
 
-        links = links_to_follow(page) 
-        links.reject! { |lnk| @bloomfilter.visited_url?(lnk) }  #redudant?
+        do_page_blocks(page)    # DSL
+
+        links = links_to_follow(page)    # DSL
+        
+        # links.reject! { |lnk| @bloomfilter.visited_url?(lnk) }  # in the dsl  
         links.each do |lnk|
           # next if lnk.to_s==url  # avoid loop
           next if depth_limit and (page.depth + 1 > depth_limit)
@@ -119,6 +123,8 @@ module CloudCrawler
       saved_urls = @page_store.s3.save! 
  
       # add pages to bloomfilter only if store to s3 succeeds
+      # skip root page?
+      
       saved_urls.each { |url|  @bloomfilter.visit_url(url) }     
     end
     
