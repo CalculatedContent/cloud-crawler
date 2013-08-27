@@ -25,9 +25,11 @@ require 'cloud-crawler'
 require 'trollop'
 require 'open-uri'
 
-url = URI::encode("http://www.livestrong.com")
+url = "http://www.livestrong.com"
 
 opts = Trollop::options do
+  opt :url, "url to crawl", :short => "-u", :default => url
+
   opt :job_name, "name of crawl", :short => "-n", :default => "word-count"
   opt :batch_size, "size of bulk crawl job", :short => "-b", :default => 10
 
@@ -41,21 +43,34 @@ opts = Trollop::options do
 
   opt :accept_cookies, "accept cookies", :short => "-C", :default => false
 end
+
+puts "Scheduling Job to count words in the titles of pages at '#{opts[:url]}'"
+puts "Crawl has a depth limit of #{opts[:depth_limit]}"
+
 #Trollop::die :s3_bucket, "s3 bucket #{opts[:s3_bucket]} not found, please make first" if `s3cmd ls | grep "#{opts[:s3_bucket]}"`.empty?
 Trollop::die :delay, "delay  #{opts[:delay]} must be > 0" if opts[:delay].nil? or  opts[:delay] < 1
 
-job = {:url => URI::encode(url), :qid => 1 ,  :batch_id => 1 }  
+job = {:url => URI::encode(opts[:url]), :qid => 1 , :batch_id => 1 }  
 batch = [job]
 
 # classic word counting application
-CloudCrawler::batch_crawl(batch, opts)  do |cc|
+CloudCrawler::batch_crawl(batch, opts) do |worker|
 
+<<<<<<< HEAD
   cc.on_every_page do |page|
     next unless page.html? and page.document and page.document.title
     page.document.title.downcase.split(/\s/).each do |tok|
       m_cache.incr(tok)
     end
   end  
+=======
+  worker.on_every_page do |page|
+      next unless page.html? and page.document and page.document.title
+      page.document.title.downcase.split(/\s/).each do |tok|
+         m_cache.incr(tok)
+      end
+  end
+>>>>>>> ed70831b9ccc43bd50c8d365242845c1156b3cf0
   
 end
 
