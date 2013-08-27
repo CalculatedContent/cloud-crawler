@@ -36,7 +36,9 @@ spec = Gem::Specification.new do |s|
 
   s.files = %w[
     VERSION
-    LICENSE.txt
+    LICENSE
+    INSTALL.aws.rdoc
+    INSTALL.local.rdoc
     CHANGELOG.rdoc
     README.rdoc
     Rakefile
