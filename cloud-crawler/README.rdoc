@@ -7,7 +7,33 @@ Distributed Ruby Web Crawler, backed up by Redis
 * see *INSTALL.aws.rdoc* for deployment on Amazon AWS using Chef (Production)
 * see *INSTALL.local.rdoc* for deployment on your local machine (Development)
 
-== CONTRIBUTING
+== CONTRIBUTING - Short version
+
+1/ Fork the repository at https://github.com/CalculatedContent/cloud-crawler
+
+2/ Create your fix branch
+ $ git checkout -b my-fix-branch master
+
+3/ Make your changes
+
+4/ Commit your changes
+ $ git commit -am "feat(core) Added feature XYZ"
+ $ git commit -am "fix(DSL) HTML parser was breaking (Closes #666)"
+
+5/ Push your changes to GitHub
+ $ git push origin my-fix-branch
+
+6/ Submit a Pull Request in GitHub
+
+Thank you for your contribution!
+
+== CONTRIBUTING - Long version
+
+If you are not familiar with Git and GitHub, start with these resources:
+* GitHub's {web based tutorial}[http://try.github.io]. It will walk you through the basics in 15 minutes
+* The {Git Real class}[http://gitreal.codeschool.com] at codeschool
+* The {Git Reference website}[http://gitref.org]
+* The {Pro Git book}[http://git-scm.com/book] by Scott Chacon, available for free
 
 === 1. Fork the upstream Cloud Crawler repository:
 
@@ -19,7 +45,22 @@ Distributed Ruby Web Crawler, backed up by Redis
 
 === 2. Clone your newly created fork
 
- $ git clone https://github.com/**YOU_USERNAME**/cloud-crawler.git
+==== HTTPS method (recommended by GitHub)
+
+ $ git clone https://github.com/**YOUR_USERNAME**/cloud-crawler.git
+ $ cd cloud-crawler/
+
+==== SSH Method
+
+Alternatively, you can use the {SSH Method}[https://help.github.com/articles/generating-ssh-keys]
+
+ $ cd ~/.ssh/
+ # Create SSH keys. This will create your public/private key pair named id_rsa/id_rsa.pub respectively.
+ $ ssh-keygen -t rsa -C "My GitHub Key"
+ # Uploaded the public key (id_rsa.pub) in the GitHub interface (Account settings/SSH Keys/Add SSH key)
+ # then actually clone the repository using SSH
+ $ cd ~/
+ $ git clone git@github.com:**YOUR_USERNAME**/cloud-crawler.git
  $ cd cloud-crawler/
 
 === 3. (Optional) Add the upstream Cloud Crawler repository as remote
@@ -83,11 +124,15 @@ When the patch is reviewed and merged, delete your branch and pull your (and oth
 
  $ git push origin :my-fix-branch
 
+or if you prefer the new syntax (since Git v1.7.0)
+
+ $ git push origin --delete my-fix-branch
+
 9.2. To check out the master branch:
 
  $ git checkout master
 
-9.3. To delete a local branch:
+9.3. To delete the local branch:
 
  $ git branch -D my-fix-branch
 
