@@ -38,7 +38,8 @@ module CloudCrawler
       @opts.reverse_merge! CloudCrawler::DEFAULT_OPTS
       
       @namespace = @opts[:job_name] 
-      @cache = Redis::Namespace.new("#{@namespace}:cache", :redis => @redis)
+      @m_cache = Redis::Namespace.new("#{@namespace}:m_cache", :redis => @redis)
+      @ccmq = Redis::Namespace.new("#{@namespace}:ccmq", :redis => @redis)
 
       @page_store = RedisPageStore.new(@redis, @opts)
       @bloomfilter = RedisUrlBloomfilter.new(@redis)
@@ -49,7 +50,7 @@ module CloudCrawler
     end
 
     def crawl_link(url, blocks={})
-      job = TestCrawlJob.new(url, referer=nil, depth=nil, opts=@opts, blocks=blocks)
+      job = TestCrawlJob.new(url, referer=nil, depth=nil, opts=@opts, ccmq=@ccmq, blocks=blocks)
       CrawlJob.perform(job)
       while qjob = job.queue.pop
         qjob.perform
@@ -143,7 +144,7 @@ module CloudCrawler
     # end
 
     it "should optionally discard page bodies to conserve memory" do
-      @opts[:discard_page_bodies] = true
+      @opts[:discard_page] = true
       crawl_link(FakePage.new('0').url)
       @page_store.values.first.doc.should be_nil
     end
@@ -156,9 +157,9 @@ module CloudCrawler
 
       # problem:  how to get the state back -- it is not persisted in the run
       # need to persist to redis or page-store
-      b = {:on_every_page_blocks => [Proc.new { cache.incr "count" }.to_source].to_json }
+      b = {:on_every_page_block => Proc.new { cache.incr "count" }.to_source }
       crawl_link(pages[0].url,blocks=b)
-      @cache.get("count").should == "3"
+      @m_cache.get("count").should == "3"
     end
 
     it "should provide a focus_crawl method to select the links on each page to follow" do
@@ -167,7 +168,7 @@ module CloudCrawler
       pages << FakePage.new('1')
       pages << FakePage.new('2')
 
-      b = {:focus_crawl_block => [Proc.new { page.links.reject{|l| l.to_s =~ /1/ }}.to_source].to_json }
+      b = {:focus_crawl_block => Proc.new { page.links.reject{|l| l.to_s =~ /1/ }}.to_source }
       crawl_link(pages[0].url,blocks=b).should == 2
       @page_store.keys.should_not include(pages[1].url.to_s)
       @page_store.keys.should include(pages[0].url.to_s)
@@ -182,7 +183,7 @@ module CloudCrawler
       pages << FakePage.new('3')
       
       # convert pattern to source
-      b = {:skip_link_patterns => [/1/,/3/].map!{|x| x.source }.to_json }
+      b = {:skip_link_patterns => [/1/,/3/].map!{|x| x.source } }
       crawl_link(pages[0].url,blocks=b).should == 2
       
     end
@@ -243,18 +244,33 @@ module CloudCrawler
         crawl_link(@pages[0].url).should == 4
       end
 
+   
+      
+      it ' should allow dsl to access @page' do
+    
+       end
+   
+   
+   it ' should allow dsl to access the nokogiri @doc of a parsed html page' do
+    
+   end
+   
+   it ' should allow dsl to detect html, xml, or json' do
+    
+   end
+   
+   
+   # TODO:   implement this test
+    it 'should have a dsl_id auto set and incremented' do
+      
     end
+    
+    
+     # TODO:   implement this test
+    it 'should have a job_id auto set and incremented' do
+      
+    end
+ end
 
   end
 end
-
-#TODO:  monday 15-apr-2012
-#  1. test DSL with link_elems matchin
-#  2. write serp crawler, related link crawler using dsl
-#  3.  test cralwer stil works on cloud
-#  4.  create 3-4 examples, write some docs on how to install and run,
-#  based on the anemone docs 
-#  5.  clean up chef repo
-#  6. check out and in redis-bloomfilter
-#  7.  prep power point / talk and share on CC / opensource web site
-# 8.  

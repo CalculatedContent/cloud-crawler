@@ -1,7 +1,7 @@
 #
 # Copyright (c) 2013 Charles H Martin, PhD
 #  
-#  Calculated Content (TN)
+#  Calculated Content (TM)
 #  http://calculatedcontent.com
 #  charles@calculatedcontent.com
 #
@@ -37,7 +37,8 @@ module CloudCrawler
       init_without_pagestore(qless_job)
       @page_store = RedisPageStore.new(@local_redis,@opts)
       @http_cache={}
-      @http=nil
+      @http = nil
+      @page = nil
     end
      
     class << self
@@ -49,9 +50,10 @@ module CloudCrawler
     end
     
     
+    
 
     def self.process_job(job)
-      LOGGER.info "processing curl job #{job}"
+      LOGGER.info "processing curl job id #{job_id}"
 
       link, referer, depth = job[:link], job[:referer], job[:depth]
       
@@ -59,8 +61,8 @@ module CloudCrawler
 
       # hack for cookies .. should be jid  is this correct?
       # VERY BAD
-      @http_cache[job[:qid]] ||=  CloudCrawler::HTTP.new(@opts)
-      @http=@http_cache[job[:qid]]
+      @http_cache[job_id] ||=  CloudCrawler::HTTP.new(@opts)
+      @http=@http_cache[job_id]
       
       return [] if http.nil?
       

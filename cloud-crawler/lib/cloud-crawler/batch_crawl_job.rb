@@ -1,7 +1,7 @@
 #
 # Copyright (c) 2013 Charles H Martin, PhD
 #  
-#  Calculated Content (TN)
+#  Calculated Content (TM)
 #  http://calculatedcontent.com
 #  charles@calculatedcontent.com
 #
@@ -75,8 +75,8 @@ module CloudCrawler
       # hack for cookies 
       # belongs in batch job itself
       
-      @http_cache[job[:qid]] ||=  CloudCrawler::HTTP.new(@opts)
-      @http=@http_cache[job[:qid]]
+      @http_cache[job_id] ||=  CloudCrawler::HTTP.new(@opts)
+      @http=@http_cache[job_id]
       
       return next_jobs if http.nil?
       
@@ -119,7 +119,7 @@ module CloudCrawler
     def self.do_post_batch
       super()
       do_post_batch_without_pagestore
-      LOGGER.info " saving #{@page_store.keys.size} pages " 
+      LOGGER.info " saving #{@page_store.keys.size} pages intp page store" 
       saved_urls = @page_store.s3.save! 
  
       # add pages to bloomfilter only if store to s3 succeeds

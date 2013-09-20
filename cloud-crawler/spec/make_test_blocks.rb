@@ -20,36 +20,35 @@
 #
 require 'rubygems'
 require 'bundler/setup'
+require 'qless'
 require 'json'
 require 'active_support/core_ext'
-require 'cloud-crawler/batch_job'
-require 'make_test_blocks'
 
-#
-# A batch of jobs.  The data 
-#
 module CloudCrawler
-  class TestBatchJob < BatchJob
-    include MakeTestBlocks
+  module MakeTestBlocks
     
-    attr_accessor :data, :client, :queue
-    def initialize(links, opts, ccmq, blocks)
-      @client = Qless::Client.new
-      @queue_name = opts[:queue_name] 
-      @queue = @client.queues[@queue_name]
+
+    def self.make_test_blocks(ccmq, blocks={})
+      blocks[:focus_crawl_block] ||= nil
+      blocks[:on_every_page_block] ||= nil
+     
+      blocks[:before_crawl_block] ||= nil
+      blocks[:after_crawl_block] ||= nil
+      blocks[:before_batch_block] ||= nil
+      blocks[:after_after_block] ||= nil
       
-      @data = {}
-      @data[:opts] = opts.to_json     
-      @data[:dsl_id] = MakeTestBlocks::make_test_blocks(ccmq,blocks)
+      blocks[:skip_link_patterns] ||=  []
+      blocks[:on_pages_like_blocks] ||= Hash.new { |hash,key| hash[key] = [] }
       
-      @data[:batch] = [links].flatten.map { |lnk|  { :link =>  lnk, :depth => 0 } }.to_json
+      json = blocks.to_json
+      id = "12345" #json.hash  can not use hash, need different id
+      ccmq["dsl_blocks:#{id}"]=json
+      
+          puts  "test blocks #{id} =>#{blocks}"
+
+      
+      return id
     end
     
- 
-
   end
-
-
-
-
 end

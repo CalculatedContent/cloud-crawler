@@ -1,7 +1,7 @@
 #
 # Copyright (c) 2013 Charles H Martin, PhD
 #  
-#  Calculated Content (TN)
+#  Calculated Content (TM)
 #  http://calculatedcontent.com
 #  charles@calculatedcontent.com
 #
@@ -33,22 +33,42 @@ module CloudCrawler
   
     def self.init(qless_job)
       @namespace = @opts[:job_name] || 'cc'
-      @queue_name = @opts[:queue_name] 
-      @cache = Redis::Namespace.new("#{@namespace}:cache", :redis => qless_job.client.redis)
+      
+      @queue_name = @opts[:queue_name]   #ccmc
+      @m_cache = Redis::Namespace.new("#{@namespace}:m_cache", :redis => qless_job.client.redis)
+      @cc_master_q = Redis::Namespace.new("#{@namespace}:ccmq", :redis =>  qless_job.client.redis)
+      
       @page_store = RedisPageStore.new(qless_job.client.redis,@opts)
       @bloomfilter = RedisUrlBloomfilter.new(qless_job.client.redis,@opts)
       @queue = qless_job.client.queues[@queue_name]   
       @depth_limit = @opts[:depth_limit]
     end
   
-    def self.cache
-      @cache
+    def self.m_cache
+      @m_cache
     end
-  
+ 
+    def self.cache
+      @m_cache
+    end
+ 
+       
+    def self.get_blocks(id)
+      # should reference driver
+      json = @cc_master_q["dsl_blocks:#{id}"]
+      if json then JSON.parse(json) else {} end
+    end
+    
+    
+
+    
     def self.perform(qless_job)
       super(qless_job)
       init(qless_job)
-             
+      
+      LOGGER.info  "CrawlJob: setting up dsl id = #{dsl_id}"
+      setup_dsl(dsl_id)  # or could just pass tghe damn blocks in
+            
       data = qless_job.data.symbolize_keys
       link, referer, depth = data[:link], data[:referer], data[:depth]     
       return if link == :END     
@@ -70,7 +90,7 @@ module CloudCrawler
             @queue.put(CrawlJob, data)
          end
          
-         page.discard_doc! if @opts[:discard_page_bodies]
+         page.discard_doc! if @opts[:discard_page]
          @page_store[url] = page   
          @bloomfilter.visit_url(url)
 

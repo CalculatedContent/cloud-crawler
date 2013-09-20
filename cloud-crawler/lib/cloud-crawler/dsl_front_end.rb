@@ -38,8 +38,8 @@ module CloudCrawler
     :user_agent => "CloudCrawler",
     # no delay between requests
     :delay => 0,
-    # don't obey the robots exclusion protocol
-    :obey_robots_txt => false,
+    # do obey the robots exclusion protocol by default
+    :obey_robots_txt => true,
     # by default, don't limit the depth of the crawl
     :depth_limit => false,
     # number of times HTTP redirects will be followed
@@ -56,14 +56,20 @@ module CloudCrawler
     :proxy_port => false,
     # HTTP read timeout in seconds
     :read_timeout => nil,
-    
+
     # allow links outside of the root domain
     :outside_domain => false,
     # allow links inside of the root domain
     :inside_domain => true,
     
     # save batch jobs in s3
-    :save_batch => true
+    :save_batch => true,
+ 
+    # auto-increment batch and job ids if they are nil
+    :auto_increment => true,
+    
+    # checkpoint turned on, only used for now when job limit is specified
+    :checkpoint => true
   
   }
 
@@ -86,49 +92,80 @@ module CloudCrawler
         @opts = opts.reverse_merge! DEFAULT_OPTS
 
         @focus_crawl_block = nil
-        @on_every_page_blocks = []
-        @skip_link_patterns = []
-        #  @after_crawl_blocks = []
-        @on_pages_like_blocks = Hash.new { |hash,key| hash[key] = [] }
+        @on_every_page_block = nil
+      
 
+        @after_crawl_block = nil
+        @before_crawl_block = nil
+        
+        @after_batch_block = nil
+        @before_batch_block = nil
+        
+        @skip_link_patterns = []
+        @on_pages_like_blocks = Hash.new { |hash,key| hash[key] = [] }
+        
         yield self if block_given?
       end
       
       def opts
         @opts
       end
+      
+      # driver provides callback into cache
+      def make_blocks
+        json  = block_sources.to_json
+        id = put_blocks_in_cache(json)
+        return id
+      end
+      
 
       def block_sources
         blocks = {}
-        blocks[:focus_crawl_block] = [@focus_crawl_block].compact.map(&:to_source).to_json
-        blocks[:on_every_page_blocks] = @on_every_page_blocks.compact.map(&:to_source).to_json
-        blocks[:skip_link_patterns] = @skip_link_patterns.compact.to_json
-        blocks[:on_pages_like_blocks] = @on_pages_like_blocks.each{ |_,a|  a.compact.map!(&:to_source) }.to_json
+        blocks[:focus_crawl_block] = block_to_source @focus_crawl_block
+        blocks[:on_every_page_block] = block_to_source @on_every_page_block 
+        blocks[:on_after_crawl_block] = block_to_source @after_crawl_block 
+        blocks[:on_before_crawl_block] = block_to_source @before_crawl_block 
+        blocks[:on_after_batch_block] = block_to_source @after_batch_block 
+        blocks[:on_before_batch_block] = block_to_source @before_batch_block 
+
+        blocks[:skip_link_patterns] = @skip_link_patterns.compact
+        blocks[:on_pages_like_blocks] = @on_pages_like_blocks.each{ |_,a|  a.compact.map!(&:to_source) }
         return blocks
       end
+      
+      def block_to_source(block)
+        if block then block.to_source else nil end  
+      end
 
-      #TODO:  implement later in driver
-      #
-      # def after_crawl(&block)
-      # @after_crawl_blocks << block
-      # self
-      # end
-
-      #
-      # Add one ore more Regex patterns for URLs which should not be
-      # followed
-      #
-      def skip_links_like(*patterns)
-        @skip_link_patterns.concat [patterns].flatten.compact.map { |x| x.source }
+      # TODO:  replacen with MP
+      def after_crawl(&block)
+        @after_crawl_block = block
         self
       end
+      
+       def before_crawl(&block)
+        @before_crawl_block = block
+        self
+      end
+      
+      def after_batch(&block)
+        @after_batch_block = block
+        self
+      end
+      
+       def before_batch(&block)
+        @before_batch_block = block
+        self
+      end
+
+     
 
       #
       # Add a block to be executed on every Page as they are encountered
       # during the crawl
       #
       def on_every_page(&block)
-        @on_every_page_blocks << block
+        @on_every_page_block = block
         self
       end
 
@@ -150,7 +187,17 @@ module CloudCrawler
       # The block should return an Array of URI objects.
       #
       def focus_crawl(&block)
+        "making focus crawl block #{block}"
         @focus_crawl_block = block
+        self
+      end
+      
+       #
+      # Add one ore more Regex patterns for URLs which should not be
+      # followed
+      #
+      def skip_links_like(*patterns)
+        @skip_link_patterns.concat [patterns].flatten.compact.map { |x| x.source }
         self
       end
 

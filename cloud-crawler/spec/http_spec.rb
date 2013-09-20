@@ -33,7 +33,44 @@ module CloudCrawler
         http = CloudCrawler::HTTP.new
         http.fetch_page(SPEC_DOMAIN).should be_an_instance_of(Page)
       end
+      
+      
 
+    
+    
+      it 'should respond to ...' do
+        
+              # :user_agent
+     # :accept_cookies?
+      # :proxy_host
+      # :proxy_port
+#   redirect_limit
+     # :read_timeout
+   
+      end
+      
+       it 'should pool connections?  ' do
+         
+       end
+       
+         it 'should provide an api agnostic response code ' do
+         
+       end
+       
+        it 'should understand cookies ' do
+         
+       end
+       
+         it 'should crawl javascript via  a browser ' do
+         
+       end
+       
+       it 'should provide json not as a page?  or a json page?' do
+         
+       end
+       
+       
+    
     end
   end
 end

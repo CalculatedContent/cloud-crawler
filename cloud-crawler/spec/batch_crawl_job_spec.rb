@@ -40,7 +40,8 @@ module CloudCrawler
      
       @namespace = @opts[:job_name]
       @w_cache = Redis::Namespace.new("#{@namespace}:w_cache", :redis => @redis)
-      
+      @ccmq =  Redis::Namespace.new("#{@namespace}:ccmq", :redis => @redis)
+
       @page_store = RedisPageStore.new(@redis, @opts)
       @bloomfilter = RedisUrlBloomfilter.new(@redis)
       
@@ -56,7 +57,7 @@ module CloudCrawler
     
     def crawl_link(urls, blocks={})
       
-      qless_job = TestBatchJob.new(urls, opts=@opts, blocks=blocks)
+      qless_job = TestBatchJob.new(urls, opts=@opts, ccmq=@ccmq, blocks=blocks)
       CloudCrawler::BatchCrawlJob.perform(qless_job)
       while qless_job = qless_job.queue.pop
         qless_job.perform
@@ -182,7 +183,7 @@ module CloudCrawler
       pages << FakePage.new('1')
       pages << FakePage.new('2')
 
-      b = {:on_every_page_blocks => [Proc.new { w_cache.incr "count" }.to_source].to_json }
+      b = {:on_every_page_block => Proc.new { w_cache.incr "count" }.to_source }
       crawl_link(pages[0].url,blocks=b)
       @w_cache.get("count").should == "3"
     end
@@ -193,7 +194,7 @@ module CloudCrawler
       pages << FakePage.new('1')
       pages << FakePage.new('2')
 
-      b = {:focus_crawl_block => [Proc.new { page.links.reject{|l| l.to_s =~ /1/ }}.to_source].to_json }
+      b = {:focus_crawl_block => Proc.new { page.links.reject{|l| l.to_s =~ /1/ }}.to_source }
       crawl_link(pages[0].url,blocks=b).should == 2
       @page_store.keys.should_not include(pages[1].url.to_s)
       @page_store.keys.should include(pages[0].url.to_s)
@@ -208,7 +209,7 @@ module CloudCrawler
       pages << FakePage.new('3')
       
       # convert pattern to source
-      b = {:skip_link_patterns => [/1/,/3/].map!{|x| x.source }.to_json }
+      b = {:skip_link_patterns => [/1/,/3/].map!{|x| x.source } }
       crawl_link(pages[0].url,blocks=b).should == 2
       
     end
@@ -343,6 +344,9 @@ module CloudCrawler
     it 'should normalize the url, or use some other key, for the pagestore' do
       
     end
+    
+    
+      
     
     
    

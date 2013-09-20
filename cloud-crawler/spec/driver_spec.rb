@@ -1,6 +1,6 @@
 #
 # Copyright (c) 2013 Charles H Martin, PhD
-#  
+#
 #  Calculated Content (TM)
 #  http://calculatedcontent.com
 #  charles@calculatedcontent.com
@@ -29,7 +29,7 @@ require 'cloud-crawler/redis_page_store'
 #  crawl options
 
 #TODO: Problem:  redisdb completely flushed at every test run
-#      need to namespace redis somehow ? 
+#      need to namespace redis somehow ?
 #      to avoid blowing away the redis db when running rake on a prod machine
 #
 
@@ -50,9 +50,9 @@ module CloudCrawler
     end
 
     after(:each) do
-       @redis.flushdb
+      @redis.flushdb
     end
-    
+
     def run_jobs
       while qjob = @queue.pop
         qjob.perform
@@ -64,129 +64,177 @@ module CloudCrawler
       pages = []
       pages << FakePage.new('0', :links => ['1', '2'])
       pages << FakePage.new('1', :links => ['3'])
-   #   pages << FakePage.new('2')
-    #  pages << FakePage.new('3')  we dont need this page
+      #   pages << FakePage.new('2')
+      #  pages << FakePage.new('3')  we dont need this page
 
       Driver.crawl(pages[0].url) do |a|
         a.focus_crawl do |p|
           p.all_links
         end
       end
-      
+
       run_jobs
       @page_store.size.should == 4
     end
-  
+
+    # #
+    # # it 'should support recuring crawl job'
+    # #
+    # # @opts[:recur] = 60
+    # # # crawl some links
+    # # # check size of page store
+    # # # flush the db
+    # # # wait
+    # #
+    # # # check size of pagestore again
+    # #
+    # # end
 # 
-    # it 'should support recuring crawl job'
-#     
-       # @opts[:recur] = 60
-       # # crawl some links
-       # # check size of page store
-       # # flush the db
-       # # wait
-#     
-       # # check size of pagestore again
-#        
+    # it 'should auto_increment a batch job if necessary and ' do
+# 
+      # @opts[:auto_increment] = true
+      # # submit jobs in batch
+      # batch = [{ :url => "http://www.ehow.com" } ]
+#       
+      # Driver.batch_crawl( batch )
+      # batch.first[:batch_id].should == 1
+      # batch.first[:job_id].should == 1
+#       
+      # batch = [{ :url => "http://www.ehow.com" } ]
+#         
+      # Driver.batch_crawl( batch )
+      # batch.first[:batch_id].should == 2
+      # batch.first[:job_id].should == 2
     # end
-  
-
-    it "should crawl all the html pages loaded as hashes" do
-      pages = []
-      pages << FakePage.new('0', :links => ['1', '2'])
-      pages << FakePage.new('1', :links => ['3'])
-      pages << FakePage.new('2')
-      pages << FakePage.new('3')
-
-      Driver.crawl( {:url => pages[0].url} ) do |a|
-        a.focus_crawl do |p|
-          p.all_links
-        end
-      end
-      
-      run_jobs
-      @page_store.size.should == 4
-    end
-
-
-
-
-    it "should be able to call a block on every page" do
-      pages = []
-      pages << FakePage.new('0', :links => ['1', '2'])
-      pages << FakePage.new('1')
-      pages << FakePage.new('2')
-
-      count = 0
-      Driver.crawl(pages[0].url) do |a|
-        a.on_every_page do 
-          cache.incr "count" 
-        end
-      end
-
-      run_jobs
-      @cache["count"].should == "3"
-    end
-
-    it "should provide a focus_crawl method to select the links on each page to follow" do
-      pages = []
-      pages << FakePage.new('0', :links => ['1', '2'])
-      pages << FakePage.new('1')
-      pages << FakePage.new('2')
-
-      # note:  sourcify gets confused with multiple procs on the same line
-      Driver.crawl(pages[0].url) do |a|
-        a.focus_crawl do |p|
-          p.links.reject do |l|
-            l.to_s =~ /1/ end
-        end
-      end
-
-      run_jobs
-      @page_store.keys.should include(pages[0].url.to_s)
-      @page_store.keys.should_not include(pages[1].url.to_s)
-    end
-    
-    
-    
-
-    describe "options" do
-      it "should accept options for the crawl" do
-        core = Driver.crawl(SPEC_DOMAIN,
-        :verbose => false,
-        :discard_page => true,
-        :user_agent => 'test',
-        :delay => 8,  # not implemented yet
-        :obey_robots_txt => true,
-        :depth_limit => 3)
-
-        core.opts[:verbose].should == false
-        core.opts[:discard_page].should == true
-        core.opts[:user_agent].should == 'test'
-        core.opts[:delay].should == 8
-        core.opts[:obey_robots_txt].should == true
-        core.opts[:depth_limit].should == 3
-      end
-    end
-
-    it "should accept options via setter methods in the crawl block" do
-      core = Driver.crawl(SPEC_DOMAIN) do |a|
-        a.verbose = false
-        a.discard_page = true
-        a.user_agent = 'test'
-        a.delay = 8
-        a.obey_robots_txt = true
-        a.depth_limit = 3
-      end
-
-      core.opts[:verbose].should == false
-      core.opts[:discard_page].should == true
-      core.opts[:delay].should == 8
-      core.opts[:user_agent].should == 'test'
-      core.opts[:obey_robots_txt].should == true
-      core.opts[:depth_limit].should == 3
-    end
-
+#     
+#     
+    # it 'should not auto_increment if the batch id was already set ' do
+# 
+      # @opts[:auto_increment] = true
+      # # submit jobs in batch
+      # batch = [{ :url => "http://www.ehow.com", :batch_id => 3 } ]
+#       
+      # Driver.batch_crawl( batch )
+      # batch.first[:batch_id].should == 3
+# 
+    # end
+#     
+     # it 'should not auto_increment if the option is not set ' do
+# 
+      # @opts[:auto_increment] = false
+      # batch = [{ :url => "http://www.ehow.com" } ]
+#       
+      # Driver.batch_crawl( batch )
+      # batch.first[:batch_id].should be_nil
+# 
+    # end
+#     
+#     
+#     
+#     
+    # # TODO:  change to m=have batch contain the data directly
+    # #  instead of an array of jobs
+    # it 'should add the opts to the job ' do
+# 
+    # end
+#     
+# 
+    # it "should crawl all the html pages loaded as hashes" do
+      # pages = []
+      # pages << FakePage.new('0', :links => ['1', '2'])
+      # pages << FakePage.new('1', :links => ['3'])
+      # pages << FakePage.new('2')
+      # pages << FakePage.new('3')
+# 
+      # Driver.crawl( {:url => pages[0].url} ) do |a|
+        # a.focus_crawl do |p|
+          # p.all_links
+        # end
+      # end
+# 
+      # run_jobs
+      # @page_store.size.should == 4
+    # end
+# 
+    # it "should be able to call a block on every page" do
+      # pages = []
+      # pages << FakePage.new('0', :links => ['1', '2'])
+      # pages << FakePage.new('1')
+      # pages << FakePage.new('2')
+# 
+      # count = 0
+      # Driver.crawl(pages[0].url) do |a|
+        # a.on_every_page do
+          # cache.incr "count"
+        # end
+      # end
+# 
+      # run_jobs
+      # @cache["count"].should == "3"
+    # end
+# 
+    # it "should provide a focus_crawl method to select the links on each page to follow" do
+      # pages = []
+      # pages << FakePage.new('0', :links => ['1', '2'])
+      # pages << FakePage.new('1')
+      # pages << FakePage.new('2')
+# 
+      # # note:  sourcify gets confused with multiple procs on the same line
+      # Driver.crawl(pages[0].url) do |a|
+        # a.focus_crawl do |p|
+          # p.links.reject do |l|
+            # l.to_s =~ /1/ end
+        # end
+      # end
+# 
+      # run_jobs
+      # @page_store.keys.should include(pages[0].url.to_s)
+      # @page_store.keys.should_not include(pages[1].url.to_s)
+    # end
+# 
+    # describe "options" do
+      # it "should accept options for the crawl" do
+        # core = Driver.crawl(SPEC_DOMAIN,
+        # :verbose => false,
+        # :discard_page => true,
+        # :user_agent => 'test',
+        # :delay => 8,  # not implemented yet
+        # :obey_robots_txt => true,
+        # :depth_limit => 3,
+        # :auto_increment => true)
+# 
+        # core.opts[:verbose].should == false
+        # core.opts[:discard_page].should == true
+        # core.opts[:user_agent].should == 'test'
+        # core.opts[:delay].should == 8
+        # core.opts[:obey_robots_txt].should == true
+        # core.opts[:depth_limit].should == 3
+# 
+        # core.opts[:auto_increment].should == true
+      # end
+    # end
+# 
+    # it "should accept options via setter methods in the crawl block" do
+      # core = Driver.crawl(SPEC_DOMAIN) do |a|
+        # a.verbose = false
+        # a.discard_page = true
+        # a.user_agent = 'test'
+        # a.delay = 8
+        # a.obey_robots_txt = true
+        # a.depth_limit = 3
+        # a.auto_increment = true
+      # end
+# 
+      # core.opts[:verbose].should == false
+      # core.opts[:discard_page].should == true
+      # core.opts[:delay].should == 8
+      # core.opts[:user_agent].should == 'test'
+      # core.opts[:obey_robots_txt].should == true
+      # core.opts[:depth_limit].should == 3
+# 
+      # core.opts[:auto_increment].should == true
+    # end
+# 
   end
 
 end

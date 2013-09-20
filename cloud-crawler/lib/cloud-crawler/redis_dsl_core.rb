@@ -18,38 +18,27 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-require 'rubygems'
-require 'bundler/setup'
 require 'json'
+require 'active_support/inflector'
 require 'active_support/core_ext'
-require 'cloud-crawler/batch_job'
-require 'make_test_blocks'
+require 'cloud-crawler/logger'
 
-#
-# A batch of jobs.  The data 
-#
 module CloudCrawler
-  class TestBatchJob < BatchJob
-    include MakeTestBlocks
-    
-    attr_accessor :data, :client, :queue
-    def initialize(links, opts, ccmq, blocks)
-      @client = Qless::Client.new
-      @queue_name = opts[:queue_name] 
-      @queue = @client.queues[@queue_name]
-      
-      @data = {}
-      @data[:opts] = opts.to_json     
-      @data[:dsl_id] = MakeTestBlocks::make_test_blocks(ccmq,blocks)
-      
-      @data[:batch] = [links].flatten.map { |lnk|  { :link =>  lnk, :depth => 0 } }.to_json
+
+  # will be used to breat out qless / redis hooks
+  
+  module RedisDslCore
+    def self.included(base)
+      base.send :extend, ClassMethods
+     # base.send :extend, InstanceMethods
     end
-    
- 
 
+   
+    module ClassMethods
+      # Qless hooks
+      
+     
+
+    end
   end
-
-
-
-
 end

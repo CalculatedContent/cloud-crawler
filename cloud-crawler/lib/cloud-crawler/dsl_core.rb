@@ -1,7 +1,7 @@
 #
 # Copyright (c) 2013 Charles H Martin, PhD
 #  
-#  Calculated Content (TN)
+#  Calculated Content (TM)
 #  http://calculatedcontent.com
 #  charles@calculatedcontent.com
 #
@@ -45,18 +45,51 @@ module CloudCrawler
         @data = qless_job.data.symbolize_keys
         @opts = JSON.parse(data[:opts]).symbolize_keys
         @robots = Robotex.new(@opts[:user_agent]) if @opts[:obey_robots_txt]
+        
+        @batch_id = @data[:batch_id]
+        @job_id = @data[:job_id]
+        @dsl_id = @data[:dsl_id]
+        
+        @page = nil
 
-        # should this be 1 giant parse?
-        @focus_crawl_block = JSON.parse(data[:focus_crawl_block]).first
-        @on_every_page_blocks = JSON.parse(data[:on_every_page_blocks])
-        @on_pages_like_blocks = JSON.parse(data[:on_pages_like_blocks])
-        @skip_link_patterns = JSON.parse(data[:skip_link_patterns])        
-      # for performance, should construct REGEXPs here, not with /#{pattern}/
-      #  @after_crawl_blocks = JSON.parse(data[:after_crawl_blocks])
       rescue
         LOGGER.fatal e.backtrace
       end
 
+      # implement in the job itself
+      #  note:  this is different now, expected json parsed, no symbols for keys
+      # def get_blocks(id)
+        # return {}
+      # end
+      
+     # setup crawl dsl
+    def setup_dsl(id)
+       blocks = get_blocks(id)
+       blocks.symbolize_keys!
+       
+       LOGGER.info "DslCore:  setting up dsl #{id}"
+       
+      @focus_crawl_block = blocks[:focus_crawl_block]
+      @on_every_page_block= blocks[:on_every_page_block]
+      @skip_link_patterns = blocks[:skip_link_patterns]     
+      @after_crawl_block = blocks[:after_crawl_block]
+      @before_crawl_block = blocks[:before_crawl_block]
+      @after_batch_block = blocks[:after_batch_block]
+      @before_batch_block = blocks[:before_batch_block]
+      
+       # for performance, should construct REGEXPs here, not with /#{pattern}/
+      @on_pages_like_blocks = blocks[:on_pages_like_blocks]
+
+       # 
+       # TODO: create singleton methods for performance gain if desired
+       #   have methods access @ vars 
+       # blocks.each_pair do |name,block|
+          # define_singleton_method(name.to_sym, block) 
+       # end
+       
+    end
+
+  
      # accessors for DSL, but not thread safe?
      def data
        @data
@@ -64,8 +97,19 @@ module CloudCrawler
     
      def job
         @job
-      end
+     end
       
+     def job_id
+        @data[:job_id]
+     end
+     
+      def batch_id
+        @data[:batch_id]
+     end
+     
+      def dsl_id
+        @data[:dsl_id]
+     end
  
      def opts
        @opts
@@ -75,6 +119,10 @@ module CloudCrawler
        @opts[:delay]
      end
      
+     def delay=(delay_in_sec)
+       @opts[:delay]=delay_in_sec
+     end
+     
      def user_agent
        @opts[:user_agent]
      end
@@ -82,12 +130,22 @@ module CloudCrawler
      def user_agent=(ua)
        @opts[:user_agent]=ua
      end
+     
+     def page
+       @page
+     end
+     
+     def doc
+       @page.doc
+     end
+       
+       
     
       #
-      # TODO: implement locally
+      # TODO: execute locally on workers as cleanup
       #
       def do_after_crawl_blocks
-        @after_crawl_blocks.each { |block| instance_eval(block).call(@page_store) }
+         instance_eval(@after_crawl_block).call(@page_store) if @after_crawl_block
       end
 
       #
@@ -95,10 +153,8 @@ module CloudCrawler
       # Execute the on_every_page blocks for *page*
       #
       def do_page_blocks(page)
-        @on_every_page_blocks.each do |block|   
-          instance_eval(block).call(page)
-        end
-
+        instance_eval(@on_every_page_block).call(page) if @on_every_page_block
+  
         @on_pages_like_blocks.each do |pattern, blocks|
           blocks.each { |block| instance_eval(block).call(page) } if page.url.to_s =~ /#{pattern}/
         end
@@ -110,7 +166,7 @@ module CloudCrawler
       # and the block given to focus_crawl()
       #
       def links_to_follow(page)
-        @page = page  # need below, sorry
+        @page = page  
         links = @focus_crawl_block ? instance_eval(@focus_crawl_block).call(page) : page.links
         links.select { |link| visit_link?(link, page) }.map { |link| link.dup }
       end
@@ -157,7 +213,7 @@ module CloudCrawler
         @opts[:obey_robots_txt] ? @robots.allowed?(link) : true
       rescue
         false
-        end
+      end
 
       #
       # optionally allows outside_domain links

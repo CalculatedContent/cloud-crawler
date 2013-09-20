@@ -63,7 +63,12 @@ module CloudCrawler
       children << children.map{ |x| make_children(x, n, m) }
       return children.flatten
     end
-
+    
+    # does not work no idea whjy
+    def self.do_post_batch
+       # turn off for testing
+       # later, mock up
+    end
   end
 
 end

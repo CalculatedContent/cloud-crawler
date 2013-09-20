@@ -25,9 +25,12 @@ require 'cloud-crawler/batch_curl_job'
 require 'cloud-crawler/batch_job'
 require 'test_batch_job'
 require 'sourcify' #,'~> 0.6'  
+require 'make_test_blocks'
+
 
 module CloudCrawler
-  
+   include MakeTestBlocks
+
   
   #TODO:  combine this test with the batch crawl test
   # since they both need this functionality
@@ -45,7 +48,8 @@ module CloudCrawler
      
       @namespace = @opts[:job_name]
       @w_cache = Redis::Namespace.new("#{@namespace}:w_cache", :redis => @redis)
-      
+      @ccmq =  Redis::Namespace.new("#{@namespace}:ccmq", :redis => @redis)
+
       @page_store = RedisPageStore.new(@redis, @opts)
       @bloomfilter = RedisUrlBloomfilter.new(@redis)
       
@@ -64,7 +68,7 @@ module CloudCrawler
     #  
     def crawl_link(urls, blocks={})
       
-      qless_job = TestBatchJob.new(urls, opts=@opts, blocks=blocks)
+      qless_job = TestBatchJob.new(urls, opts=@opts, ccmq=@ccmq, blocks=blocks)
       CloudCrawler::BatchCurlJob.perform(qless_job)
       while qless_job = qless_job.queue.pop
         qless_job.perform
@@ -114,7 +118,7 @@ module CloudCrawler
       # TODO: solv eproblem of to get the state back -- it is not persisted in the run
       # need to persist to redis or page-store
       
-      b = {:on_every_page_blocks => [Proc.new { w_cache.incr "count" }.to_source].to_json }
+      b = {:on_every_page_block => Proc.new { w_cache.incr "count" }.to_source }
       crawl_link(pages.map(&:url),b).should == 4
       @w_cache.get("count").should == "4"
     end
@@ -170,6 +174,12 @@ module CloudCrawler
     it 'should crawl all the links given, without any duplicates' do
       
     end
+    
+    
+ 
+   
+   
+   
 
 
   end

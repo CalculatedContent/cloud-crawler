@@ -26,10 +26,13 @@ require 'cloud-crawler/driver'
 require 'active_support/inflector'
 require 'active_support/core_ext'
 require 'child_spawning_batch_job'
+require 'make_test_blocks'
+
 require 'qless'
 require 'sourcify'
 
 module CloudCrawler
+  include MakeTestBlocks
   describe BatchJob do
 
     before(:each) do
@@ -54,23 +57,23 @@ module CloudCrawler
       @w_cache = Redis::Namespace.new("#{@namespace}:w_cache", :redis => @redis)
       @s3_cache = Redis::Namespace.new("#{@namespace}:s3_cache", :redis => @redis)
 
+      # cc master queue
+      @cc_master_q = Redis::Namespace.new("#{@namespace}:ccmq", :redis =>  @client.redis)
+ 
     end
 
     after(:each) do
       @redis.flushdb
     end
 
+   
+    
     def run_batch(batch)
       data = {}
       data[:opts] = @opts.to_json
       data[:batch] = batch.to_json
-            
-      # because we need to break dsl core out of of batch job eventually
-      data[:focus_crawl_block] = [].to_json
-      data[:on_every_page_blocks] = [].to_json
-      data[:skip_link_patterns] =  [].to_json
-      data[:on_pages_like_blocks] = Hash.new { |hash,key| hash[key] = [] }.to_json
-
+      data[:dsl_id] = MakeTestBlocks::make_test_blocks(@cc_master_q, {})
+   
       @queue.put( CloudCrawler::ChildSpawningBatchJob, data )
 
       num_ran_batch_jobs = 0
@@ -149,7 +152,61 @@ module CloudCrawler
       
       
     end
+    
+    
+    it "should stop if the max jobs limit is reached" do   
+      puts "....\n\n"
+      @opts[:checkpoint] = false # default is true
+      @opts[:job_limit] = 10
+      
+      num_ran_batch_jobs = run_batch(make_batch)
+      
+      num_ran_batch_jobs.should == 6 # just what it is if this works
+      
+      jobs =  @redis.keys "ql:j:*"
+      jobs.size.should == 10
+      
+      # checkpointing is turned off, can not test without turning off save!
+     # cp_keys = @cp_cache.keys "*"
+     # cp_keys.size.should == 0
+    end
+    
+    
+     # # does not work?
+     # it "should put the data into the checkpopint cache, but not delete for testing" do   
+      # puts "....\n\n"
+      # @opts[:checkpoint] = true # default is true
+      # @opts[:job_limit] = 10
+#       
+      # puts "job name = #{@opts[:job_name]}"
+      # num_ran_batch_jobs = run_batch(make_batch)
+#       
+      # num_ran_batch_jobs.should == 6 # just what it is if this works
+#       
+      # jobs =  @redis.keys "ql:j:*"
+      # jobs.size.should == 10
+#       
+      # # don not test untiul mocking is ready
+      # # # post batch should be turned off in test batch job
+      # # cp_keys = @cp_cache.keys "*"
+      # # cp_keys.size.should == 1
+#       
+    # end
+#     
+
+  # testing requirs mocks / acceess to s3
+  # non-trivial...I will try to set up
+  # need to checkpoint, flush the jobs only, and then resubmit upto a limit
+  # jobs should be checkpointed to s3 and then pulled back, => a good naming scheme
+  # large number of jobs => use redis hashes, not sets?
+  it 'should support a graceful restart' do
+    
+  end
   
+  #TODO: optimize so jobs can be restarted without flushing / storing the entire DSL
+  #  a major refector that will take time to develop
+  # TODO:  test on amazon elsatic cache
+  # TODO: test just jobs on amazon...maybe batch is not necessary for elastic cache?
       
     
   it "should have access to the master cache" do
@@ -192,7 +249,47 @@ module CloudCrawler
   # it ' should allow a child class to access @job through the dsl' do
 #     
   # end
+  
+ # TODO:   implement this test
+    it 'should have a batch_id ' do
+      
+    end
+    
+    it 'should have fail if the batch_id is not set on submission ' do
+      
+    end
+    
+    
+     it 'should not look up the dsl if the dsl_id is nil ' do
+      
+     end
+     
+      it 'should not fail if the job_id is not set ' do
+      
+     end
+     
+     it 'should stop if the dsl_id is invalid ' do
+      
+     end
+     
+     
+    
+    
+     # TODO:   implement this test
+    it 'should have (at least private) access to the cc_master_q' do
+      
+    end
 
+
+  # TODO:   implement this test
+    it 'should have (at least private) access to the local checkpoint queue' do
+      
+    end
+    
+    
 
   end
 end
+
+#TODO:  figure out how to test the checkponts
+# Im ok to use S3 directly

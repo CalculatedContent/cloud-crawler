@@ -2,7 +2,7 @@
 #
 # Copyright (c) 2013 Charles H Martin, PhD
 #  
-#  Calculated Content (TN)
+#  Calculated Content (TM)
 #  http://calculatedcontent.com
 #  charles@calculatedcontent.com
 #
@@ -32,17 +32,24 @@ require 'sourcify'
 require 'qless'
 
 module CloudCrawler
-  VERSION = '0.1';
+  VERSION = '0.2';
     
   #
   # Convenience methods to start a crawl
   #
-  
-  
+    
   def CloudCrawler.crawl(urls, opts = {}, &block)
     opts.reverse_merge! CloudCrawler::Driver::DRIVER_OPTS
     Driver.crawl(urls, opts, &block)
   end
+  
+    
+  def CloudCrawler.standalone_crawl(urls, opts = {}, &block)
+    opts.reverse_merge! CloudCrawler::Driver::DRIVER_OPTS
+    Driver.crawl(urls, opts, &block)
+    Worker.run(opts)
+  end
+  
   
   def CloudCrawler.batch_crawl(urls, opts = {}, &block)
     opts.reverse_merge! CloudCrawler::Driver::DRIVER_OPTS
@@ -54,13 +61,7 @@ module CloudCrawler
     Driver.batch_curl(urls, opts, &block)
   end
   
-  
-  def CloudCrawler.standalone_crawl(urls, opts = {}, &block)
-    opts.reverse_merge! CloudCrawler::Driver::DRIVER_OPTS
-    Driver.crawl(urls, opts, &block)
-    Worker.run(opts)
-  end
-  
+
  
   def CloudCrawler.standalone_batch_crawl(urls, opts = {}, &block)
     opts.reverse_merge! CloudCrawler::Driver::DRIVER_OPTS
@@ -92,6 +93,7 @@ module CloudCrawler
       :verbose => true,
       :interval => 10,
       :job_reserver => 'Ordered'
+    
     }
 
     def initialize(opts = {}, &block)
@@ -100,7 +102,13 @@ module CloudCrawler
       @client = Qless::Client.new( :host => opts[:qless_host], :port => opts[:qless_port] )
       @queue = @client.queues[opts[:queue_name]]
       @client.config['heartbeat'] = opts[:timeout] || DEFAULT_HEARTBEAT_IN_SEC
-
+      
+      # same as client code base
+      # perhaps should isolate somewhere
+      namespace = opts[:job_name]
+      LOGGER.info "initialzing driver for #{namespace}"
+      @cc_master_q = Redis::Namespace.new("#{namespace}:ccmq", :redis =>  @client.redis)
+      
       yield self if block_given?
     end
     
@@ -110,22 +118,72 @@ module CloudCrawler
       return url.to_s
     end
     
+      
+   def auto_increment?
+     @opts[:auto_increment] 
+   end
+   
+   
+   def next_batch_id
+      @cc_master_q.incr("auto_batch_ids")
+   end
+   
+   def next_job_id
+      @cc_master_q.incr("auto_job_ids")
+   end
+   
+    def next_dsl_id
+      @cc_master_q.incr("auto_dsl_id")
+   end
+   
+   
+    
    # TODO;  eventually consolidate these apis
 
     def load_crawl_job(hsh) 
-      data = block_sources
-      data[:opts] = @opts.to_json
+      LOGGER.info "loading crawl job = #{hsh}"
+      
+      data = {}
+      data[:opts] = @opts.to_json       
+      data[:dsl_id] = make_blocks   
       
       data[:link] = normalize_link( hsh[:url])
       data.reverse_merge!(hsh)
       
+      LOGGER.info "keys on ccmq #{@cc_master_q.keys}"
       submit( CrawlJob, data, @opts )
     end
     
+    
+   def auto_increment(batch)
+     return if batch.nil? or batch.empty? 
+     job = batch.first
+     job[:batch_id] = next_batch_id  if job[:batch_id].nil? 
+  
+      if job[:job_id].nil? then
+        batch.each { |hsh|  hsh[:job_id] = next_job_id }
+      end    
+      LOGGER.info "auto-increment batch_id = #{job[:batch_id]}"
+   end
+   
+ 
+    # see DslFrontEnd, sorry
+    def put_blocks_in_cache(json)
+      # does not work  :   id = json.hash
+      id = next_dsl_id
+      @cc_master_q["dsl_blocks:#{id}"]=json
+      return id
+    end
+    
+    
     def load_batch_crawl(batch) 
-      data = block_sources
-      data[:opts] = @opts.to_json
-       
+      LOGGER.info "loading batch crawl job #{batch}"
+      auto_increment(batch) if auto_increment?
+      
+      data = {}
+      data[:opts] = @opts.to_json       
+      data[:dsl_id] = make_blocks
+      
       batch.each do |hsh| 
          hsh[:link] = normalize_link( hsh[:url] )
        end
@@ -134,11 +192,14 @@ module CloudCrawler
       submit( BatchCrawlJob, data, @opts )
     end
     
-    
+ 
    def load_batch_curl(batch) 
       LOGGER.info "loading batch curl job #{batch}"
-      data = block_sources
-      data[:opts] = @opts.to_json
+      auto_increment(batch) if auto_increment?
+     
+      data = {}
+      data[:opts] = @opts.to_json       
+      data[:dsl_id] = make_blocks
        
       batch.each do |hsh| 
          hsh[:link] = normalize_link( hsh[:url] )
@@ -164,10 +225,15 @@ module CloudCrawler
       end
     end
       
+    
     #
     # Convenience method to start a new crawl
     #
     def self.crawl(urls, opts = {}, &block)
+      msg = "crawl #{urls} "
+      msg += " with #{block.to_source}"  if block
+      LOGGER.info msg
+
       LOGGER.info "no urls to crawl" if urls.nil? or urls.empty?
       self.new(opts) do |core|
         yield core if block_given?
@@ -208,3 +274,10 @@ module CloudCrawler
   end # Driver
 
 end
+
+#TODO: set first job somehow
+# dodo:  set auto-inc keys for re-sbumits
+# defauylt:  first jonb = job_id 0 and batch_id 0
+#  can reset to 1, 1 with dsl
+#  can rest to something else?
+
