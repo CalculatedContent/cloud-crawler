@@ -44,13 +44,16 @@ module CloudCrawler
     def size
       @connections.size
     end
+    
     #
     # Fetch a single Page from the response of an HTTP request to *url*.
     # Just gets the final destination page.
+    # Does not retrun the redirects
     #
     def fetch_page(url, referer = nil, depth = nil)
       fetch_pages(url, referer, depth).last
     end
+   
 
     #
     # Create new Pages from the response of an HTTP request to *url*,

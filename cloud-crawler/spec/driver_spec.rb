@@ -42,7 +42,8 @@ module CloudCrawler
       FakeWeb.clean_registry
       @redis = Redis.new
       @redis.flushdb
-      @opts = CloudCrawler::Driver::DRIVER_OPTS
+      @opts = {}
+      @opts.reverse_merge! CloudCrawler::Driver::DRIVER_OPTS
       @page_store = RedisPageStore.new(@redis, @opts)
       @cache =  Redis::Namespace.new("#{@opts[:job_name]}:cache", :redis => @redis)
       @client = Qless::Client.new

@@ -34,8 +34,8 @@ module CloudCrawler
         http.fetch_page(SPEC_DOMAIN).should be_an_instance_of(Page)
       end
       
-      
 
+    
     
     
       it 'should respond to ...' do

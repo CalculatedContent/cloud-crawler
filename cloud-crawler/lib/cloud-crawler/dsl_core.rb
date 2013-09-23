@@ -138,6 +138,9 @@ module CloudCrawler
      def doc
        @page.doc
      end
+     
+     
+   
        
        
     
@@ -252,6 +255,11 @@ module CloudCrawler
       def skip_link?(link)
         @skip_link_patterns.any? { |pattern| link.path =~ /#{pattern}/  }
       end
+      
+      
+     def keep_redirects?
+       @opts[:keep_redirects]
+     end
 
     end
   end

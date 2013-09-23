@@ -23,6 +23,7 @@ spec = Gem::Specification.new do |s|
   s.add_dependency "bson_ext", ">=1.3.1"
   s.add_dependency "i18n", ">=0.6.4"
   s.add_dependency "iconv", ">=1.0.3"
+  s.add_dependency "httparty"
   s.add_dependency "thin"   # for qless-web
   
   # s.add_dependency "qless", ">=0.9.2"  # cc version

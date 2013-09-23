@@ -34,6 +34,7 @@ module CloudCrawler
     
     attr_accessor :data, :client, :queue
     def initialize(links, opts, ccmq, blocks)
+      
       @client = Qless::Client.new
       @queue_name = opts[:queue_name] 
       @queue = @client.queues[@queue_name]

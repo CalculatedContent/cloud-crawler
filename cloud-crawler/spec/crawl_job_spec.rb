@@ -33,8 +33,9 @@ module CloudCrawler
     before(:each) do
       FakeWeb.clean_registry
       @redis = Redis.new
-      @redis.flushdb
-      @opts = CloudCrawler::Driver::DRIVER_OPTS
+      @redis.flushall
+      @opts = {}
+      @opts.reverse_merge! CloudCrawler::Driver::DRIVER_OPTS
       @opts.reverse_merge! CloudCrawler::DEFAULT_OPTS
       
       @namespace = @opts[:job_name] 
@@ -46,7 +47,8 @@ module CloudCrawler
     end
     
     after(:each) do
-       @redis.flushdb
+       @redis.flushall
+       @opts = {}
     end
 
     def crawl_link(url, blocks={})
@@ -111,6 +113,7 @@ module CloudCrawler
     end
 
     it "should follow http redirects" do
+     # default: @opts[:keep_redirects] = true
       pages = []
       pages << FakePage.new('0', :links => ['1'])
       pages << FakePage.new('1', :redirect => '2')

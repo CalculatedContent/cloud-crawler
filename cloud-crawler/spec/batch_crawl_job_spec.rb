@@ -33,8 +33,9 @@ module CloudCrawler
     before(:each) do
       FakeWeb.clean_registry
       @redis = Redis.new
-      @redis.flushdb
-      @opts = CloudCrawler::Driver::DRIVER_OPTS
+      @redis.flushall
+      @opts = {}
+      @opts.reverse_merge! CloudCrawler::Driver::DRIVER_OPTS
       @opts.reverse_merge! CloudCrawler::DEFAULT_OPTS
       @opts[:save_batch]= false
      
@@ -46,12 +47,12 @@ module CloudCrawler
       @bloomfilter = RedisUrlBloomfilter.new(@redis)
       
     end
-    
+   
    
     after(:each) do
-       @redis.flushdb
+       @redis.flushall
+       @opts = {}
     end
-    
     
         
     
@@ -67,11 +68,7 @@ module CloudCrawler
     end
     
  
-    
-    
-
   
-
     it "should crawl all the html pages in a domain by following <a> href's" do 
       pages = []
       pages << FakePage.new('0', :links => ['1', '2'])
@@ -97,7 +94,20 @@ module CloudCrawler
       
     end
     
-    it "should follow http redirects" do
+    
+     it "should follow http redirects but only keep the last page" do
+      @opts[:keep_redirects]=false
+      pages = []
+      pages << FakePage.new('0', :links => ['1'])
+      pages << FakePage.new('1', :redirect => '2')
+      pages << FakePage.new('2')
+
+      # should not keep page 1
+      crawl_link(pages[0].url).should == 2
+    end
+    
+    it "should follow http redirects and keep them" do
+   #   @opts[:keep_redirects]=true  # should be default
       pages = []
       pages << FakePage.new('0', :links => ['1'])
       pages << FakePage.new('1', :redirect => '2')
@@ -105,6 +115,9 @@ module CloudCrawler
 
       crawl_link(pages[0].url).should == 3
     end
+    
+   
+    
     
     it "should not follow links that leave the original domain" do
       pages = []
@@ -124,16 +137,6 @@ module CloudCrawler
       @page_store.keys.should_not  include('http://www.other.com/')
     end
 
-
-
-    it "should follow http redirects" do
-      pages = []
-      pages << FakePage.new('0', :links => ['1'])
-      pages << FakePage.new('1', :redirect => '2')
-      pages << FakePage.new('2')
-
-      crawl_link(pages[0].url).should == 3
-    end
     
      it "should include the query string when following links" do
       pages = []

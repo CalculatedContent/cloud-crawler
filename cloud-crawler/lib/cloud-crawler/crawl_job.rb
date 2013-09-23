@@ -51,6 +51,8 @@ module CloudCrawler
     def self.cache
       @m_cache
     end
+    
+  
  
        
     def self.get_blocks(id)
@@ -60,7 +62,7 @@ module CloudCrawler
     end
     
     
-
+    
     
     def self.perform(qless_job)
       super(qless_job)
@@ -74,7 +76,15 @@ module CloudCrawler
       return if link == :END     
                   
       http = CloudCrawler::HTTP.new(@opts)
-      pages = http.fetch_pages(link, referer, depth)
+      
+      #TODO: implement DSL logic to use browser or not
+      pages = if keep_redirects? then
+          http.fetch_pages(link, referer, depth) 
+        else 
+          [ http.fetch_page(link, referer, depth) ]
+      end
+      
+      
       pages.each do |page|
          url = page.url.to_s
          next if @bloomfilter.visited_url?(url)

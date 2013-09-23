@@ -34,7 +34,7 @@ module CloudCrawler
     def self.init_with_pagestore(qless_job)   
       @page_store = RedisPageStore.new(@local_redis,@opts)
       @bloomfilter = RedisUrlBloomfilter.new(@redis)
-      @http_cache={}
+  #    @http_cache={}
       @http=nil
       init_without_pagestore(qless_job)
     end
@@ -75,12 +75,18 @@ module CloudCrawler
       # hack for cookies 
       # belongs in batch job itself
       
-      @http_cache[job_id] ||=  CloudCrawler::HTTP.new(@opts)
-      @http=@http_cache[job_id]
+      # @http_cache[job_id] ||=  CloudCrawler::HTTP.new(@opts)
+      # @http=@http_cache[job_id]
+      
+      @http = CloudCrawler::HTTP.new(@opts)
       
       return next_jobs if http.nil?
       
-      fetched_pages = http.fetch_pages(link, referer, depth) # hack for testing
+      fetched_pages = if keep_redirects? then
+          http.fetch_pages(link, referer, depth) 
+        else 
+          [ http.fetch_page(link, referer, depth) ]
+      end
 
       fetched_pages.flatten!
       fetched_pages.compact!

@@ -42,7 +42,8 @@ module CloudCrawler
       FakeWeb.clean_registry
       @redis = Redis.new
       @redis.flushdb
-      @opts = CloudCrawler::Driver::DRIVER_OPTS
+      @opts = {}
+      @opts.reverse_merge! CloudCrawler::Driver::DRIVER_OPTS
       @opts.reverse_merge! CloudCrawler::DEFAULT_OPTS
       @opts[:save_batch]= false
      

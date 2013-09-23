@@ -43,7 +43,9 @@ module CloudCrawler
     # by default, don't limit the depth of the crawl
     :depth_limit => false,
     # number of times HTTP redirects will be followed
-    :redirect_limit => 5,
+    :redirect_limit => 5, 
+    # keep all pages , even redirects
+    :keep_redirects => true,
     # Hash of cookie name => value to send with HTTP requests
     :cookies => nil,
     # accept cookies from the server and send them back?

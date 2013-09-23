@@ -40,7 +40,8 @@ module CloudCrawler
       @redis = Redis.new
       @redis.flushall
 
-      @opts = CloudCrawler::Driver::DRIVER_OPTS
+      @opts = {}
+      @opts.reverse_merge! CloudCrawler::Driver::DRIVER_OPTS
       @opts.reverse_merge! CloudCrawler::DEFAULT_OPTS
     
       @opts[:queue_name] = 'test_batch_job_spec'

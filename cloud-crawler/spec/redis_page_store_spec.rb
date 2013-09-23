@@ -32,7 +32,8 @@ module CloudCrawler
     # redis should be running locally
       before(:each) do
         @url = SPEC_DOMAIN
-        @opts =  CloudCrawler::Driver::DRIVER_OPTS
+        @opts = {}
+        @opts.reverse_merge! CloudCrawler::Driver::DRIVER_OPTS
         @redis = Redis::Namespace.new("RedisPageStoreSpec", :redis => Redis.new)
         @store = RedisPageStore.new(@redis, @opts)
         @page = Page.new(URI(@url))
