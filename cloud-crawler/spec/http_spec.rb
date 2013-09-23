@@ -73,6 +73,16 @@ module CloudCrawler
       
       
            
+      it "should get the headers" do
+        
+        FakeWeb.register_uri(:get, SPEC_DOMAIN, :body => "Hello", :content_type => "text/plain")
+        http = CloudCrawler::HTTP.new( {:verbose => true} )
+        page = http.fetch_page(SPEC_DOMAIN)
+        page.headers["content-type"].first.should ==  "text/plain"
+
+      end
+      
+      
       # N/A
       # it "should , optionally, get the status message without getting the body" do
 #           
@@ -87,15 +97,9 @@ module CloudCrawler
    #   end
       
       
-       it "should get the headers" do
-        
-        FakeWeb.register_uri(:get, SPEC_DOMAIN, :body => "Hello", :content_type => "text/plain")
-        http = CloudCrawler::HTTP.new( {:verbose => true} )
-        page = http.fetch_page(SPEC_DOMAIN)
-        page.headers["content-type"].first.should ==  "text/plain"
-
-      end
+    
       
+      # http://www.townx.org/index.php?q=blog/elliot/ruby_tuesday_fakeweb
       it "should follow the re-direct" do
         
       end
