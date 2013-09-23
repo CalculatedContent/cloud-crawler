@@ -19,6 +19,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 require 'spec_helper'
+require 'uri'
 
 module CloudCrawler
   describe HTTP do
@@ -26,18 +27,86 @@ module CloudCrawler
     describe "fetch_page" do
       before(:each) do
         FakeWeb.clean_registry
+        
       end
 
       it "should still return a Page if an exception occurs during the HTTP connection" do
         HTTP.stub!(:refresh_connection).and_raise(StandardError)
-        http = CloudCrawler::HTTP.new
+        http = CloudCrawler::HTTP.new( {:verbose => true} )
         http.fetch_page(SPEC_DOMAIN).should be_an_instance_of(Page)
       end
       
+      it "should set the code to 200 if the page is found" do
+          
+        FakeWeb.register_uri(:get, SPEC_DOMAIN, :body => "Hello World!")
+      
+        http = CloudCrawler::HTTP.new( {:verbose => true} )
+        page = http.fetch_page(SPEC_DOMAIN)
+        page.code.should == 200
+      end
+      
+      
+      it "should set the code to 404 and body if the page is not found" do
+          
+       FakeWeb.register_uri(:get, SPEC_DOMAIN, :body => "Nothing to be found 'round here",
+                                                    :status => ["404", "Not Found"])
+      
+        http = CloudCrawler::HTTP.new( {:verbose => true} )
+        page = http.fetch_page(SPEC_DOMAIN)
+        page.code.should == 404
+        
+        page.body.should == "Nothing to be found 'round here"
 
-    
-    
-    
+      #  page.response.message.should ==  "Not Found"
+      end
+      
+ 
+      
+      it "should have a non-zero response time" do
+          
+        FakeWeb.register_uri(:get, SPEC_DOMAIN, :body => "Hello World!")
+      
+        http = CloudCrawler::HTTP.new( {:verbose => true} )
+        page = http.fetch_page(SPEC_DOMAIN)
+        page.response_time.should_not be_nil
+      end
+      
+      
+           
+      # N/A
+      # it "should , optionally, get the status message without getting the body" do
+#           
+       # FakeWeb.register_uri(:get, SPEC_DOMAIN, :body => "Nothing to be found 'round here",
+                                                    # :status => ["404", "Not Found"])
+#       
+        # http = CloudCrawler::HTTP.new( {:verbose => true} )
+        # page = http.fetch_head(SPEC_DOMAIN)
+        # page.code.should == 404
+        # #page.headers['status'].should ==  "Not Found"
+#         
+   #   end
+      
+      
+       it "should get the headers" do
+        
+        FakeWeb.register_uri(:get, SPEC_DOMAIN, :body => "Hello", :content_type => "text/plain")
+        http = CloudCrawler::HTTP.new( {:verbose => true} )
+        page = http.fetch_page(SPEC_DOMAIN)
+        page.headers["content-type"].first.should ==  "text/plain"
+
+      end
+      
+      it "should follow the re-direct" do
+        
+      end
+
+
+
+      
+      
+      
+      
+
       it 'should respond to ...' do
         
               # :user_agent

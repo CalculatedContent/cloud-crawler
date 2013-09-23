@@ -51,6 +51,7 @@ module CloudCrawler
     # Does not retrun the redirects
     #
     def fetch_page(url, referer = nil, depth = nil)
+      puts "the url is #{url}"
       fetch_pages(url, referer, depth).last
     end
    
@@ -146,7 +147,7 @@ module CloudCrawler
       begin
           # if redirected to a relative url, merge it with the host of the original
           # request url
-          loc = url.merge(loc) if loc.relative?
+          loc = url.merge(loc) if loc.relative?          
 
           response, response_time = get_response(loc, referer)
           code = Integer(response.code)
@@ -161,7 +162,7 @@ module CloudCrawler
     #
     def get_response(url, referer = nil)
       full_path = url.query.nil? ? url.path : "#{url.path}?#{url.query}"
-
+      
       opts = {}
       opts['User-Agent'] = user_agent if user_agent
       opts['Referer'] = referer.to_s if referer
@@ -174,12 +175,13 @@ module CloudCrawler
         start = Time.now()
         # format request
         req = Net::HTTP::Get.new(full_path, opts)
+        
         # HTTP Basic authentication
         req.basic_auth url.user, url.password if url.user
         response = connection(url).request(req)
         finish = Time.now()
         response_time = ((finish - start) * 1000).round
-       
+
         @cookie_store.merge!(response['Set-Cookie']) if accept_cookies?
        # LOGGER.info "setting cookie to  #{@cookie_store} "
         return response, response_time
