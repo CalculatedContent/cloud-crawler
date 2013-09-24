@@ -97,7 +97,7 @@ module CloudCrawler
     end
 
     def size
-      @pages.keys("*").size
+      @pages.dbsize
     end
 
     def keys
