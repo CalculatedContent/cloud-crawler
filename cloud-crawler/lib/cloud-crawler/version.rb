@@ -18,20 +18,10 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-require 'rubygems'
-require 'bundler/setup'
 
-%w[logger
-   cookie_store
-   http
-   page
-   redis_page_store
-   driver
-   dsl_core
-   dsl_front_end
-   crawl_job
-   batch_crawl_job
-   batch_curl_job
-   worker].each do |f|
-  require "cloud-crawler/#{f}"
+module CloudCrawler
+  MAJOR   = 0
+  MINOR   = 2
+  PATCH   = 0
+  VERSION = [MAJOR, MINOR, PATCH].join('.')
 end
