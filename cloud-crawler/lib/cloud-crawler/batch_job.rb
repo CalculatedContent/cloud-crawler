@@ -197,10 +197,10 @@ module CloudCrawler
       end
 
       if checkpoint? then
-        num_checkpoints = @cc_checkpoints.scard("data")  
+        num_checkpoints = @cc_checkpoints.keys("*").size
         if num_checkpoints > 0
           LOGGER.info " checkpointing #{num_checkpoints} jobs "  
-          @cc_checkpoints.s3.save!   
+          @cc_checkpoints.s3.save!  if save_batch  # we can test is
         end
       end
       
@@ -240,11 +240,23 @@ module CloudCrawler
     #  => s3_cache needs buffer overflow capacity also
     def self.checkpoint(data)
       LOGGER.info "checkpointing"
-
-      @cc_checkpoints.sadd("data", data)
-      num_cps = @cc_checkpoints.scard("data")
-      LOGGER.info  "num checkpoints = #{num_cps}"
       
+      # code = data.hash  # a hash code : this never works
+      
+      # auto increment key for checkpointed data blocks
+      bid = @cc_checkpoints.incr("bid")  # a number starting at 1
+      
+      # probably should be 
+      #   bid = data[:batch_id]
+     
+      key = "batch:#{bid}"
+      
+      @cc_checkpoints[key] = data[:batch] # data = {:batch => [array].json }
+      num_cps = @cc_checkpoints.keys("batch:*")
+      LOGGER.info  "num checkpoints = #{num_cps}"
+    
+      puts "check point data #{key}  #{@cc_checkpoints[key]}"
+      # if save/_batch
       # this gets save at the end of the batch?
       # if s3 cache runs out of memory, we are fucked
     end

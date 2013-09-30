@@ -57,6 +57,8 @@ module CloudCrawler
       @m_cache = Redis::Namespace.new("#{@namespace}:m_cache", :redis => @redis)
       @w_cache = Redis::Namespace.new("#{@namespace}:w_cache", :redis => @redis)
       @s3_cache = Redis::Namespace.new("#{@namespace}:s3_cache", :redis => @redis)
+      
+      @cc_checkpoints = Redis::Namespace.new("#{@namespace}:cccp", :redis =>  @local_redis)
 
       # cc master queue
       @cc_master_q = Redis::Namespace.new("#{@namespace}:ccmq", :redis =>  @client.redis)
@@ -168,20 +170,14 @@ module CloudCrawler
          num_ran_batch_jobs = run_batch(make_batch) 
          num_ran_batch_jobs.should == 1
         
-        puts "num i = #{i}"
-          num_qjobs =  @redis.keys("ql:j:*").size  # keys returns an array
-          
-          puts "num num_qjobs = #{num_qjobs}"
-          num_qjobs.should == i+1
-
+         num_qjobs =  @redis.keys("ql:j:*").size  # keys returns an array          
+         num_qjobs.should == i+1
       end
   
   
       # a batch of 10 child spawning batch jobs creates (10*22=220) child crawl jobs
       num_crawl_jobs =  @m_cache["num_jobs"].to_i
       num_crawl_jobs.should == JOB_LIMIT*@opts[:batch_size]*ChildSpawningBatchJob::NUM_CHILDREN_SPAWNED
-
-
     end
     
      # this test only works if queue_up is true
@@ -202,8 +198,6 @@ module CloudCrawler
       # a batch of 10 child spawning batch jobs creates (10*22=220) child crawl jobs
       num_crawl_jobs = @m_cache["num_jobs"].to_i
       num_crawl_jobs.should == @opts[:batch_size]*ChildSpawningBatchJob::NUM_CHILDREN_SPAWNED
-      
-      puts "num_crawl_jobs  #{num_crawl_jobs}"
     end
     
     
@@ -223,43 +217,46 @@ module CloudCrawler
       num_qjobs =  @redis.keys("ql:j:*").size  # keys returns an array
       num_qjobs.should == JOB_LIMIT
       
-      num_crawl_jobs = @m_cache["num_jobs"].to_i
-      puts "num_crawl_jobs  #{num_crawl_jobs}"
-       
-       
-      # I don't know if the test works
-      # in principal, if we run 1 more job it should not run the job?
-      #  or maybe it should not submit the job?
-      
-      # checkpointing is turned off, can not test without turning off save!
-     # cp_keys = @cp_cache.keys "*"
-     # cp_keys.size.should == 0
-      
+      num_crawl_jobs = @m_cache["num_jobs"].to_i       
     end
     
     
     
-     # # does not work?
-     # it "should put the data into the checkpopint cache, but not delete for testing" do   
-      # puts "....\n\n"
-      # @opts[:checkpoint] = true # default is true
-      # @opts[:job_limit] = 10
-#       
-      # puts "job name = #{@opts[:job_name]}"
-      # num_ran_batch_jobs = run_batch(make_batch)
-#       
-      # num_ran_batch_jobs.should == 6 # just what it is if this works
-#       
-      # jobs =  @redis.keys "ql:j:*"
-      # jobs.size.should == 10
-#       
-      # # don not test untiul mocking is ready
-      # # # post batch should be turned off in test batch job
-      # # cp_keys = @cp_cache.keys "*"
-      # # cp_keys.size.should == 1
-#       
-    # end
-#     
+     # this needs to be mocked to s3
+      it "should put the extra jobs in a data key in the checkpopint cache" do   
+       @opts[:checkpoint] = true # will save the resubmitted jobs to s3 instead of redis
+       @opts[:save_batch] = false  # save_batch also saves the  batch checkpoint
+
+       @opts[:job_limit] = JOB_LIMIT   # batch job limit or crawl job limit
+       @opts[:queue_up] = true
+      
+      # --- SAME AS ABOVE ---
+      # each child spawn job will spawn many jobs
+      # so the total number of jobs run here could be < 10
+      num_ran_batch_jobs = run_batch(make_batch)     
+      num_ran_batch_jobs.should be < JOB_LIMIT
+     
+      # but the total number qless jobs on redis should == 10
+      num_qjobs =  @redis.keys("ql:j:*").size  # keys returns an array
+      num_qjobs.should == JOB_LIMIT
+      
+      num_crawl_jobs = @m_cache["num_jobs"].to_i             
+
+      #  --- --- --- --- ---
+
+
+      cp_keys = @cc_checkpoints.keys("batch:*")
+      cp_keys.should_not be_nil
+      
+      cp_keys.size.should be > 1
+            
+      batch_json = @cc_checkpoints["batch:1"]  # the actual batch data
+      batch_array = JSON.parse(batch_json)
+      
+      batch_array.should_not be_empty
+      
+  
+    end
 
   # testing requirs mocks / acceess to s3
   # non-trivial...I will try to set up
