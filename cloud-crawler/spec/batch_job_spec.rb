@@ -153,24 +153,90 @@ module CloudCrawler
       
       
     end
+   
     
     
-    it "should stop if the max jobs limit is reached" do   
+       
+    it 'should not resubmit any jobs since queue_up is false ' do
       puts "....\n\n"
+      JOB_LIMIT = 10
       @opts[:checkpoint] = false # default is true
-      @opts[:job_limit] = 10
+      @opts[:job_limit] = JOB_LIMIT    
+      @opts[:queue_up] = false #default is false, but we dont rely on defaults 
+             
+      JOB_LIMIT.times do |i|
+         num_ran_batch_jobs = run_batch(make_batch) 
+         num_ran_batch_jobs.should == 1
+        
+        puts "num i = #{i}"
+          num_qjobs =  @redis.keys("ql:j:*").size  # keys returns an array
+          
+          puts "num num_qjobs = #{num_qjobs}"
+          num_qjobs.should == i+1
+
+      end
+  
+  
+      # a batch of 10 child spawning batch jobs creates (10*22=220) child crawl jobs
+      num_crawl_jobs =  @m_cache["num_jobs"].to_i
+      num_crawl_jobs.should == JOB_LIMIT*@opts[:batch_size]*ChildSpawningBatchJob::NUM_CHILDREN_SPAWNED
+
+
+    end
+    
+     # this test only works if queue_up is true
+    # if queue_up is false, then the jobs keep going
+    it "should NOT stop at the  max number of jobs since queue_up is false" do   
+      JOB_LIMIT = 10
+      @opts[:checkpoint] = false # default is true
+      @opts[:job_limit] = JOB_LIMIT   
+      @opts[:queue_up] = false
       
-      num_ran_batch_jobs = run_batch(make_batch)
+      num_ran_batch_jobs = run_batch(make_batch) 
+      num_ran_batch_jobs.should == 1
       
-      num_ran_batch_jobs.should == 6 # just what it is if this works
+      num_qjobs =  @redis.keys("ql:j:*").size  # keys returns an array
+      num_qjobs.should == 1
+
+       
+      # a batch of 10 child spawning batch jobs creates (10*22=220) child crawl jobs
+      num_crawl_jobs = @m_cache["num_jobs"].to_i
+      num_crawl_jobs.should == @opts[:batch_size]*ChildSpawningBatchJob::NUM_CHILDREN_SPAWNED
       
-      jobs =  @redis.keys "ql:j:*"
-      jobs.size.should == 10
+      puts "num_crawl_jobs  #{num_crawl_jobs}"
+    end
+    
+    
+    it "should stop max number of jobs since queue_up is true" do   
+     puts "....\n\n"
+      JOB_LIMIT = 10
+      @opts[:checkpoint] = false # default is true
+      @opts[:job_limit] = JOB_LIMIT   # batch job limit or crawl job limit
+      @opts[:queue_up] = true
+      
+      # each child spawn job will spawn many jobs
+      # so the total number of jobs run here could be < 10
+      num_ran_batch_jobs = run_batch(make_batch)     
+      num_ran_batch_jobs.should be < JOB_LIMIT
+     
+      # but the total number qless jobs on redis should == 10
+      num_qjobs =  @redis.keys("ql:j:*").size  # keys returns an array
+      num_qjobs.should == JOB_LIMIT
+      
+      num_crawl_jobs = @m_cache["num_jobs"].to_i
+      puts "num_crawl_jobs  #{num_crawl_jobs}"
+       
+       
+      # I don't know if the test works
+      # in principal, if we run 1 more job it should not run the job?
+      #  or maybe it should not submit the job?
       
       # checkpointing is turned off, can not test without turning off save!
      # cp_keys = @cp_cache.keys "*"
      # cp_keys.size.should == 0
+      
     end
+    
     
     
      # # does not work?

@@ -28,6 +28,7 @@ module CloudCrawler
   
   class ChildSpawningBatchJob < BatchJob
     
+    # actually 220
     NUM_CHILDREN_SPAWNED = 22
     
     def self.process_batch(batch)
@@ -45,6 +46,9 @@ module CloudCrawler
       
       m_cache["simple_job:#{hsh[:iid]}"]=hsh.to_json
       s3_cache["simple_job:#{hsh[:iid]}"]=hsh.to_json
+      
+      # num_jobs = m_cache["num_jobs"]
+     # puts "num jobs from child spawning job= #{num_jobs}"
       
       self.make_children(hsh)
     end

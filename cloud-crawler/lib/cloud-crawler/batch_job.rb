@@ -160,7 +160,6 @@ module CloudCrawler
       return next_batch
     end
 
-    # start s3 pipeline?
     #  must be set in DSL..not important for now
     # if pipelined? then () else () end
     
