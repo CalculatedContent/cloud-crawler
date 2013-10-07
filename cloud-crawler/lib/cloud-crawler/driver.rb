@@ -181,7 +181,7 @@ module CloudCrawler
       auto_increment(batch) if auto_increment?
       
       data = {}
-      data[:opts] = @opts.to_json       
+      data[:opts] = @opts.to_json   # this is bulky 
       data[:dsl_id] = make_blocks
       
       batch.each do |hsh| 

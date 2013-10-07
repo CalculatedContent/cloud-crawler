@@ -70,6 +70,9 @@ module CloudCrawler
     # auto-increment batch and job ids if they are nil
     :auto_increment => true,
     
+    # limit number of jobs on queue to prevent buffer overflow
+    :job_limit => 10_000,
+    
     # checkpoint turned on, only used for now when job limit is specified
     :checkpoint => true
   

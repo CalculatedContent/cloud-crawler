@@ -75,7 +75,7 @@ module CloudCrawler
       # not to be accessed by dsl, hence the long name
       # notice this is local
       @cc_checkpoints = Redis::Namespace.new("#{@namespace}:cccp", :redis =>  @local_redis)
-      @cc_checkpoints.s3_init(@opts)
+      @cc_checkpoints.s3_init(@opts)   
   
 
       @queue = qless_job.client.queues[@queue_name]
@@ -130,9 +130,9 @@ module CloudCrawler
       @opts[:checkpoint]
     end
   
-  
+    # 
     def self.qjob_limit?
-      !@opts[:job_limit].nil?
+      @opts[:job_limit] # true if not nill
     end
   
     def self.max_qjobs
@@ -200,7 +200,7 @@ module CloudCrawler
         num_checkpoints = @cc_checkpoints.keys("*").size
         if num_checkpoints > 0
           LOGGER.info " checkpointing #{num_checkpoints} jobs "  
-          @cc_checkpoints.s3.save!  if save_batch  # we can test is
+          @cc_checkpoints.s3.save!  if save_batch?  
         end
       end
       
