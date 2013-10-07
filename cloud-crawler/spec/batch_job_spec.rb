@@ -252,7 +252,7 @@ module CloudCrawler
             
       batch_json = @cc_checkpoints["batch:1"]  # the actual batch data
       batch_array = JSON.parse(batch_json)
-      
+      batch_array.should be_kind_of Hash
       batch_array.should_not be_empty
       
   

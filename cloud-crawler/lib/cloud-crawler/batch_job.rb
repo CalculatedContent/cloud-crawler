@@ -251,7 +251,8 @@ module CloudCrawler
      
       key = "batch:#{bid}"
       
-      @cc_checkpoints[key] = data[:batch] # data = {:batch => [array].json }
+      # must be a valid hash that can be parsed
+      @cc_checkpoints[key] = { :batch => JSON.parse(data[:batch]) }.to_json 
       num_cps = @cc_checkpoints.keys("batch:*")
       LOGGER.info  "num checkpoints = #{num_cps}"
     
