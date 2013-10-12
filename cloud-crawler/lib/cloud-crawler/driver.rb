@@ -188,7 +188,7 @@ module CloudCrawler
          hsh[:link] = normalize_link( hsh[:url] )
        end
       
-      data[:batch] = batch.to_json
+      data[:batch] = make_batch
       submit( BatchCrawlJob, data, @opts )
     end
     

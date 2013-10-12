@@ -257,7 +257,7 @@ module CloudCrawler
       key = "batch:#{bid}"
       
       # must be a valid hash that can be parsed
-      # note:  batch data has been compressed already
+      # note:  batch data has been compressed already, but this has to be a hash for s3 cashes
       @cc_checkpoints[key] = { :batch => data[:batch] }.to_json 
       num_cps = @cc_checkpoints.keys("batch:*")
       LOGGER.info  "num checkpoints = #{num_cps}"

@@ -20,7 +20,6 @@
 #
 require 'robotex'
 require 'sourcify'
-require 'json'
 require 'active_support/inflector'
 require 'active_support/core_ext'
 require 'cloud-crawler/logger'
@@ -130,7 +129,7 @@ module CloudCrawler
       end
       
       def make_batch(batch=[])
-        compress batch.to_json
+        compress batch
       end
 
       def block_sources
