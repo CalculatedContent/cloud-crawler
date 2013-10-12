@@ -181,14 +181,14 @@ module CloudCrawler
       auto_increment(batch) if auto_increment?
       
       data = {}
-      data[:opts] = make_opts   
+      data[:opts] = make_opts 
       data[:dsl_id] = make_blocks
       
       batch.each do |hsh| 
          hsh[:link] = normalize_link( hsh[:url] )
        end
       
-      data[:batch] = make_batch
+      data[:batch] = make_batch batch
       submit( BatchCrawlJob, data, @opts )
     end
     

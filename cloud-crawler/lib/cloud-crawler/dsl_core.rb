@@ -44,10 +44,8 @@ module CloudCrawler
       # ask chm , see dsl_test
       def perform(qless_job)
         @data = qless_job.data.symbolize_keys
-        puts "data #{data}"
-        # unzip data opts ... decompress should include JSON parse
+        # unzip data opts ... decompress includes JSON parse and symbolize_keys 
         @opts = decompress data[:opts]
-        puts "data @opts #{@opts}"
         
         @robots = Robotex.new(@opts[:user_agent]) if @opts[:obey_robots_txt]
         
@@ -56,6 +54,11 @@ module CloudCrawler
         @dsl_id = @data[:dsl_id]
         
         @page = nil
+        
+        LOGGER.info "DslCore:perform  data #{@data} "
+        LOGGER.info "DslCore:perform  opts #{@opts} "
+        LOGGER.info "DslCore:perform  ids  #{@batch_id}  #{@job_id} #{@dsl_id}"
+
 
       rescue => e
         LOGGER.fatal e.backtrace
@@ -74,6 +77,8 @@ module CloudCrawler
        blocks = get_blocks(id)  # already decompressed, and keys symbolized
        
        LOGGER.info "DslCore:  setting up dsl #{id}"
+       LOGGER.info "DslCore:  blocks #{blocks}"
+
        
       @focus_crawl_block = blocks[:focus_crawl_block]
       @on_every_page_block= blocks[:on_every_page_block]

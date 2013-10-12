@@ -262,7 +262,6 @@ module CloudCrawler
       num_cps = @cc_checkpoints.keys("batch:*")
       LOGGER.info  "num checkpoints = #{num_cps}"
     
-      puts "check point data #{key}  #{@cc_checkpoints[key]}"
       # if save/_batch
       # this gets save at the end of the batch?
       # if s3 cache runs out of memory, we are fucked
