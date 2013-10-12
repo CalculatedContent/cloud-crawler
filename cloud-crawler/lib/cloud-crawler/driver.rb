@@ -144,7 +144,7 @@ module CloudCrawler
       LOGGER.info "loading crawl job = #{hsh}"
       
       data = {}
-      data[:opts] = @opts.to_json       
+      data[:opts] = make_opts  
       data[:dsl_id] = make_blocks   
       
       data[:link] = normalize_link( hsh[:url])
@@ -168,10 +168,10 @@ module CloudCrawler
    
  
     # see DslFrontEnd, sorry
-    def put_blocks_in_cache(json)
-      # does not work  :   id = json.hash
+    def put_blocks_in_cache(data)
+      # does not work  :   id = json.hash ... really need id from job submitted
       id = next_dsl_id
-      @cc_master_q["dsl_blocks:#{id}"]=json
+      @cc_master_q["dsl_blocks:#{id}"]=data  # compressed json
       return id
     end
     
@@ -181,7 +181,7 @@ module CloudCrawler
       auto_increment(batch) if auto_increment?
       
       data = {}
-      data[:opts] = @opts.to_json   # this is bulky 
+      data[:opts] = make_opts   
       data[:dsl_id] = make_blocks
       
       batch.each do |hsh| 
@@ -198,14 +198,14 @@ module CloudCrawler
       auto_increment(batch) if auto_increment?
      
       data = {}
-      data[:opts] = @opts.to_json       
+      data[:opts] = make_opts   
       data[:dsl_id] = make_blocks
        
       batch.each do |hsh| 
          hsh[:link] = normalize_link( hsh[:url] )
        end
       
-      data[:batch] = batch.to_json
+      data[:batch] = make_batch batch
       submit( BatchCurlJob, data, @opts )   
      
     end
@@ -221,7 +221,7 @@ module CloudCrawler
       else
          LOGGER.info "submitting #{klass} single (non recurring) job"   
           
-         @queue.put(klass, data )
+         @queue.put(klass, data)
       end
     end
       

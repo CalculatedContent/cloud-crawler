@@ -1,6 +1,6 @@
 #
 # Copyright (c) 2013 Charles H Martin, PhD
-#  
+#
 #  Calculated Content (TM)
 #  http://calculatedcontent.com
 #  charles@calculatedcontent.com
@@ -18,37 +18,42 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-require 'rubygems'
-require 'bundler/setup'
-require 'qless'
-require 'json'
+
+require 'active_support/inflector'
 require 'active_support/core_ext'
+require 'zlib'
+require 'base64'
+require 'json'
+
+#  should recursively compress and decompress
+# see batch job 180
+
+# for exmaple, arrays of hashes should be symbolized
+
+# i would prefer the bulk of this to be done in lua, but...
 
 module CloudCrawler
-  module MakeTestBlocks
-    
+  module DslCommon
+   
+    def decompress(str)
+      json = Zlib::Inflate.inflate(Base64.decode64 str)
 
-    def self.make_test_blocks(ccmq, blocks={})
-      blocks[:focus_crawl_block] ||= nil
-      blocks[:on_every_page_block] ||= nil
-     
-      blocks[:before_crawl_block] ||= nil
-      blocks[:after_crawl_block] ||= nil
-      blocks[:before_batch_block] ||= nil
-      blocks[:after_after_block] ||= nil
+      obj = JSON.parse(json)
+      obj.symbolize_keys! if obj.kind_of? Hash
       
-      blocks[:skip_link_patterns] ||=  []
-      blocks[:on_pages_like_blocks] ||= Hash.new { |hash,key| hash[key] = [] }
-      
-      json = blocks.to_json
-      id = "12345" #json.hash  can not use hash, need different id
-      ccmq["dsl_blocks:#{id}"]=json
-      
-          puts  "test blocks #{id} =>#{blocks}"
+      # TODO: deep decompression, recursively if possible
+      # obj.map! { |x| x.symbolize_keys! } if obj.kind_of Array
+      obj
+    rescue => e
+      p e.message
+      p e.backtrace
+      end
 
-      
-      return id
+    def compress(obj)
+      # TODO: deep compression,  recursively if possible
+      # array.compact! if obj.kind_of Array
+      Base64.encode64 Zlib::Deflate.deflate(obj.to_json)
     end
-    
+
   end
 end

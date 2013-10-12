@@ -24,26 +24,32 @@ require 'json'
 require 'active_support/inflector'
 require 'active_support/core_ext'
 require 'cloud-crawler/logger'
+require 'cloud-crawler/dsl_common' 
+
 
 module CloudCrawler
 
   
   module DslCore
     def self.included(base)
+      base.send :extend, DslCommon
       base.send :extend, ClassMethods
-     # base.send :extend, InstanceMethods
     end
 
-   
+
     module ClassMethods
       # Qless hook
-      
+
       # could also optimize dsl as a singleton method
       # for crawling, may not help
       # ask chm , see dsl_test
       def perform(qless_job)
         @data = qless_job.data.symbolize_keys
-        @opts = JSON.parse(data[:opts]).symbolize_keys
+        puts "data #{data}"
+        # unzip data opts ... decompress should include JSON parse
+        @opts = decompress data[:opts]
+        puts "data @opts #{@opts}"
+        
         @robots = Robotex.new(@opts[:user_agent]) if @opts[:obey_robots_txt]
         
         @batch_id = @data[:batch_id]
@@ -52,20 +58,21 @@ module CloudCrawler
         
         @page = nil
 
-      rescue
+      rescue => e
         LOGGER.fatal e.backtrace
       end
 
-      # implement in the job itself
-      #  note:  this is different now, expected json parsed, no symbols for keys
-      # def get_blocks(id)
-        # return {}
-      # end
+   
+      def get_blocks(id)
+        # it better be here
+        decompress get_blocks_from_cache(id)
+      end
       
      # setup crawl dsl
+     
+     
     def setup_dsl(id)
-       blocks = get_blocks(id)
-       blocks.symbolize_keys!
+       blocks = get_blocks(id)  # already decompressed, and keys symbolized
        
        LOGGER.info "DslCore:  setting up dsl #{id}"
        
@@ -100,7 +107,7 @@ module CloudCrawler
      end
       
      def job_id
-        @data[:job_id]
+        @data[:job_id]  # i wish i could use qless id
      end
      
       def batch_id

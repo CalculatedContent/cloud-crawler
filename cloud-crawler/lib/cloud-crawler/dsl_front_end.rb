@@ -1,6 +1,6 @@
 #
 # Copyright (c) 2013 Charles H Martin, PhD
-#  
+#
 #  Calculated Content (TM)
 #  http://calculatedcontent.com
 #  charles@calculatedcontent.com
@@ -24,11 +24,12 @@ require 'json'
 require 'active_support/inflector'
 require 'active_support/core_ext'
 require 'cloud-crawler/logger'
+require 'cloud-crawler/dsl_common'
 
 module CloudCrawler
 
- #TODO:  these are never actually input
- #  need to reconcile with unit tests and trollop
+  #TODO:  these are never actually input
+  #  need to reconcile with unit tests and trollop
   DEFAULT_OPTS = {
     # disable verbose output
     :verbose => false,
@@ -43,7 +44,7 @@ module CloudCrawler
     # by default, don't limit the depth of the crawl
     :depth_limit => false,
     # number of times HTTP redirects will be followed
-    :redirect_limit => 5, 
+    :redirect_limit => 5,
     # keep all pages , even redirects
     :keep_redirects => true,
     # Hash of cookie name => value to send with HTTP requests
@@ -63,19 +64,19 @@ module CloudCrawler
     :outside_domain => false,
     # allow links inside of the root domain
     :inside_domain => true,
-    
+
     # save batch jobs in s3
     :save_batch => true,
- 
+
     # auto-increment batch and job ids if they are nil
     :auto_increment => true,
-    
+
     # limit number of jobs on queue to prevent buffer overflow
     :job_limit => 10_000,
-    
+
     # checkpoint turned on, only used for now when job limit is specified
     :checkpoint => true
-  
+
   }
 
   # does DSL can use instance methods or class instance methods ?
@@ -85,6 +86,7 @@ module CloudCrawler
     end
 
     module InstanceMethods
+      include DslCommon
 
       # where are the getters?
       DEFAULT_OPTS.keys.each do |key|
@@ -98,48 +100,55 @@ module CloudCrawler
 
         @focus_crawl_block = nil
         @on_every_page_block = nil
-      
 
         @after_crawl_block = nil
         @before_crawl_block = nil
-        
+
         @after_batch_block = nil
         @before_batch_block = nil
-        
+
         @skip_link_patterns = []
         @on_pages_like_blocks = Hash.new { |hash,key| hash[key] = [] }
-        
+
         yield self if block_given?
       end
-      
+
       def opts
         @opts
       end
+
       
+      def make_opts
+        compress opts
+      end
+
       # driver provides callback into cache
       def make_blocks
-        json  = block_sources.to_json
-        id = put_blocks_in_cache(json)
+        data  = compress block_sources
+        id = put_blocks_in_cache(data) # would prefer qless id here if possible
         return id
       end
       
+      def make_batch(batch=[])
+        compress batch.to_json
+      end
 
       def block_sources
         blocks = {}
         blocks[:focus_crawl_block] = block_to_source @focus_crawl_block
-        blocks[:on_every_page_block] = block_to_source @on_every_page_block 
-        blocks[:on_after_crawl_block] = block_to_source @after_crawl_block 
-        blocks[:on_before_crawl_block] = block_to_source @before_crawl_block 
-        blocks[:on_after_batch_block] = block_to_source @after_batch_block 
-        blocks[:on_before_batch_block] = block_to_source @before_batch_block 
+        blocks[:on_every_page_block] = block_to_source @on_every_page_block
+        blocks[:on_after_crawl_block] = block_to_source @after_crawl_block
+        blocks[:on_before_crawl_block] = block_to_source @before_crawl_block
+        blocks[:on_after_batch_block] = block_to_source @after_batch_block
+        blocks[:on_before_batch_block] = block_to_source @before_batch_block
 
         blocks[:skip_link_patterns] = @skip_link_patterns.compact
         blocks[:on_pages_like_blocks] = @on_pages_like_blocks.each{ |_,a|  a.compact.map!(&:to_source) }
         return blocks
       end
-      
+
       def block_to_source(block)
-        if block then block.to_source else nil end  
+        if block then block.to_source else nil end
       end
 
       # TODO:  replacen with MP
@@ -147,23 +156,21 @@ module CloudCrawler
         @after_crawl_block = block
         self
       end
-      
-       def before_crawl(&block)
+
+      def before_crawl(&block)
         @before_crawl_block = block
         self
       end
-      
+
       def after_batch(&block)
         @after_batch_block = block
         self
       end
-      
-       def before_batch(&block)
+
+      def before_batch(&block)
         @before_batch_block = block
         self
       end
-
-     
 
       #
       # Add a block to be executed on every Page as they are encountered
@@ -196,8 +203,8 @@ module CloudCrawler
         @focus_crawl_block = block
         self
       end
-      
-       #
+
+      #
       # Add one ore more Regex patterns for URLs which should not be
       # followed
       #

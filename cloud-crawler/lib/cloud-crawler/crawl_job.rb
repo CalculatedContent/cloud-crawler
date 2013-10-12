@@ -28,6 +28,7 @@ require 'active_support/core_ext'
 
 module CloudCrawler
   
+    
   class CrawlJob
     include DslCore
   
@@ -55,10 +56,8 @@ module CloudCrawler
   
  
        
-    def self.get_blocks(id)
-      # should reference driver
-      json = @cc_master_q["dsl_blocks:#{id}"]
-      if json then JSON.parse(json) else {} end
+    def self.get_blocks_from_cache(id)
+      @cc_master_q["dsl_blocks:#{id}"] 
     end
     
     

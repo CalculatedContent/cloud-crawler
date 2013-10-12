@@ -63,10 +63,24 @@ module CloudCrawler
        @http
     end
 
+    # (A) memory optimization
+    #
+    # pre_batch(batch)
+    #   get links from ccmq
+    #   either from a list or lookup in hashes
+    
+    
+    #  get_link
+    #    links.pop
+    
+    #  next_link
+    #    
     def self.process_job(job)
       LOGGER.info "processing job #{job}"
       next_jobs = []
 
+      #TODO: place links in a high performance cache
+      #  link, referer, depth = get_link
       link, referer, depth = job[:link], job[:referer], job[:depth]
       
       return next_jobs if link.nil? or link.empty? or link == :END

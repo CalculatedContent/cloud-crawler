@@ -139,6 +139,11 @@ module CloudCrawler
       (@opts[:job_limit] || -1).to_i
     end
     
+    
+    # memory optimization
+    #  store ALL batch data in hashes
+    #  hset / hget
+    #
 
     # should be memory size
     # need to flush queue, remove or serialize jobs
@@ -147,9 +152,9 @@ module CloudCrawler
     end
     
     # same as crawl job
-    def self.get_blocks(id)
-      json = @cc_master_q["dsl_blocks:#{id}"]
-      if json then JSON.parse(json) else {} end
+    # TODO:  should decompress in the core, not here
+    def self.get_blocks_from_cache(id)
+      @cc_master_q["dsl_blocks:#{id}"] || "{}"
     end
     
     
@@ -172,7 +177,7 @@ module CloudCrawler
       do_pre_batch 
       next_batch = this_batch.map do |hsh|
         @job=hsh # hack for dsl
-        hsh.symbolize_keys!
+        hsh.symbolize_keys!   # decompress should recursively decompress
         sleep(delay) if delay
         process_job(hsh)
       end
@@ -252,7 +257,8 @@ module CloudCrawler
       key = "batch:#{bid}"
       
       # must be a valid hash that can be parsed
-      @cc_checkpoints[key] = { :batch => JSON.parse(data[:batch]) }.to_json 
+      # note:  batch data has been compressed already
+      @cc_checkpoints[key] = { :batch => data[:batch] }.to_json 
       num_cps = @cc_checkpoints.keys("batch:*")
       LOGGER.info  "num checkpoints = #{num_cps}"
     
@@ -272,7 +278,7 @@ module CloudCrawler
 
       # use @ for DSL ... crappy design
       #  create in init:  @data = qless_job.data.symbolize_keys
-      batched_jobs = JSON.parse(data[:batch])
+      batched_jobs = decompress data[:batch]
             
       LOGGER.info "performing #{batched_jobs.size} batched batched_jobs "
       while batched_jobs.size > 0 do
@@ -288,7 +294,7 @@ module CloudCrawler
         if queue_up? then
           LOGGER.info "queing up next batched_jobs #{next_batch.size}"
           next_batch.each_slice(batch_size) do |batch|
-            data[:batch] = batch.to_json
+            data[:batch] = compress batch
             data[:first_job] = false
             # increment job id somehow?
             

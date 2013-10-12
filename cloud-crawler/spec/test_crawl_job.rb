@@ -23,12 +23,15 @@ require 'bundler/setup'
 require 'qless'
 require 'json'
 require 'active_support/core_ext'
-require 'make_test_blocks'
+require 'make_test_data'
+
+$:.unshift(File.dirname(__FILE__))
+require 'spec_helper'
 
 
 module CloudCrawler
   class TestCrawlJob 
-    include MakeTestBlocks
+    include MakeTestData
     
     attr_accessor :data, :client, :queue
     def initialize(link, referer=nil, depth=nil, opts={}, ccmq=nil, blocks={})
@@ -38,8 +41,8 @@ module CloudCrawler
       @queue = @client.queues[@queue_name]
       
       @data = {}
-      @data[:opts] = opts.to_json    
-      @data[:dsl_id] = MakeTestBlocks::make_test_blocks(ccmq, blocks)
+      @data[:opts] =  MakeTestData::make_test_opts(opts)
+      @data[:dsl_id] = MakeTestData::make_test_blocks(ccmq, blocks)
       
       @data[:link], @data[:referer], @data[:depth] = link, referer, depth
     end

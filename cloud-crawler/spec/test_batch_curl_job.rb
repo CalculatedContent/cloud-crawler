@@ -25,10 +25,15 @@ require 'json'
 require 'active_support/core_ext'
 require 'make_test_blocks'
 
+$:.unshift(File.dirname(__FILE__))
+require 'spec_helper'
+
+
 
 module CloudCrawler
   class TestBatchCrawlJob 
-    include MakeTestBlocks
+    include MakeTestData
+    include DslCommon
     
     attr_accessor :data, :client, :queue
     def initialize(links, opts, ccmq, blocks)
@@ -37,12 +42,13 @@ module CloudCrawler
       @queue = @client.queues[@queue_name]
       
       @data = {}
-      @data[:opts] = opts.to_json     
-      @data[:dsl_id] = make_test_blocks(ccmq, blocks)
+      @data[:opts] = MakeTestData::make_test_opts(opts)
+      @data[:dsl_id] = MakeTestData::make_test_blocks(ccmq, blocks)
          
-      @data[:batch] = [links].flatten.map { |lnk|  { :link =>  lnk, :depth => 0 } }.to_json
-    end
-    
+             
+
+      batch =  [links].flatten.map { |lnk|  { :link =>  lnk, :depth => 0 } }
+      @data[:batch] = MakeTestData::make_test_batch(batch)    end 
 
   end
 

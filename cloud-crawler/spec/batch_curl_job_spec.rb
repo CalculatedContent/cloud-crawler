@@ -25,11 +25,11 @@ require 'cloud-crawler/batch_curl_job'
 require 'cloud-crawler/batch_job'
 require 'test_batch_job'
 require 'sourcify' #,'~> 0.6'  
-require 'make_test_blocks'
+require 'make_test_data'
 
 
 module CloudCrawler
-   include MakeTestBlocks
+   include MakeTestData
 
   
   #TODO:  combine this test with the batch crawl test

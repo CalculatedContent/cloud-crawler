@@ -20,41 +20,49 @@
 #
 require 'rubygems'
 require 'bundler/setup'
+require 'qless'
 require 'json'
 require 'active_support/core_ext'
-require 'cloud-crawler/batch_job'
-require 'make_test_data'
 
 $:.unshift(File.dirname(__FILE__))
 require 'spec_helper'
 
-#
-# A batch of jobs.  The data 
-#
 module CloudCrawler
-  class TestBatchJob < BatchJob
-    include MakeTestData
-    
-    attr_accessor :data, :client, :queue
-    def initialize(links, opts, ccmq, blocks)
-      
-      @client = Qless::Client.new
-      @queue_name = opts[:queue_name] 
-      @queue = @client.queues[@queue_name]
-      
-      @data = {}
-      @data[:opts] =  MakeTestData::make_test_opts(opts)
-      @data[:dsl_id] =  MakeTestData::make_test_blocks(ccmq,blocks)
-      
-      batch = [links].flatten.map { |lnk|  { :link =>  lnk, :depth => 0 } }
-      @data[:batch] = MakeTestData::make_test_batch(batch)
+  module MakeTestData
+    class << self
+      include DslCommon
     end
     
- 
+    def self.make_test_opts(opts={})
+      compress opts
+    end
+    
+     
+    def self.make_test_batch(batch={:batch => []})
+      compress batch
+    end
+    
+    
+    def self.make_test_blocks(ccmq, blocks={})
+      blocks[:focus_crawl_block] ||= nil
+      blocks[:on_every_page_block] ||= nil
+     
+      blocks[:before_crawl_block] ||= nil
+      blocks[:after_crawl_block] ||= nil
+      blocks[:before_batch_block] ||= nil
+      blocks[:after_after_block] ||= nil
+      
+      blocks[:skip_link_patterns] ||=  []
+      blocks[:on_pages_like_blocks] ||= Hash.new { |hash,key| hash[key] = [] }
+      
+      id = "12345" #json.hash  can not use hash, need different id
+      ccmq["dsl_blocks:#{id}"]=compress blocks
+      
+      puts  "test blocks #{id} =>#{blocks}"
 
+      
+      return id
+    end
+    
   end
-
-
-
-
 end

@@ -26,13 +26,13 @@ require 'cloud-crawler/driver'
 require 'active_support/inflector'
 require 'active_support/core_ext'
 require 'child_spawning_batch_job'
-require 'make_test_blocks'
+require 'make_test_data'
 
 require 'qless'
 require 'sourcify'
 
 module CloudCrawler
-  include MakeTestBlocks
+  include MakeTestData
   describe BatchJob do
 
     before(:each) do
@@ -73,9 +73,9 @@ module CloudCrawler
     
     def run_batch(batch)
       data = {}
-      data[:opts] = @opts.to_json
-      data[:batch] = batch.to_json
-      data[:dsl_id] = MakeTestBlocks::make_test_blocks(@cc_master_q, {})
+      data[:opts] = MakeTestData::make_test_opts @opts
+      data[:batch] = MakeTestData::make_test_batch batch
+      data[:dsl_id] = MakeTestData::make_test_blocks(@cc_master_q, {})
    
       @queue.put( CloudCrawler::ChildSpawningBatchJob, data )
 
