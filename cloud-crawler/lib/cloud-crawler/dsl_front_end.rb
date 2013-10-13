@@ -74,7 +74,7 @@ module CloudCrawler
     :job_limit => 10_000,
 
     # checkpoint turned on, only used for now when job limit is specified
-    :checkpoint => true
+    :checkpoint => false
 
   }
 
