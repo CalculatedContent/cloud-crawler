@@ -78,7 +78,6 @@ module CloudCrawler
        
        LOGGER.info "DslCore:  setting up dsl #{id}"
        LOGGER.info "DslCore:  blocks #{blocks}"
-
        
       @focus_crawl_block = blocks[:focus_crawl_block]
       @on_every_page_block= blocks[:on_every_page_block]
