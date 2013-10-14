@@ -5,6 +5,8 @@ gem 'sourcify', :git=>"git://github.com/CalculatedContent/sourcify.git"
 gem 'qless', :git=>"git://github.com/CalculatedContent/qless.git"
 
 # helper scripts
+gem 'headless'
+gem 'selenium-webdriver'
 gem 'whenever'
 gem 'fog'
 
