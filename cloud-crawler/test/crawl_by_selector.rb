@@ -5,7 +5,7 @@ require 'cloud-crawler'
 require 'trollop'
 
 opts = Trollop::options do
-  opt :urls, "urls to crawl", :short => "-u", :multi => true,  :default => "http://www.ehow.com"
+  opt :urls, "urls to crawl", :short => "-u", :multi => true,  :default => "http://www.example.com"
   opt :selector, "selector", :default => "body", :type => :string
   opt :file, "file path to save output", :short => "-f", :default => "crawl.out", :type => :string
 end
