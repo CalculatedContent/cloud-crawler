@@ -55,14 +55,7 @@ module CloudCrawler
     end
     
     
-     
-    class << self
-      alias_method_chain :init, :pagestore
-      alias_method_chain :visit_link?, :bloomfilter
-    end
-    
-        
-     
+ 
     def self.http
        @http
     end
@@ -127,7 +120,7 @@ module CloudCrawler
     
         # cache, only mark after saved to s3
         if  opts[:discard_page] then
-          @saved_urls << page
+          @saved_urls << url
         else  
           @page_store[url] = page 
         end
@@ -143,23 +136,34 @@ module CloudCrawler
       return next_jobs
     end
 
-  end
-     
-    def self.do_post_batch
-      super()
+
+    def self.do_post_batch_with_pagestore
+      LOGGER.info "do_post_batch_with_pagestore" 
       do_post_batch_without_pagestore
       unless opts[:discard_page] then
         LOGGER.info " saving #{@page_store.keys.size} pages into page store" 
         @saved_urls = @page_store.s3.save! 
-      end    
+      end
+         
  
       # add pages to bloomfilter only if store to s3 succeeds
       # if we discarded pages, then touch those kept in local cache
-      
-      @saved_urls.each { |url|  @bloomfilter.visit_url(url) }     
+      LOGGER.info " marking #{@saved_urls.size} urls in bloomfilter"
+      @bloomfilter.visit_urls(@saved_urls)  
     end
     
  
+     
+    class << self
+      alias_method_chain :init, :pagestore
+      alias_method_chain :do_post_batch, :pagestore
+      alias_method_chain :visit_link?, :bloomfilter
+    end
+    
+        
+     
+     
+     end
     
 
 end

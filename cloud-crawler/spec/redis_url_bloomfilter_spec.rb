@@ -83,7 +83,7 @@ module CloudCrawler
     end
 
     it "should detect normalized urls " do
-      @bloomfilter.visit("https://www.google.com")
+      @bloomfilter.visit_url("https://www.google.com")
       @bloomfilter.visited_url?("http://www.google.com").should == true
     end
 
