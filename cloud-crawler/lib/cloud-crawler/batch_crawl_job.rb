@@ -43,7 +43,8 @@ module CloudCrawler
     def self.visit_link_with_bloomfilter?(link, from_page = nil) 
         visit = visit_link_without_bloomfilter?(link, from_page)  
         #return visit if recrawl? link  
-        return visit && !@bloomfilter.visited_url?(link)
+        # debug here
+        return visit && @bloomfilter.not_visited_url?(link)
     end
     
     # option to recrawl links
