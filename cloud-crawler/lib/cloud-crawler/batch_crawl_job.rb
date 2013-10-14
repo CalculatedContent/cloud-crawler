@@ -33,9 +33,10 @@ module CloudCrawler
         
     def self.init_with_pagestore(qless_job)   
       @page_store = RedisPageStore.new(@local_redis,@opts)
+      @saved_urls = []
       @bloomfilter = RedisUrlBloomfilter.new(@redis)
   #    @http_cache={}
-      @http=nil
+      @http=nil    
       init_without_pagestore(qless_job)
     end
     
@@ -87,8 +88,7 @@ module CloudCrawler
       link, referer, depth = job[:link], job[:referer], job[:depth]
       
       return next_jobs if link.nil? or link.empty? or link == :END
-      return next_jobs if @bloomfilter.visited_url?(link.to_s)
-
+      return next_jobs if @bloomfilter.visited_url?(link.to_s)  # should not really need
       # hack for cookies 
       # belongs in batch job itself
       
@@ -125,7 +125,13 @@ module CloudCrawler
           next_jobs << next_job
         end
     
-        @page_store[url] = page unless opts[:discard_page]
+        # cache, only mark after saved to s3
+        if  opts[:discard_page] then
+          @saved_urls << page
+        else  
+          @page_store[url] = page 
+        end
+        
       end
 
       # must optionally turn off caching for testing
@@ -142,13 +148,15 @@ module CloudCrawler
     def self.do_post_batch
       super()
       do_post_batch_without_pagestore
-      LOGGER.info " saving #{@page_store.keys.size} pages intp page store" 
-      saved_urls = @page_store.s3.save! 
+      unless opts[:discard_page] then
+        LOGGER.info " saving #{@page_store.keys.size} pages into page store" 
+        @saved_urls = @page_store.s3.save! 
+      end    
  
       # add pages to bloomfilter only if store to s3 succeeds
-      # skip root page?
+      # if we discarded pages, then touch those kept in local cache
       
-      saved_urls.each { |url|  @bloomfilter.visit_url(url) }     
+      @saved_urls.each { |url|  @bloomfilter.visit_url(url) }     
     end
     
  

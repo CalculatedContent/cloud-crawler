@@ -70,6 +70,7 @@ module CloudCrawler
     
     # same as page store
     #TODO:  normalize urls when parameters are present
+    # i.e: "http://www.bodybuilding.com/fun/bbinfo.php/?order=AUTHOR&page=WeiderPrinciples"
     def key_for(url)
       url.to_s.downcase.gsub("https",'http').gsub(/\s+/,' ')
     end
@@ -100,6 +101,7 @@ module CloudCrawler
     end
     alias_method :visited_url?, :include?
     alias_method :touched_url?, :include? 
+    
     
     def not_include?(url)
       return !include?(url)
