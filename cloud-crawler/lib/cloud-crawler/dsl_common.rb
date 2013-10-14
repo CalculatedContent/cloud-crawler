@@ -40,21 +40,19 @@ module CloudCrawler
 
       # try to parse json, return string if can not parse
       begin
-      obj = JSON.parse(json)  
-      obj.symbolize_keys! if obj.kind_of? Hash
+        obj = JSON.parse(json)  
+        obj.symbolize_keys! if obj.kind_of? Hash
      
       # TODO: deep decompression, recursively if possible
       # obj.map! { |x| x.symbolize_keys! } if obj.kind_of Array
       
-      return obj
-      rescue
+       return obj
+      rescue => e
         #log ?
       end
       
       return json
-    rescue => e
-      p e.message
-      p e.backtrace
+   
       end
 
     def compress(obj)
