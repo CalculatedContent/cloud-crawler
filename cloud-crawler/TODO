@@ -1,3 +1,79 @@
+TODO for release 0.2
+
+A. Implement before and after batch crawl method hooks
+
+  after crawl needs to periodically poll qless and see if all jobs have completed
+  if completed, it can do something
+   
+  needs to run in background as nice , or as a job that is submitted locally
+   or as a cronjob>
+   
+A.*  maybe not 0.2 release
+   require some thought
+
+B.  can i actually crawl bodybuilding.com
+  get some performance stats on
+  b.1  how many jobs can be submitted on small until memory runs out
+  b.2  timing statistics and cost estimates for a large crawl,
+
+
+C. common crawl processor
+   c.1 advertise and explain batch_curl, maybe rename to common_crawl (YES)
+   c.2 add helper methods for crawling and processing common_crawl data
+       
+D.  port latest version of QLess
+  d.1  try to migrate to latest version and check for bugs
+
+  
+E.  net/http vs httparty
+   test and see if net/http is actually faster
+   
+
+F.  google crawls
+  make sure the google crawls actually work
+  f.1  crawl for related queries
+  f.2  crawl for serps
+  
+  have some help scripts, that are mine, that support this
+  
+  
+G.  blog psot on DSL
+  make sure DSL is described in post
+  have some sample scripts in github
+  test w/ruby 2.0
+  
+  
+H. Lua Bloom Filter .. instead of bloomd !!!
+    should make life easier, not sure if better
+    
+    
+I. Checkpointing:
+   add script to pull data from checkpoints and resubit N jobs
+   need a simple bookkeeping scheme to make sure we can checkpoint at scale
+   really this is silly...just a stopgap...but it is important
+  
+J. update the deck to 0.2
+
+K.  Not just in domain...under domain
+  bodybuilding.com/fun
+  
+    => has to be under this
+    => redirect might be a problem
+    
+    select_links_below_root
+    select_links_in_domain
+    select_links_outside_domain
+    select_links in_domain and without_queries
+    
+     
+    
+    
+  L.  make sure chef is not going nuts and retsrating the workers all the time
+    really learn chef
+    learn ansible
+   
+-------------------------------------------------
+
 Basic Issues TODO  for / with Pierre and Dave
 
 1.   Make sure INSTALL.local is upto date
@@ -20,7 +96,7 @@ Basic Issues TODO  for / with Pierre and Dave
   
 3.a   set up ENV VARs  for   AWS
 
-AWS_SECRET_ACCESS_KEY
+AWS_SECRET_ACCESS_KEY~
 AWS_ACCESS_KEY_ID
 EC2_AVAILABILITY_ZONE
 EC2_REGION
@@ -47,6 +123,7 @@ same as we did for  Katie
   deploy_cloud_master.sh
 
   deploy_cloud_worker.sh
+
 
 
 

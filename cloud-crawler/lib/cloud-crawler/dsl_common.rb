@@ -38,12 +38,20 @@ module CloudCrawler
     def decompress(str)
       json = Zlib::Inflate.inflate(Base64.decode64 str)
 
-      obj = JSON.parse(json)
+      # try to parse json, return string if can not parse
+      begin
+      obj = JSON.parse(json)  
       obj.symbolize_keys! if obj.kind_of? Hash
-      
+     
       # TODO: deep decompression, recursively if possible
       # obj.map! { |x| x.symbolize_keys! } if obj.kind_of Array
-      obj
+      
+      return obj
+      rescue
+        #log ?
+      end
+      
+      return json
     rescue => e
       p e.message
       p e.backtrace
