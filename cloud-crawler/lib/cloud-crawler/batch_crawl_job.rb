@@ -136,13 +136,13 @@ module CloudCrawler
       return next_jobs
     end
 
-
     def self.do_post_batch_with_pagestore
       LOGGER.info "do_post_batch_with_pagestore" 
       do_post_batch_without_pagestore
-      unless opts[:discard_page] then
+     # if  save_page_store? then
+      if save_batch? and !opts[:discard_page] then
         LOGGER.info " saving #{@page_store.keys.size} pages into page store" 
-        @saved_urls = @page_store.s3.save! 
+        @saved_urls = @page_store.save! 
       end
          
  
