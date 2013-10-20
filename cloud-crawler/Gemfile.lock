@@ -157,5 +157,6 @@ DEPENDENCIES
   redis-caches!
   rspec (>= 2.12.0)
   selenium-webdriver
+  sinatra
   sourcify!
   whenever
