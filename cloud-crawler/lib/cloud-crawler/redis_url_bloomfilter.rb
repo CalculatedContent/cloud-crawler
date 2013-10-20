@@ -28,6 +28,7 @@ require 'cloud-crawler/logger'
     
 module CloudCrawler
    
+   #TODO: replace with lua bloomfilter
   class RedisUrlBloomfilter
     include Enumerable
     
@@ -68,10 +69,14 @@ module CloudCrawler
     end
     
     # same as page store
+    #TODO:  normalize urls when parameters are present
+    # i.e: "http://www.bodybuilding.com/fun/bbinfo.php/?order=AUTHOR&page=WeiderPrinciples"
     def key_for(url)
       url.to_s.downcase.gsub("https",'http').gsub(/\s+/,' ')
     end
     
+    
+   
     
     # bloom filter methods
    
@@ -96,7 +101,13 @@ module CloudCrawler
     end
     alias_method :visited_url?, :include?
     alias_method :touched_url?, :include? 
-
+    
+    
+    def not_include?(url)
+      return !include?(url)
+    end
+    alias_method :not_visited_url?, :not_include?
+    alias_method :not_touched_url?, :not_include? 
 
   end
 end

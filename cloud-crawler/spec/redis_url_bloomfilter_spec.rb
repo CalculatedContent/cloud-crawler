@@ -1,6 +1,6 @@
 #
 # Copyright (c) 2013 Charles H Martin, PhD
-#  
+#
 #  Calculated Content (TM)
 #  http://calculatedcontent.com
 #  charles@calculatedcontent.com
@@ -21,53 +21,71 @@
 $:.unshift(File.dirname(__FILE__))
 require 'spec_helper'
 
-
 module CloudCrawler
-  describe RedisPageStore do
+  describe RedisUrlBloomfilter do
 
     before(:all) do
       FakeWeb.clean_registry
     end
 
     # redis should be running locally
-      before(:each) do
-        @url = SPEC_DOMAIN
-        @redis = Redis::Namespace.new("RedisUrlBloomfilterSpec", :redis => Redis.new)
-        @bloomfilter = RedisUrlBloomfilter.new(@redis)
+    before(:each) do
+      @url = SPEC_DOMAIN
+      @redis = Redis::Namespace.new("RedisUrlBloomfilterSpec", :redis => Redis.new)
+      @bloomfilter = RedisUrlBloomfilter.new(@redis)
+    end
+
+    after(:each) do
+      @redis.flushdb
+    end
+
+    it "should normalize https in urls " do
+      @bloomfilter.key_for("https://www.google.com").should == "http://www.google.com"
+    end
+
+    it "should have a namespace" do
+      @bloomfilter.should respond_to(:namespace)
+    end
+
+    it "should store a  url in the bloomfilter" do
+      @bloomfilter.should respond_to(:touch_url)
+      @bloomfilter.should respond_to(:touched_url?)
+
+      @bloomfilter.touch_url(@url)
+      @bloomfilter.touched_url?(@url).should == true
+      @bloomfilter.touched_url?("test").should == false
+
+      @bloomfilter.touch_urls( ["http://a","http://b","http://c"] )
+
+    end
+
+    it "alias touch to visit" do
+      @bloomfilter.should respond_to(:include?)
+      @bloomfilter.should respond_to(:visit_url)
+      @bloomfilter.should respond_to(:visit_urls)
+      @bloomfilter.should respond_to(:visited_url?)
+    end
+
+    it "should support not methods" do
+      @bloomfilter.should respond_to(:not_include?)
+      @bloomfilter.should respond_to(:not_visited_url?)
+      @bloomfilter.should respond_to(:not_touched_url?)
+    end
+
+    it "should store an array of urls in bloomfilter" do
+      @bloomfilter.should respond_to(:visited_url?)
+
+      @bloomfilter.visit_urls( ["http://a","http://b","http://c"] )
+      ["http://a","http://b","http://c"].each do |url|
+        @bloomfilter.touched_url?(url).should == true
       end
 
-      after(:each) do
-        @redis.flushdb
-      end
-              
-      it "should normalize https in urls " do
-         @bloomfilter.key_for("https://www.google.com").should == "http://www.google.com"
-      end
+    end
 
-      
-      it "should have a namespace" do
-        @bloomfilter.should respond_to(:namespace)
-      end
-        
-      it "should store urls in bloomfilter" do
-        @bloomfilter.should respond_to(:touch_url)
-        @bloomfilter.should respond_to(:touched_url?)
-
-        @bloomfilter.touch_url(@url)
-        @bloomfilter.touched_url?(@url).should == true
-        @bloomfilter.touched_url?("test").should == false
-        
-        @bloomfilter.touch_urls( ["http://a","http://b","http://c"] )
-        
-      end
-      
-      it "alias touch to visit" do
-        @bloomfilter.should respond_to(:visit_url)
-        @bloomfilter.should respond_to(:visit_urls)
-        @bloomfilter.should respond_to(:visited_url?)
-      end
-      
- 
+    it "should detect normalized urls " do
+      @bloomfilter.visit_url("https://www.google.com")
+      @bloomfilter.visited_url?("http://www.google.com").should == true
+    end
 
   end
 end

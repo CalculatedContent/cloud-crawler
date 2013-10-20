@@ -33,32 +33,29 @@ module CloudCrawler
         
     def self.init_with_pagestore(qless_job)   
       @page_store = RedisPageStore.new(@local_redis,@opts)
+      @saved_urls = []
       @bloomfilter = RedisUrlBloomfilter.new(@redis)
   #    @http_cache={}
-      @http=nil
+      @http=nil    
       init_without_pagestore(qless_job)
     end
     
     
     def self.visit_link_with_bloomfilter?(link, from_page = nil) 
         visit = visit_link_without_bloomfilter?(link, from_page)  
-        return visit if recrawl? link  
-        return visit && !@bloomfilter.visited_url?(link)
+        #return visit if recrawl? link  
+        # debug here
+        return visit && @bloomfilter.not_visited_url?(link)
     end
     
+    # option to recrawl links
+    # not implemented yet
     def self.recrawl?(link)
       false
     end
     
     
-     
-    class << self
-      alias_method_chain :init, :pagestore
-      alias_method_chain :visit_link?, :bloomfilter
-    end
-    
-        
-     
+ 
     def self.http
        @http
     end
@@ -84,8 +81,7 @@ module CloudCrawler
       link, referer, depth = job[:link], job[:referer], job[:depth]
       
       return next_jobs if link.nil? or link.empty? or link == :END
-      return next_jobs if @bloomfilter.visited_url?(link.to_s)
-
+      return next_jobs if @bloomfilter.visited_url?(link.to_s)  # should not really need
       # hack for cookies 
       # belongs in batch job itself
       
@@ -122,7 +118,13 @@ module CloudCrawler
           next_jobs << next_job
         end
     
-        @page_store[url] = page unless opts[:discard_page]
+        # cache, only mark after saved to s3
+        if  opts[:discard_page] then
+          @saved_urls << url
+        else  
+          @page_store[url] = page 
+        end
+        
       end
 
       # must optionally turn off caching for testing
@@ -134,21 +136,34 @@ module CloudCrawler
       return next_jobs
     end
 
-  end
-     
-    def self.do_post_batch
-      super()
+
+    def self.do_post_batch_with_pagestore
+      LOGGER.info "do_post_batch_with_pagestore" 
       do_post_batch_without_pagestore
-      LOGGER.info " saving #{@page_store.keys.size} pages intp page store" 
-      saved_urls = @page_store.s3.save! 
+      unless opts[:discard_page] then
+        LOGGER.info " saving #{@page_store.keys.size} pages into page store" 
+        @saved_urls = @page_store.s3.save! 
+      end
+         
  
       # add pages to bloomfilter only if store to s3 succeeds
-      # skip root page?
-      
-      saved_urls.each { |url|  @bloomfilter.visit_url(url) }     
+      # if we discarded pages, then touch those kept in local cache
+      LOGGER.info " marking #{@saved_urls.size} urls in bloomfilter"
+      @bloomfilter.visit_urls(@saved_urls)  
     end
     
  
+     
+    class << self
+      alias_method_chain :init, :pagestore
+      alias_method_chain :do_post_batch, :pagestore
+      alias_method_chain :visit_link?, :bloomfilter
+    end
+    
+        
+     
+     
+     end
     
 
 end
