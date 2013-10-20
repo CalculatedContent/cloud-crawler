@@ -1,5 +1,6 @@
 require 'cloud-crawler'
 require 'uri'
+require 'fakeweb'
 
 module CloudCrawler
   describe HTTP do
@@ -16,6 +17,7 @@ module CloudCrawler
                     </script><div></div>
             </body></html>
         HTML
+        FakeWeb.allow_net_connect = true
         http = CloudCrawler::HTTP.new( {
             verbose: true,
             headless: true,
@@ -24,6 +26,7 @@ module CloudCrawler
         page = http.fetch_page("http://localhost/")
         page.code.should == 200
         page.body == html.delete(' ')
+        FakeWeb.allow_net_connect = false
       end
     end
   end
