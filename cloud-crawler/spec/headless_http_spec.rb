@@ -21,7 +21,7 @@ module CloudCrawler
         http = CloudCrawler::HTTP.new( {
             verbose: true,
             headless: true,
-            headless_wait: 5
+            headless_wait: 1
         } )
         page = http.fetch_page("http://localhost/")
         page.code.should == 200
