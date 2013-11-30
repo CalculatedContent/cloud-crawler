@@ -22,6 +22,8 @@ require 'net/https'
 require 'cloud-crawler/page'
 # require 'cloud-crawler/cookie_store'
 require 'cloud-crawler/logger'
+require 'headless'
+require 'selenium-webdriver'
 
 module CloudCrawler
   class HTTP
@@ -184,6 +186,18 @@ module CloudCrawler
 
         @cookie_store.merge!(response['Set-Cookie']) if accept_cookies?
        # LOGGER.info "setting cookie to  #{@cookie_store} "
+        if @opts[:headless]
+            # Override the body with the javascript eval'd from the headless browser.
+            Headless.ly do
+                driver = Selenium::WebDriver.for :firefox
+                driver.navigate.to url.to_s
+
+                wait = Selenium::WebDriver::Wait.new(:timeout => @opts[:headless_wait].to_i) # seconds
+                wait.until {
+                    response.body = driver.page_source
+                }
+            end
+        end
         return response, response_time
       rescue Timeout::Error, Net::HTTPBadResponse, EOFError => e
         puts e.inspect if verbose?
