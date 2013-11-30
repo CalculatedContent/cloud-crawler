@@ -25,7 +25,7 @@ module CloudCrawler
         } )
         page = http.fetch_page("http://localhost/")
         page.code.should == 200
-        page.body == html.delete(' ')
+        page.body.should == html.delete(' ')
         FakeWeb.allow_net_connect = false
       end
     end
