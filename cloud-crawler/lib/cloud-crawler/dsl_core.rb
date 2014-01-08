@@ -26,6 +26,26 @@ require 'cloud-crawler/logger'
 require 'cloud-crawler/dsl_common' 
 
 
+#TODO: add and process do_json_blocks
+#      as part of batch_api
+
+#  add DSL to allow
+#   format: page | xml | json
+#   opts in dsl, not just trollop
+#   DSL for twitter, instagram,etc
+#   make sure we can share elements across 
+#  add:  recurring job elements for curl
+#  allow N=10-100 little jobs with same api
+#    set limits as tos to prevent TOS errors
+#    allow multiple http parties => may authenticate multiople times
+#  not sure which job is being submitted and how to mix and match with dsl:" solve"
+#  design new DSL
+#     crawls are seperate from curls
+#  allow mixing curls, apis, and social media
+#  allow scheduling of jobs
+#  add timnestamps
+#  implement bloomfilter caching for all by id, if turned on with DSL
+
 module CloudCrawler
 
   

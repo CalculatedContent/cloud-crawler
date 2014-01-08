@@ -1,3 +1,61 @@
+TODO:  need tasks manager again
+
+Release 0.3  social media search
+-instagram
+-twitter
+-vine
+-facebook
+
+1.  data store -> PageStore, JsonStore
+
+2.  batch job -> BatchSocialJob
+  
+3.  test recurring jobs, other qless jobs as batch job
+   can we schedule a recurring job
+   other features?  do we need timeouts
+   
+4.  refactor jobs to implement get data, put in store
+    batch data job
+      gets data
+      check bloomfilter to see if data is there
+      place in local redis store
+      sync local cache to master
+      saves to s3
+      flush
+      notify someone data is ready
+      
+
+5.  assign ids to jobs so redis cache can be accessed by id
+    ids need some kind of security / authentication
+    
+6.  set up rack streaming and/or pull endpoint on master
+    to allow external access to cache
+    
+    http://www.intridea.com/blog/2012/5/24/building-streaming-rest-apis-with-ruby
+    
+    what port?  
+    how authenticate?
+    also allow simple redis polling
+    
+    
+7.  implement dsl for social
+  social_sear
+  
+  
+8.  change DSL to just say crawl
+  remove term batch , or at least deprecate , replace with sugar
+  social_crawl(opts)
+    by default, crawls for hashtags, gets jsons, checks for repeats, syncs to master
+    crawls N social media sites and aggregates
+    place data in cache for user to retrieve -> sync cache idea
+    
+    
+
+
+
+
+
+
 TODO for release 0.2
 
 A. Implement before and after batch crawl method hooks

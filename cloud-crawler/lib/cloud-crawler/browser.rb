@@ -18,45 +18,24 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-require 'net/https'
 require 'cloud-crawler/page'
-# require 'cloud-crawler/cookie_store'
 require 'cloud-crawler/logger'
-require 'headless'
-require 'selenium-webdriver'
 
 module CloudCrawler
   class HTTP
     
     
-    # Maximum number of redirects to follow on each get_response
-    REDIRECT_LIMIT = 5
+    def initialize(opts = {})
+      @opts = opts
+    end
     
 
-    # CookieStore for this HTTP client
-    attr_reader :cookie_store
-    
-    def initialize(opts = {})
-      @connections = {}
-      @opts = opts
-      @cookie_store =  CookieStore.new(@opts[:cookies])
+     def fetch_page_with_browser(url, referer = nil, depth = nil)
+      page = Page.new
+      
+      return page
     end
     
-    
-    def size
-      @connections.size
-    end
-    
-    #
-    # Fetch a single Page from the response of an HTTP request to *url*.
-    # Just gets the final destination page.
-    # Does not retrun the redirects
-    #
-    def fetch_page(url, referer = nil, depth = nil)
-      puts "the url is #{url}"
-      fetch_pages(url, referer, depth).last
-    end
-   
 
     #
     # Create new Pages from the response of an HTTP request to *url*,
@@ -88,13 +67,7 @@ module CloudCrawler
       end
     end
 
-    #
-    # The maximum number of redirects to follow
-    #
-    def redirect_limit
-      @opts[:redirect_limit] || REDIRECT_LIMIT
-    end
-
+   
     #
     # The user-agent string which will be sent with each request,
     # or nil if no such option is set
@@ -136,12 +109,6 @@ module CloudCrawler
     end
     
 
-
-    def verbose?
-      @opts[:verbose]
-    end
-
-
     private
 
     #
@@ -155,7 +122,7 @@ module CloudCrawler
       begin
           # if redirected to a relative url, merge it with the host of the original
           # request url
-          loc = url.merge(loc) if loc.relative?          
+          loc = url.merge(loc) if loc.relative?
 
           response, response_time = get_response(loc, referer)
           code = Integer(response.code)
@@ -170,7 +137,7 @@ module CloudCrawler
     #
     def get_response(url, referer = nil)
       full_path = url.query.nil? ? url.path : "#{url.path}?#{url.query}"
-      
+
       opts = {}
       opts['User-Agent'] = user_agent if user_agent
       opts['Referer'] = referer.to_s if referer
@@ -183,27 +150,14 @@ module CloudCrawler
         start = Time.now()
         # format request
         req = Net::HTTP::Get.new(full_path, opts)
-        
         # HTTP Basic authentication
         req.basic_auth url.user, url.password if url.user
         response = connection(url).request(req)
         finish = Time.now()
         response_time = ((finish - start) * 1000).round
-
+       
         @cookie_store.merge!(response['Set-Cookie']) if accept_cookies?
        # LOGGER.info "setting cookie to  #{@cookie_store} "
-        if @opts[:headless]
-            # Override the body with the javascript eval'd from the headless browser.
-            Headless.ly do
-                driver = Selenium::WebDriver.for :firefox
-                driver.navigate.to url.to_s
-
-                wait = Selenium::WebDriver::Wait.new(:timeout => @opts[:headless_wait].to_i) # seconds
-                wait.until {
-                    response.body = driver.page_source
-                }
-            end
-        end
         return response, response_time
       rescue Timeout::Error, Net::HTTPBadResponse, EOFError => e
         puts e.inspect if verbose?
@@ -213,27 +167,8 @@ module CloudCrawler
       end
     end
 
-    def connection(url)
-      @connections[url.host] ||= {}
-
-      if conn = @connections[url.host][url.port]
-        return conn
-      end
-
-      refresh_connection url
-    end
-
-    def refresh_connection(url)
-      http = Net::HTTP.new(url.host, url.port, proxy_host, proxy_port)
-
-      http.read_timeout = read_timeout if !!read_timeout
-
-      if url.scheme == 'https'
-        http.use_ssl = true
-        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      end
-
-      @connections[url.host][url.port] = http.start 
+    def verbose?
+      @opts[:verbose]
     end
 
     #

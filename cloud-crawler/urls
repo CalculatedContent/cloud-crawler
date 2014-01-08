@@ -1,0 +1,47 @@
+
+
+
+*** Instantiated Worker
+*** got: <Qless::Job 396761bad5e547aba2911e43e74a5f45 (CloudCrawler::BatchCurlJob / crawls / running)>
+I, [2013-12-05T17:16:55.573667 #10476]  INFO -- : DslCore:perform  data {:root_job=>true, :opts=>"eJxVUUFu2zAQ/IrAUwu4tpwgbeLcW+QQ5NBLbwuKXFusKC6zJB07Rf/epWWp\nCKADNTMc7sz+Ub+pg6BHVDu1d8ECo3ERofN0SGqlOp1ND8m9i2DbrlTSRyEr\nqHZ77ROulEWvz8IKeQtdMQNmMTOeiv1iWL95ZFVVMffg3eiEFaOSkEEfMFTx\nM7077/Xmbt02n561cSFT6h+bp5DRNwI0Lz+bX822Xd8/Nnzc3bTr9nPzA81A\nm5t228q3bb47xj2dNpWsD7pkNFuI8sgyqzZG5gBDNDhMC9yjj8vPa8GCcyeX\nALWIV48pQU+pzuvJaH85z0QkFuLr7beHGbHdJecRuaMkVpmLmEsy5KP2U5u1\nfEZpQlRi+8IWGa2YUodnYOooJ8inPN8WUkKaPPd4t1IDYoQZT7NwCRiK97KY\nwUWQXHyGlNmFw//okel0vuaaxBMyBbqKGLWF7EakssjkmJxFsDRqFxapCx/Q\naRxdMoELhnG8LHxCa/prEFlhK32YXlYayYX56b//APA26QU=\n", :batch=>"eJzN1stqwzAQBdB/0cIrU7+fIPIhpRRZGWK1iuVIo0Ao+fe60K5UrUe7GWYW\nl7O6r1/MW81mtiLuc1EgyHUzVqB6keZaOBBWrqcbtyDVDpkF9HbjTiG4zPnl\nqpBnzlg8HjTcxSYhQ7Mryc0drND6OHorgS/aXFwmPK7GKnzwn9MuLsArlrMz\naPFgc5mzmzqzucrZIlCu77/Lh1n+Rq22T9Kwz5warA7B6ghYTQ5WJwDWhGBN\nBKwhB2sSAGtDsDYC1pKDtQmAdSFYFwHryMG6BMD6EKyPgPXkYH0CYEMINkTA\nBnKwIQGwMQQbI2AjOdiYANgUgk0RsIkcbEoArCr/aa5lrLqW5GZH3ufbNyer\nU/U=\n", :dsl_id=>1} 
+I, [2013-12-05T17:16:55.573786 #10476]  INFO -- : DslCore:perform  opts {:job_name=>"find_recipe_blogs", :batch_size=>10, :save_batch=>false, :delay=>1, :s3_bucket=>"cloud-crawler", :depth_limit=>0, :user_agent=>"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:20.0) Gecko/20100101 Firefox/20.0", :discard_page=>false, :accept_cookies=>false, :help=>false, :queue_name=>"crawls", :qless_host=>"localhost", :qless_port=>6379, :qless_db=>0, :verbose=>true, :interval=>10, :job_reserver=>"Ordered", :obey_robots_txt=>true, :redirect_limit=>5, :keep_redirects=>true, :cookies=>nil, :skip_query_strings=>false, :proxy_host=>nil, :proxy_port=>false, :read_timeout=>nil, :outside_domain=>false, :inside_domain=>true, :auto_increment=>true, :job_limit=>10000, :checkpoint=>false} 
+I, [2013-12-05T17:16:55.573814 #10476]  INFO -- : DslCore:perform  ids     1
+I, [2013-12-05T17:16:55.573835 #10476]  INFO -- : init qless batch job
+I, [2013-12-05T17:16:55.574270 #10476]  INFO -- : performing qless batch job, id = 
+I, [2013-12-05T17:16:55.574400 #10476]  INFO -- : performing 10 batched batched_jobs 
+I, [2013-12-05T17:16:55.574424 #10476]  INFO -- :  10 batched_jobs being processed
+I, [2013-12-05T17:16:55.574444 #10476]  INFO -- :  10 this_batch size
+I, [2013-12-05T17:16:55.574464 #10476]  INFO -- :  processing batch of size 10
+I, [2013-12-05T17:16:55.574690 #10476]  INFO -- : DslCore:  setting up dsl 1
+I, [2013-12-05T17:16:55.574742 #10476]  INFO -- : DslCore:  blocks {:focus_crawl_block=>nil, :on_every_page_block=>"proc do |page|\n  qid = job[:qid]\n  url = job[:url]\n  ((((($stdout << \"job id \") << qid) << \"page.code  \") << page.code) << \"\\n\")\n  next if (page.nil? or ((not page.html?) or page.doc.nil?))\n  page.doc.search(\"h3 a\").each { |htag| m_cache.lpush(\"blogs\", htag) }\nend", :on_after_crawl_block=>nil, :on_before_crawl_block=>nil, :on_after_batch_block=>nil, :on_before_batch_block=>nil, :skip_link_patterns=>[], :on_pages_like_blocks=>{}}
+I, [2013-12-05T17:16:55.574771 #10476]  INFO -- :  do pre batch for 
+I, [2013-12-05T17:16:56.575522 #10476]  INFO -- : processing curl job id 
+job id 1page.code  200
+I, [2013-12-05T17:16:58.342893 #10476]  INFO -- : processing curl job id 
+*** CONT received; resuming job processing
+#<Timeout::Error: Timeout::Error>
+job id 2page.code  200
+I, [2013-12-05T17:17:59.765618 #10476]  INFO -- : processing curl job id 
+#<Timeout::Error: Timeout::Error>
+job id 3page.code  200
+I, [2013-12-05T17:19:01.211639 #10476]  INFO -- : processing curl job id 
+job id 4page.code  200
+I, [2013-12-05T17:19:10.047194 #10476]  INFO -- : processing curl job id 
+*** CONT received; resuming job processing
+#<Timeout::Error: Timeout::Error>
+job id 5page.code  200
+I, [2013-12-05T17:20:11.419624 #10476]  INFO -- : processing curl job id 
+job id 6page.code  200
+I, [2013-12-05T17:21:06.982062 #10476]  INFO -- : processing curl job id 
+job id 7page.code  200
+I, [2013-12-05T17:21:14.136267 #10476]  INFO -- : processing curl job id 
+job id 8page.code  200
+I, [2013-12-05T17:21:49.532637 #10476]  INFO -- : processing curl job id 
+job id 9page.code  200
+I, [2013-12-05T17:21:50.968264 #10476]  INFO -- : processing curl job id 
+job id 10page.code  200
+I, [2013-12-05T17:21:55.672407 #10476]  INFO -- :  do post batch for 
+I, [2013-12-05T17:21:55.672479 #10476]  INFO -- : next batched_jobs like 
+I, [2013-12-05T17:21:55.672507 #10476]  INFO -- : running 0 next batched_jobs on same worker
+I, [2013-12-05T17:21:55.672547 #10476]  INFO -- :  0 batched_jobs left
+*** Failed to complete <Qless::Job 396761bad5e547aba2911e43e74a5f45 (CloudCrawler::BatchCurlJob / crawls / running)>: Failed to complete 396761bad5e547aba2911e43e74a5f45 (CloudCrawler::BatchCurlJob / crawls / running) -- can't be reloaded
