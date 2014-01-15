@@ -25,7 +25,6 @@ require 'active_support/core_ext'
 require 'cloud-crawler/logger'
 require 'cloud-crawler/dsl_common' 
 
-
 #TODO: add and process do_json_blocks
 #      as part of batch_api
 
@@ -153,14 +152,7 @@ module CloudCrawler
        @opts[:delay]=delay_in_sec
      end
      
-     def user_agent
-       @opts[:user_agent]
-     end
-     
-     def user_agent=(ua)
-       @opts[:user_agent]=ua
-     end
-     
+    
      def page
        @page
      end

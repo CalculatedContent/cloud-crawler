@@ -25,6 +25,8 @@ require 'cloud-crawler/logger'
 require 'headless'
 require 'selenium-webdriver'
 
+require 'cloud-crawler/mozilla_agents' 
+
 module CloudCrawler
   class HTTP
     
@@ -97,10 +99,11 @@ module CloudCrawler
 
     #
     # The user-agent string which will be sent with each request,
-    # or nil if no such option is set
+    # or random if no such option is set
     #
     def user_agent
       @user_agent ||= @opts[:user_agent]
+      MozillaAgents.random_agent if @user_agent.nil or @user_agent.to_sym == :random
     end
     
     def user_agent=(ua)
