@@ -103,7 +103,7 @@ module CloudCrawler
     #
     def user_agent
       @user_agent ||= @opts[:user_agent]
-      MozillaAgents.random_agent if @user_agent.nil or @user_agent.to_sym == :random
+      MozillaAgents.random_agent if @user_agent.nil? or @user_agent == "random"
     end
     
     def user_agent=(ua)
