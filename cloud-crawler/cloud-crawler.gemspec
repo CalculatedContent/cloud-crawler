@@ -17,7 +17,7 @@ spec = Gem::Specification.new do |s|
   s.add_dependency "redis-namespace", ">=1.2.1"
   s.add_dependency "bloomfilter-rb", ">=2.1.1"
   s.add_dependency "hiredis", "~> 0.4.5"
-  s.add_dependency "active_support", "~> 3.0.0"
+  s.add_dependency "activesupport", "~> 3.0.0"
   s.add_dependency "webrick", "~> 1.3.1"
   s.add_dependency "trollop"
   s.add_dependency "bson_ext", ">=1.3.1"
