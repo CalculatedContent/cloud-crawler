@@ -63,6 +63,7 @@ IAM users will not work, even with Administrator Access.
 1.5 Set up the default knife configuration
 
  $ cat ~/.chef/knife.rb
+ knife[:aws_ssh_key_id]="#{ENV['CHEF_KEY']}"
  knife[:identity_file]="#{ENV['CHEF_PEM']}"
  knife[:availability_zone]="#{ENV['EC2_AVAILABILITY_ZONE']}"
  knife[:aws_access_key_id]="#{ENV['AWS_ACCESS_KEY_ID']}"
